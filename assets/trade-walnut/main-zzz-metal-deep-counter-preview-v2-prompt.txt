@@ -1,0 +1,9 @@
+Use case: stylized-concept
+Asset type: player-world trading-screen background, 16:9 landscape, new image generated from scratch. Do not use an input image and do not perform image editing.
+Primary request: 沿用绝区零风格的潮流日系二次元都市动作游戏美术，生成现代东京式商业街与移动金属商铺室内。融合复古未来主义、Y2K、90年代街机、复古录像带和漫画平面设计；以大色块、底色、成组阴影和少量高光表现体积。
+Interior: 不使用木材、木家具、木板或木纹。室内全部使用深灰喷涂金属、枪灰金属、阳极铝和奶油色合成织物，包含金属服务门、顶部金属卷帘、金属柜台、金属橱柜、金属储物舱、金属睡铺和工业吊灯。
+Layout: 正面宽幅 1600×900 构图。左侧 x0–170 为服务门；顶部金属卷帘横贯画面；中央服务窗约 x328–1270、y76–400；右侧 x1440–1600 为睡铺。柜台从约 y400 开始。
+Counter requirement: 台面可用工作区域必须具有 4 个 24px 物品格行的明确视觉高度，即 4 × 24px = 约 96px 的连续无遮挡矩形区域，约 x382–1242、y400–496。台面必须明显加深，绝不能是薄条或窄边；通过透视让四行高度清晰可读，但不绘制网格线、格子、数字或 UI。
+Cabinet requirement: 柜台下方为两侧金属橱柜和中央空置深色金属储物舱。橱柜与储物舱底边必须直接接触地面：不允许底层、底座、踢脚板、额外平台、第二层橱柜或悬空缝隙。底边下方立即是地面平面。
+Window scene: 阳光下现代东京式商业街，低层店铺、遮阳棚、自动售货机、自行车、花箱、电线、配送箱、卷帘门和抽象图形招牌；无人物、无可读文字。
+Negative prompt: photorealistic, realistic photography, cyberpunk night city, dark dystopia, excessive neon lights, rainy night, gritty texture, dirty texture, noise, grain, film grain, dirty pixel, stray pixel, overly detailed texture, realistic concrete cracks, realistic rust, heavy bloom, excessive reflections, fog, blurry, depth of field blur, watercolor, oil painting, sketch, painterly texture, low saturation, medieval architecture, empty street, overcrowded pedestrians, distorted buildings, fisheye distortion, text artifacts, watermark, wood furniture, wooden panels, timber, wood grain, lower cabinet plinth, toe-kick, second bottom layer, extra shelf, floating cabinets, thin shallow countertop.

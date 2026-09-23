@@ -1,0 +1,15 @@
+# 柜台加深与镜头推近
+
+使用内置 image_gen 编辑正面黑胡桃木版。柜台向车内延伸，可视台面预留四行格子的空间但不绘制格子；镜头推近，橱柜底部接近画面底边，保留正面构图。
+
++Edit the provided approved straight-on walnut merchant wagon interior. Preserve its design, natural black walnut color, clean anime painted style, frontal centered camera, cream canvas roof and rolled shade, closed door left, built-in bed right, brass details, town view, empty furniture and absence of UI.
+
+Make this precise architectural/composition improvement:
+- EXTEND the single flat counter DEEPER INWARD TOWARD THE PLAYER. Keep rear edge directly at service hatch opening/outside, bring front edge toward viewer so the VISIBLE HORIZONTAL TABLETOP BAND becomes substantially deeper/taller in the image, sufficient to comfortably overlay FOUR ROWS of square inventory cells in implementation. DO NOT actually draw cells or grids.
+- Move camera CLOSER and crop out almost all foreground floor and rug. The bottom of the main cupboard should sit at about 97%-99% image height, close to the image's bottom edge. Do NOT merely stretch the image vertically or leave a big floor area.
+- Maintain a true straight-on view: central window, counter and main cupboard share x=50% axis, level horizontal front edge, upright cabinet faces, no corner/side viewpoint. Slightly elevated frontal eye level reveals the broad horizontal tabletop naturally, without turning it into a slanted easel or upright panel.
+Desired composition within 16:9 canvas: service opening top around y8%-12%, its lower edge / rear of countertop around y43%-45%; tabletop front edge around y61%-64%, producing a large usable tabletop band roughly 17%-19% of picture height. The flat top should be empty and continuous with usable area almost full width between left/right supports, approximately x15%-84%, sufficient for four rows of slots later. Cabinet starts just below tabletop edge around y65%, and extends to y98%; center open cupboard keeps a large uninterrupted rectangular storage interior, side doors preserved. Frame should be filled by working counter and cupboard; only a sliver of floor at bottom, rug mostly or entirely out of frame.
+Keep the top as a single REAL LEVEL HORIZONTAL slab projecting from the service hatch into wagon, rear edge touches outdoors, no wall strip, vertical board, backsplash, second raised sill, customer table or divider above countertop. The tabletop depth comes from actual extended horizontal wood surface and closer framing, NOT from a tall vertical wooden apron or from tilting the top steeply.
+Keep walnut top well lit enough that future item art is readable, warm clear daylight. All wooden parts walnut brown, no teal painted wood. Existing teal fabric accents can remain. No objects on tabletop or inside central cupboard. No people. No new decorations.
+
+Negative prompt: noise, grain, dirty pixel, stray pixel, digital grain, film grain, dithering, grunge, grid, gridlines, inventory squares, slot outlines, text, numbers, labels, UI, dialogue, tooltip, props, merchandise, character, sloping easel, vertical tabletop, raised barrier behind counter, wall above countertop, second counter, side view, oblique camera, large floor foreground, blue wood.

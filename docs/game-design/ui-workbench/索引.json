@@ -1,0 +1,19 @@
+{
+  "name": "异世界旅商经营页 UI 换皮工作区",
+  "workflow": [
+    "01_原图分析/参考说明.md",
+    "02_结构与布局/语义合约.json",
+    "02_结构与布局/布局合约.json",
+    "02_结构与布局/提取与渲染合约.json",
+    "03_风格规范生成/UI规范.md",
+    "08_网页组装/交互状态.md"
+  ],
+  "validation": "../../testing/ui-workbench/验收记录.json",
+  "implementation": [
+    "scripts/shop.gd",
+    "scripts/trade_panel.gd",
+    "scripts/scene_layers.gd",
+    "scripts/interact_hover_tip.gd",
+    "assets/ui/dialogue-frame.png"
+  ]
+}

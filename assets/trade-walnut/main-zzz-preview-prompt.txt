@@ -1,0 +1,7 @@
+Use case: style-transfer
+Asset type: game trading screen background preview, full-bleed landscape.
+Input image: main-anime.png as edit target. Preserve exact composition, camera, perspective, silhouettes and alignment.
+Primary request: 将商车交易背景改成《绝区零》式的都市潮流动作游戏美术风格。强调高对比平涂色块、锐利图形轮廓、粗细结合且稳定的黑色线稿、街头潮流配色、局部荧光橙/青/紫点缀、轻微漫画分镜和贴纸般的设计感。
+Constraints: 保持左门、顶部卷帘、中央窗框、柜台、两个下柜、空置中央储物格、右侧卧铺、提灯以及所有交互区域的位置和比例；柜台和储物格保持空置；无人物、UI、物品、标识、可读文字、水印。
+Materials/textures: 所有表面简化为图形化底色、成组赛璐璐阴影和少量高光；木板无木纹，布料平涂，城镇建筑和植被为海报式剪影。
+Avoid: 写实质感、笔刷纹理、细碎叶片、划痕、噪点、颗粒、碎亮点、过度发光、泛光、排线、杂乱描线、泥灰渐变和界面元素。

@@ -1,0 +1,55 @@
+{
+  "tool": "Built-in image_gen",
+  "assets": {
+    "forest": {
+      "prompt": "Use case: stylized-concept. Asset type: finished 16:9 background painting for a 2D anime fantasy merchant auto-battle game. A beautiful twilight woodland clearing, hand-painted anime RPG background, rich natural greens, teal shadow, warm amber sunset rays, painterly detail and confident fine outlines, coherent with a cozy wooden traveling merchant wagon. Wide panoramic side-on stage composition: canopy and ancient trunks frame both edges, luminous misty winding forest path in center distance; lower 40 percent is a broad unobstructed horizontal mossy earth clearing where separate full-body characters will be composited. Ground standing line at 83 percent image height. Upper half remains lower contrast leafy forest for separate inventory UI overlays. Tiny fireflies, ferns and fallen leaves at edges, cinematic gentle depth, polished console JRPG environment. No characters, no creatures, no furniture, no interface panels, no lettering, no logos, no grid, no watermarks. Entire canvas is opaque scenery. Landscape 1536x1024 or wider with 16:9 composition.",
+      "source": "/Users/macmini/.codex/generated_images/01a0855d-45d9-7282-8561-d46e3c713ed5/exec-ca1d2009-3c6f-4a3e-aadc-78baa7949a8d.png",
+      "file": "assets/exploration/forest.png"
+    },
+    "merchant": {
+      "prompt": "Use case: stylized-concept. Asset type: single isolated full-body transparent 2D game battle sprite. Young adult fantasy traveling merchant adventurer, short tousled chestnut hair, forest green short cape, cream shirt, brown leather vest belts and practical boots, large detailed tan leather traveling backpack with rolled teal bedroll and tiny brass lantern, holding a modest short traveling sword lowered in right hand. Facing RIGHT in three-quarter side view, alert confident neutral battle idle stance, feet planted, clear silhouette. Elegant anime JRPG illustration, precise ink outlines, warm cel shading and soft painted fabric texture, appealing 5-head proportions rather than super deformed chibi. Entire body including backpack, sword and boots inside frame with margin. Character will stand 270 pixels tall in game, readable details. Genuine transparent alpha background, no backdrop, no floor, no vignette, no glow, no text, no UI, no watermark. One character only.",
+      "source": "/Users/macmini/.codex/generated_images/01a0855d-45d9-7282-8561-d46e3c713ed5/exec-ce38ea58-2b03-4e2f-aabd-b2504f3390c7.png",
+      "file": "assets/exploration/merchant.png"
+    },
+    "slime": {
+      "prompt": "Use case: stylized-concept. Asset type: single isolated full-body transparent 2D game enemy sprite. Adorable but feisty woodland slime, asymmetrical rounded translucent mint-jade jelly body with a small moss tuft, three little leaves and one tiny cream mushroom on its head, expressive amber eyes facing LEFT towards opponent, slight leaning idle stance, subtly visible bright core, rich watery highlights. Japanese hand-painted fantasy RPG monster design with precise fine dark outlines and warm painterly cel shading, natural forest palette. Wide low silhouette, clear readable shape at 140 pixels height in gameplay. Entire creature in frame with ample transparent margin. Genuine transparent alpha background, no backdrop, no ground patch, no vignette, no aura, no text, no UI, no watermark. One monster only.",
+      "source": "/Users/macmini/.codex/generated_images/01a0855d-45d9-7282-8561-d46e3c713ed5/exec-6b99c6b6-1ced-4830-bb59-dc625241ca58.png",
+      "file": "assets/exploration/slime.png"
+    },
+    "wolf": {
+      "prompt": "A lean gray-blue woodland wolf in a tense idle battle stance on all four paws, moss green thorn vines wrapped around shoulders and tail, pointed alert ears, amber eyes, textured layered fur and elegant long silhouette, semi-stylized rather than realistic, no armor. Use case: stylized-concept. Asset type: single isolated full-body transparent 2D game enemy sprite, Japanese hand-painted fantasy RPG illustration, precise fine dark outlines, warm painterly cel shading, natural woodland palette. Facing LEFT towards opponent. Clear silhouette at 220 pixels tall in game. Entire creature in frame with margin. Genuine transparent alpha background, absolutely no colored backdrop, no floor patch, no vignette, no glow outside silhouette, no text, no UI, no watermark. One creature only.",
+      "source": "/Users/macmini/.codex/generated_images/01a0855d-45d9-7282-8561-d46e3c713ed5/exec-44e263f1-e9c4-43be-bb55-ec0399fa4ba1.png",
+      "file": "assets/exploration/wolf.png"
+    },
+    "golem": {
+      "prompt": "A squat friendly-threatening forest stone golem, ancient sandstone boulders forming bulky arms and a small stocky body, moss growing in cracks, small fern on shoulder, two warm golden rune eyes, broad grounded silhouette, clenched fists, magical adventurous charm, not horror. Use case: stylized-concept. Asset type: single isolated full-body transparent 2D game enemy sprite, Japanese hand-painted fantasy RPG illustration, precise fine dark outlines, warm painterly cel shading, natural woodland palette. Facing LEFT towards opponent. Clear silhouette at 220 pixels tall in game. Entire creature in frame with margin. Genuine transparent alpha background, absolutely no colored backdrop, no floor patch, no vignette, no glow outside silhouette, no text, no UI, no watermark. One creature only.",
+      "source": "/Users/macmini/.codex/generated_images/01a0855d-45d9-7282-8561-d46e3c713ed5/exec-43bbc9d5-6d05-431c-91d8-613c4da2cf87.png",
+      "file": "assets/exploration/golem.png"
+    },
+    "red_wolf": {
+      "prompt": "An imposing deep burgundy-furred dire wolf, scarlet eyes, russet mane, long bushy tail, dark red thorn vines around shoulders, tense low battle idle stance on all four paws, big paws and pointed ears, layered illustrated fur, elegant threatening silhouette, no blood, no armor. Use case: stylized-concept. Asset type: single isolated full-body transparent 2D game enemy sprite, Japanese hand-painted fantasy RPG illustration, precise fine dark outlines, warm painterly cel shading, natural woodland palette. Facing LEFT towards opponent. Clear silhouette at 220 pixels tall in game. Entire creature in frame with margin. Genuine transparent alpha background, absolutely no colored backdrop, no floor patch, no vignette, no glow outside silhouette, no text, no UI, no watermark. One creature only.",
+      "source": "/Users/macmini/.codex/generated_images/01a0855d-45d9-7282-8561-d46e3c713ed5/exec-a8388602-c9b9-473d-85f4-c3d66fb2215c.png",
+      "file": "assets/exploration/red_wolf.png"
+    },
+    "treant": {
+      "prompt": "An ancient woodland guardian treant, thick gnarled oak trunk body and rooted feet, long branch arms, green moss beard, leafy antler-like branches with a few golden leaves, luminous amber eyes in a wise stern face, strong readable silhouette, standing battle idle pose leaning towards left, charming magical fantasy rather than horror. Use case: stylized-concept. Asset type: single isolated full-body transparent 2D game enemy sprite, Japanese hand-painted fantasy RPG illustration, precise fine dark outlines, warm painterly cel shading, natural woodland palette. Facing LEFT towards opponent. Clear silhouette at 220 pixels tall in game. Entire creature in frame with margin. Genuine transparent alpha background, absolutely no colored backdrop, no floor patch, no vignette, no glow outside silhouette, no text, no UI, no watermark. One creature only.",
+      "source": "/Users/macmini/.codex/generated_images/01a0855d-45d9-7282-8561-d46e3c713ed5/exec-77e1af9f-4a7f-405e-a600-be12e0aac1ad.png",
+      "file": "assets/exploration/treant.png"
+    },
+    "panel": {
+      "prompt": "Use case: stylized-concept. Asset type: reusable rectangular 9-slice inventory panel skin for a hand-painted anime fantasy traveling merchant game. One front-facing FLAT rectangular opened leather inventory mat, horizontal 4:3 aspect, entire panel fills the image edge to edge. Elegant medium cognac brown leather border, double stitched seam near edge, modest antique brass corner protectors, fine embossed tiny leaf motifs ONLY at four corners. Large completely empty dark olive-brown suede interior covering central 80 percent of panel. Subtle fine fabric texture, low contrast, warm amber edge light, clean and practical artisanal travel equipment. Symmetrical straight sides and straight corners, border uniform thickness approx 5 percent image width, suitable for stretching center and sides. No perspective, no bag flap, no buckle or handle outside rectangle, no compartments, no painted grid, no objects, no icons, no symbols, no text or UI labels, no landscape, no outer padding or background. Opaque edge-to-edge texture. Highly polished game UI asset, restrained ornamentation.",
+      "source": "/Users/macmini/.codex/generated_images/01a0855d-45d9-7282-8561-d46e3c713ed5/exec-068ab2b9-723e-4b2c-9099-31f51bfa61d6.png",
+      "file": "assets/exploration/panel.png"
+    },
+    "merchant_back": {
+      "tool": "Built-in image_gen",
+      "prompt": "Use case: stylized-concept. Same brown-haired merchant identity and costume as merchant.png. Full body REAR THREE-QUARTER VIEW facing upper right, backpack dominant, green cape, teal bedroll, brass lantern and right-hand sword. Hand-painted anime fantasy RPG style, warm sunset rim light. Entire silhouette including boots inside frame. No text or scenery.",
+      "background_edit_prompt": "Preserve character. Replace checkerboard with perfectly flat solid magenta #FF00FF, including gaps between limbs and sword. No shadows, gradients or texture; sharp clean edges.",
+      "source": "assets/exploration/merchant-back-chroma.png",
+      "file": "assets/exploration/merchant-back.png",
+      "processing": "Built-in tool returned RGB instead of alpha. Generated a magenta version, then baked the Godot chroma-key material to a cropped RGBA PNG with tools/bake_merchant.gd. Original merchant.png preserved."
+    }
+  },
+  "next_generation_prompts": "assets/exploration/prompts-clean-v2.json",
+  "next_generation_note": "新版减噪提示词，尚未生成；以上 assets 条目记录已生成素材的历史提示词。"
+}

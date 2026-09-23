@@ -1,0 +1,8 @@
+Use case: stylized-concept
+Asset type: full-bleed 2D game trading screen background, 16:9 landscape, generated entirely from scratch. Do not use or edit any existing image.
+Primary request: 从零生成一张《绝区零》式都市潮流动作游戏美术的现代商业街交易场景。轻度2D日系动漫风，复古未来主义都市设计，Y2K、复古录像带、90年代街机文化、现代东京街区和漫画平面设计融合。以大色块、成组赛璐璐阴影和少量高光表现形体。
+Layout: 正面宽幅视角；左侧窄金属服务门；顶部金属卷帘；上方中央大窗通向现代商业街；中部贯穿全宽的不锈钢柜台；下方两侧金属柜体与中央完全空置的深色金属储物舱；右侧金属睡铺和工业吊灯。交易柜台与中央储物舱保持空置，留出商品和交易 UI 的负空间。
+Interior: 绝不使用木材、木家具、木板或木纹。室内全部为深灰喷涂金属、枪灰金属、阳极铝和奶油色工业织物，使用简洁接缝、少量螺栓、橙色/青色图形贴膜。
+Window scene: 阳光下的现代东京式商业街；低层店铺、遮阳棚、自动售货机、自行车、花箱、电线、配送箱、卷帘门和抽象图形招牌。招牌只能使用几何符号和色块，禁止任何可读文字。
+Hard constraints: 从零生成；无可读文字、字母、数字、标语、Logo、品牌标记、吉祥物、水印；无人物；保留清晰交易留白。
+Negative prompt: photorealistic, realistic photography, cyberpunk night city, dark dystopia, excessive neon lights, rainy night, gritty texture, dirty texture, noise, grain, film grain, dirty pixel, stray pixel, overly detailed texture, realistic concrete cracks, realistic rust, heavy bloom, excessive reflections, fog, blurry, depth of field blur, watercolor, oil painting, sketch, painterly texture, low saturation, medieval architecture, empty street, overcrowded pedestrians, distorted buildings, fisheye distortion, text artifacts, readable text, letters, numerals, words, slogans, logos, mascots, watermark, wood furniture, wooden panels, wood grain.

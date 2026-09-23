@@ -1,0 +1,32 @@
+{
+  "tool": "built-in image_gen",
+  "use_case": "stylized-concept",
+  "style_source": "docs/game-design/玩家主世界画风提示词.md",
+  "active_batch": "ordinary-fantasy-v2",
+  "active_path": "assets/items/candidates/generated",
+  "archive_path": "assets/items/archive/generated-v1",
+  "style_prompt": "Standalone ordinary otherworld fantasy game item icon; clean Japanese anime 2D illustration using large graphic color blocks, stable crisp linework, grouped shadows, and a few restrained highlights; natural handmade materials such as glass, cork, brass, cloth, leather, wood, baked bread, raw boneless meat, cooked steak, stone and plant matter as appropriate; clear readable silhouette at gameplay size; no technology, sci-fi, cyberpunk, Y2K, retro-futurist or modern industrial design; genuine transparent alpha background, one object only, no text, no logo, no watermark, no grid.",
+  "processing": {
+    "cell_px": 96,
+    "alpha_threshold": 12,
+    "max_fill_ratio": 0.94,
+    "output": "RGBA PNG",
+    "note": "Crop near-transparent generation haze, fit the visible subject inside the target unrotated grid footprint, preserve alpha."
+  },
+  "items": {
+    "small_bag": {"name": "小背包", "grid": "3x4", "file": "small_bag.png", "source": "exec-40155873-b5db-4c59-b8bc-5be063be51e3.png"},
+    "pot": {"name": "烹饪锅", "grid": "3x3", "file": "pot.png", "source": "exec-ea352bbf-c5c5-4dd2-bb52-6f37de416344.png"},
+    "alembic": {"name": "炼药器", "grid": "3x4", "file": "alembic.png", "source": "exec-5b6820a4-5941-47c7-b425-d9ead64fd862.png"},
+    "furnace": {"name": "熔炉", "grid": "4x4", "file": "furnace.png", "source": "exec-7fa40d08-1e5a-4d8d-9eeb-0cbe0d96a0cc.png"},
+    "iron_sword": {"name": "辉铁强化·旅人长剑", "grid": "2x6", "file": "iron_sword.png", "source": "exec-70549ec6-69ad-42d0-a746-cdecb8383c5b.png"},
+    "herb": {"name": "月光草", "grid": "2x3", "file": "herb.png", "source": "exec-126baa75-58cd-4bde-97d5-e6a4d6801357.png"},
+    "berry": {"name": "绯红果", "grid": "1x1", "file": "berry.png", "source": "exec-1b26bcbb-9da1-452b-a0bf-9ae4161b8001.png"},
+    "meat": {"name": "鲜兽肉", "grid": "3x2", "file": "meat.png", "source": "exec-54fc3273-201f-43bb-984f-78b4eccae2b2.png"},
+    "bread": {"name": "蜜糖面包", "grid": "3x2", "file": "bread.png", "source": "exec-76022125-076a-4aeb-82ff-5f2958d337a9.png"},
+    "steak": {"name": "香草烤肉", "grid": "3x2", "file": "steak.png", "source": "exec-231dd4d4-09dd-4cb2-a602-6e121aa27524.png"},
+    "ore": {"name": "辉铁矿", "grid": "2x2", "file": "ore.png", "source": "exec-3125b4b4-06fd-4250-a29b-913067bb8ff4.png"},
+    "sword": {"name": "旅人长剑", "grid": "2x6", "file": "sword.png", "source": "exec-3eafd87e-2bea-4532-b8d0-ae71c078be2f.png"},
+    "potion": {"name": "防护药剂", "grid": "1x3", "file": "potion.png", "source": "tube-potion-1x3-fantasy-preview.png"},
+    "power": {"name": "力量药剂", "grid": "1x3", "file": "power.png", "source": "exec-238a53e8-1942-4a84-8b7e-e027b643146b.png"}
+  }
+}

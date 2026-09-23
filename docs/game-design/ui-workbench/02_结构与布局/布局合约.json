@@ -1,0 +1,23 @@
+{
+  "viewport": {"width": 1600, "height": 900, "bottom_safe_area": 32},
+  "base_grid": {"cell": 24, "line_weight": 1, "line_alpha": 0.24},
+  "anchors": {
+    "customer_tray": {"x": 560, "y": 310, "columns": 24, "rows": 4, "cell": 24},
+    "counter": {"drop_rect": [300, 84, 1140, 436], "surface_rect": [382, 424, 1032, 96], "grid": false, "physics": {"gravity": 2400, "bounce": 0, "stack": "aabb_support"}},
+    "display": {"x": 207, "y": 238, "columns": 10, "rows": 6, "cell": 24},
+    "stock": {"x": 462, "y": 531, "columns": 30, "rows": 12, "cell": 24},
+    "recorder": {"x": 1188, "y": 418, "width": 78, "height": 58},
+    "bell": {"x": 1282, "y": 430, "width": 68, "height": 58}
+  },
+  "windows": {
+    "bag": {"width": 200, "height": 250, "title_bar": 48, "content_inset": 16, "columns": 6, "rows": 6, "cell": 24, "independent": true},
+    "trade": {"width": 300, "height": 330, "title_bar": 27, "list_height": 156, "draggable": true},
+    "machine": {"width": 232, "height": 226, "title_bar": 48, "content_inset": 20, "columns": 8, "rows": 5, "draggable": true, "independent_instances": true, "close_button_parent": "window_host"}
+  },
+  "window_rules": [
+    "窗口只保留标题栏、边框和必要内容区，不使用全屏遮罩",
+    "标题栏可拖动，窗口限制在 1600x868 的经营区域内",
+    "窗口外点击不关闭，只有关闭按钮或 Esc 关闭",
+    "长清单使用滚动容器，不扩大窗口覆盖场景"
+  ]
+}

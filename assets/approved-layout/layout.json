@@ -1,0 +1,121 @@
+{
+  "canvas": [
+    1080,
+    608
+  ],
+  "source": "User-approved HTML layout at docs/game-design/layout-review/index.html",
+  "layers": {
+    "interior": {
+      "file": "interior.png",
+      "rect": [
+        0,
+        0,
+        1080,
+        608
+      ]
+    },
+    "exterior": {
+      "file": "exterior-town.png",
+      "rect": [
+        379,
+        29,
+        321,
+        193.9333
+      ],
+      "clip": true
+    },
+    "customer": {
+      "file": "customer-sylvie.png",
+      "rect": [
+        464,
+        83,
+        167,
+        251
+      ],
+      "clip_rect": [
+        379,
+        29,
+        321,
+        193.9333
+      ]
+    },
+    "customer_goods": {
+      "rect": [
+        378,
+        232.3911,
+        324,
+        54.0444
+      ],
+      "native_ui": true
+    },
+    "counter": {
+      "polygon": [
+        [
+          292,
+          303
+        ],
+        [
+          1068,
+          320
+        ],
+        [
+          1080,
+          378
+        ],
+        [
+          226,
+          378
+        ]
+      ],
+      "native_ui": true
+    },
+    "inventory": {
+      "rect": [
+        322,
+        414,
+        432,
+        180
+      ],
+      "native_ui": true
+    },
+    "door": {
+      "rect": [
+        0,
+        5,
+        91,
+        552
+      ],
+      "interaction": true
+    },
+    "bed": {
+      "rect": [
+        914,
+        463,
+        166,
+        145
+      ],
+      "interaction": true
+    }
+  },
+  "note": "Geometry reflects approved layout; exterior clip measured against generated aperture to avoid covering the frame.",
+  "customer_sill_constraint": {
+    "game_canvas": [
+      1600,
+      900
+    ],
+    "grid_rect": [
+      560,
+      344,
+      480,
+      80
+    ],
+    "rows": 4,
+    "cell_size": 20,
+    "usable_wood_rect": [
+      550,
+      336,
+      500,
+      96
+    ]
+  }
+}

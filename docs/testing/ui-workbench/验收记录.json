@@ -1,0 +1,29 @@
+{
+  "screen": "经营页",
+  "reference": "docs/game-design/layout-review/reference.jpg",
+  "checks": [
+    {"id": "compact_trade_window", "status": "pass", "evidence": "docs/testing/previews/清单与轮廓.png"},
+    {"id": "scrollable_trade_rows", "status": "pass", "evidence": "UI_SMOKE_OK"},
+    {"id": "customer_intent_and_mixed_tabs", "status": "pass", "evidence": "UI_SMOKE_OK + tests/test_trade.gd"},
+    {"id": "customer_budget_100_200", "status": "pass", "evidence": "tests/test_trade.gd"},
+    {"id": "bag_exact_6x6", "status": "pass", "evidence": "docs/testing/previews/背包弹窗.png"},
+    {"id": "independent_machine_popups_and_nested_close", "status": "pass", "evidence": "tests/test_trade_overlay_interactions.gd + docs/testing/previews/设备加工.png"},
+    {"id": "dialogue_typewriter_paging_and_persistent_frame", "status": "pass", "evidence": "docs/testing/previews/对话框预览.png + assets/ui/dialogue-frame.png + scripts/shop.gd"},
+    {"id": "machine_window_and_next_day", "status": "pass", "evidence": "docs/testing/previews/设备加工.png"},
+    {"id": "door_and_bed_hover_outline", "status": "pass", "evidence": "docs/testing/previews/交易场景-金属素材-hover.png + tests/test_trade_overlay_interactions.gd"},
+    {"id": "metal_scene_overlay_alignment", "status": "pass", "evidence": "docs/testing/previews/交易场景-金属素材.png"},
+    {"id": "door_and_bed_click_actions", "status": "pass", "evidence": "tests/test_trade_overlay_interactions.gd"},
+    {"id": "computer_phone_bell_props", "status": "pass", "evidence": "tests/test_trade_overlay_interactions.gd + assets/interaction/computer.png + assets/interaction/phone.png + assets/interaction/call_bell.png"},
+    {"id": "roller_shutter_close_animation", "status": "pass", "evidence": "tests/test_trade_overlay_interactions.gd + assets/interaction/roller_shutter.png"},
+    {"id": "door_and_bed_blocked_until_shutter_closed", "status": "pass", "evidence": "tests/test_trade_overlay_interactions.gd"},
+    {"id": "split_city_exterior_layer", "status": "pass", "evidence": "docs/testing/previews/交易场景-金属素材.png; assets/trade-walnut/main-trade-background-split.png + assets/trade-walnut/main-trade-exterior-city.png"},
+    {"id": "hover_tip_variants", "status": "pass", "evidence": "docs/testing/previews/悬停提示-交互物.png + docs/testing/previews/悬停提示-道具.png + scripts/interact_hover_tip.gd"}
+  ],
+  "commands": [
+    "godot --headless --path . --script tests/test_trade.gd",
+    "godot --headless --path . --script tests/test_dialogue.gd",
+    "godot --headless --path . --script tests/test_trade_overlay_interactions.gd",
+    "godot --path . --script tests/preview_trade_overlays.gd",
+    "godot --path . -- --smoke-ui"
+  ]
+}

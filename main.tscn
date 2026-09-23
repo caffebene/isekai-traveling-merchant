@@ -1,0 +1,180 @@
+[gd_scene format=3 uid="uid://bw0a35hbjp4pq"]
+
+[ext_resource type="Script" uid="uid://bdpmoku067b03" path="res://scripts/shop.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://blynnlnswuek8" path="res://assets/trade-walnut/main-trade-exterior-city.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://cwc0v7y2l8hqj" path="res://assets/approved-layout/customer-sylvie.png" id="4"]
+[ext_resource type="Script" uid="uid://cd16h8oua753i" path="res://scripts/scene_layers.gd" id="5"]
+[ext_resource type="Texture2D" uid="uid://cd271is7131cv" path="res://assets/trade-walnut/main-trade-background-split.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://fd268ein215f" path="res://assets/interaction/door-metal.png" id="7_door"]
+[ext_resource type="Texture2D" uid="uid://b7dn5y64yrvmb" path="res://assets/interaction/bed-metal.png" id="8_bed"]
+[ext_resource type="Texture2D" uid="uid://dxjgjbt0dbpro" path="res://assets/interaction/table-metal.png" id="9_table"]
+[ext_resource type="Texture2D" uid="uid://cpkvnau6lpyn4" path="res://assets/interaction/computer.png" id="10_computer"]
+[ext_resource type="Texture2D" uid="uid://cxowocexm1sy0" path="res://assets/interaction/phone.png" id="11_phone"]
+[ext_resource type="Texture2D" uid="uid://dafjqxk7hfhdy" path="res://assets/interaction/call_bell.png" id="12_bell"]
+[ext_resource type="Texture2D" uid="uid://dfe6j011r4c4h" path="res://assets/interaction/door_closer.png" id="13_closer"]
+[ext_resource type="Texture2D" uid="uid://ditvprvhub7jd" path="res://assets/interaction/roller_shutter.png" id="14_shutter"]
+[ext_resource type="Script" uid="uid://c7ve0rnnw46ii" path="res://scripts/customer_art.gd" id="15_customer_art"]
+
+[node name="TravelingShop" type="Control" unique_id=105157216]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1")
+
+[node name="ArtLayers" type="Control" parent="." unique_id=258910807]
+z_index = -100
+anchors_preset = 0
+offset_right = 1600.0
+offset_bottom = 900.0
+mouse_filter = 2
+script = ExtResource("5")
+city_background = ExtResource("3")
+customer_portrait = ExtResource("4")
+
+[node name="WagonInterior" type="TextureRect" parent="ArtLayers" unique_id=1435809580]
+layout_mode = 0
+offset_top = 5.0
+offset_right = 1600.0
+offset_bottom = 907.0
+mouse_filter = 2
+texture = ExtResource("6")
+expand_mode = 1
+
+[node name="Window" type="Control" parent="ArtLayers" unique_id=1269407890]
+clip_contents = true
+anchors_preset = 0
+offset_left = 288.0
+offset_top = 84.0
+offset_right = 1312.0
+offset_bottom = 446.0
+mouse_filter = 2
+
+[node name="Exterior" type="TextureRect" parent="ArtLayers/Window" unique_id=768374184]
+visible = true
+layout_mode = 0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 1012.0
+offset_bottom = 366.0
+mouse_filter = 2
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Customer" type="Control" parent="ArtLayers/Window" unique_id=287697256]
+anchors_preset = 0
+offset_left = 335.0
+offset_top = 82.0
+offset_right = 671.0
+offset_bottom = 574.32434
+mouse_filter = 2
+script = ExtResource("15_customer_art")
+texture = ExtResource("4")
+
+[node name="DoorArt" type="TextureButton" parent="." unique_id=869941360]
+z_index = -30
+layout_mode = 0
+offset_left = -35.0
+offset_top = -5.0
+offset_right = 182.0
+offset_bottom = 945.0
+texture_normal = ExtResource("7_door")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="BedArt" type="TextureButton" parent="." unique_id=396571401]
+z_index = -20
+layout_mode = 0
+offset_left = 1360.0
+offset_top = 468.0
+offset_right = 2020.0
+offset_bottom = 1062.0
+texture_normal = ExtResource("8_bed")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="TableArt" type="TextureRect" parent="." unique_id=1068429127]
+z_index = -10
+layout_mode = 0
+offset_left = 117.0
+offset_top = 146.0
+offset_right = 1479.0
+offset_bottom = 1022.0
+mouse_filter = 2
+texture = ExtResource("9_table")
+expand_mode = 1
+
+[node name="RollerShutterClip" type="Control" parent="." unique_id=9946486]
+visible = false
+z_index = -15
+clip_contents = true
+anchors_preset = 0
+offset_left = 288.0
+offset_top = 84.0
+offset_right = 1312.0
+offset_bottom = 446.0
+mouse_filter = 2
+
+[node name="RollerShutterFill" type="ColorRect" parent="RollerShutterClip" unique_id=307647977]
+visible = false
+layout_mode = 0
+offset_right = 1024.0
+offset_bottom = 362.0
+mouse_filter = 2
+color = Color(0.0470588, 0.0705882, 0.0784314, 1)
+
+[node name="RollerShutterArt" type="TextureRect" parent="RollerShutterClip" unique_id=1667921681]
+layout_mode = 0
+offset_right = 1024.0
+offset_bottom = 362.0
+mouse_filter = 2
+texture = ExtResource("14_shutter")
+expand_mode = 1
+
+[node name="ComputerArt" type="TextureButton" parent="." unique_id=1780031201]
+z_index = -5
+layout_mode = 0
+offset_left = 1136.0
+offset_top = 281.0
+offset_right = 1376.0
+offset_bottom = 491.0
+texture_normal = ExtResource("10_computer")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="PhoneArt" type="TextureButton" parent="." unique_id=1780031202]
+z_index = -5
+layout_mode = 0
+offset_left = 1138.0
+offset_top = 462.0
+offset_right = 1204.1538
+offset_bottom = 505.0
+texture_normal = ExtResource("11_phone")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="CallBellArt" type="TextureButton" parent="." unique_id=1780031203]
+z_index = -5
+layout_mode = 0
+offset_left = 1346.0
+offset_top = 449.0
+offset_right = 1406.6666
+offset_bottom = 501.0
+texture_normal = ExtResource("12_bell")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="DoorCloserArt" type="TextureButton" parent="." unique_id=1780031204]
+z_index = -5
+layout_mode = 0
+offset_left = 1354.0
+offset_top = 152.0
+offset_right = 1384.0
+offset_bottom = 212.0
+texture_normal = ExtResource("13_closer")
+ignore_texture_size = true
+stretch_mode = 0

@@ -1,0 +1,13 @@
+{
+  "generator": "Built-in image_gen",
+  "layout": "left-only RGBA environment layers mirrored at runtime; separate ground texture and horizon plate",
+  "positive_style": "干净的日式动画游戏美术，以大色块组织画面。每种材质只用底色、成组阴影和少量高光，通过形体表现体积。细节集中在辨识特征，其他区域保持安静。保留清晰轮廓，不靠模糊制造简洁感。",
+  "negative_style": "photorealistic, realistic photography, cyberpunk night city, dark dystopia, excessive neon lights, rainy night, gritty texture, dirty texture, noise, grain, film grain, dirty pixel, stray pixel, overly detailed texture, realistic concrete cracks, realistic rust, heavy bloom, excessive reflections, fog, blurry, depth of field blur, watercolor, oil painting, sketch, painterly texture, low saturation, medieval architecture, empty street, overcrowded pedestrians, distorted buildings, fisheye distortion, text artifacts, watermark",
+  "assets": [
+    {"file": "forest-side-mid.png", "kind": "left-only transparent distant midground"},
+    {"file": "forest-side-near.png", "kind": "left-only transparent restrained edge frame"},
+    {"file": "forest-side-canopy.png", "kind": "left-only transparent distant canopy frame"},
+    {"file": "forest-ground-road.png", "kind": "standalone opaque tileable ground texture"},
+    {"file": "forest-horizon.png", "kind": "sky, mountains and distant tree-line backdrop"}
+  ]
+}

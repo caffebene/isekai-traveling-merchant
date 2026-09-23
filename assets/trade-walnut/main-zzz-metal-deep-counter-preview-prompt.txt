@@ -1,0 +1,9 @@
+Use case: stylized-concept
+Asset type: player-world / trading-screen background, full-bleed 2D game environment, generated entirely from scratch with no input image and no image editing.
+Primary request: 重新生成并优化交易场景图，沿用绝区零风格的潮流日系二次元都市动作游戏美术。现代东京式商业街从移动金属商铺的服务窗口望出去，复古未来主义、Y2K、90年代街机、复古录像带和漫画平面设计融合。以大色块、成组阴影和少量高光表现体积。
+Interior: 绝不使用木材、木家具、木板或木纹。室内全部为深灰喷涂金属、枪灰金属、阳极铝和奶油色合成织物，使用清晰接缝、少量螺栓、橙色/青色图形贴膜；平面化金属表面，无真实锈蚀、刮痕或刷纹。
+Exact layout: 正面宽幅视角，1600×900 游戏构图。左侧 x0–170 为窄金属服务门；顶部金属卷帘横贯画面；中央服务窗约 x328–1270、y76–400；右侧 x1440–1600 为金属睡铺和工业吊灯。
+Counter requirement: 中部柜台从约 y400 开始。柜台可用台面必须具有 4 个 24px 物品格行的明确视觉高度，即 1600×900 画面中约 96px 的连续无遮挡矩形工作区域（约 x382–1242、y400–496）。台面必须看起来足够深，绝不能是薄条或窄边；通过透视让四行格子高度清晰可读，但不要烘焙网格线、格子、数字或 UI。
+Cabinet requirement: 柜台下方为两侧金属橱柜和中央空置深色金属储物舱。橱柜正面底边必须直接接触地面，取消底层、底座、踢脚板、额外平台、第二层橱柜和悬空缝隙；底边之后立即进入地面平面。中央储物舱保持空置，适配程序生成的库存内容。
+Window scene: 阳光下现代东京式商业街，低层店铺、遮阳棚、自动售货机、自行车、花箱、电线、配送箱、卷帘门和抽象图形招牌；无人物。招牌只使用几何符号和色块，禁止可读文字。
+Negative prompt: photorealistic, realistic photography, cyberpunk night city, dark dystopia, excessive neon lights, rainy night, gritty texture, dirty texture, noise, grain, film grain, dirty pixel, stray pixel, overly detailed texture, realistic concrete cracks, realistic rust, heavy bloom, excessive reflections, fog, blurry, depth of field blur, watercolor, oil painting, sketch, painterly texture, low saturation, medieval architecture, empty street, overcrowded pedestrians, distorted buildings, fisheye distortion, text artifacts, watermark, wood furniture, wooden panels, timber, wood grain, lower cabinet plinth, toe-kick, second bottom layer, thin shallow countertop.
