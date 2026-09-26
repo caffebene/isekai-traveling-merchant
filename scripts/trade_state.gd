@@ -22,10 +22,10 @@ const CATALOG = {
  "tempered_axe": {"name":"淬火斧","category":"武器","value":216,"size":Vector2i(3,5),"color":"e3ad77","attack":13,"base_durability":24,"desc":"攻击 13 · 耐久 24 / 24\n按图纸制作，燃料纯度决定最大耐久。"},
  "small_bag": {"name":"小背包", "category":"容器", "value":0, "size":Vector2i(3,4), "color":"a77c56", "desc":"旅商的初始背包，占用 3 × 4 格。\n点击打开：内部有 6 × 6 格。"},
  "pot": {"name":"烹饪锅", "category":"设备", "value":120, "size":Vector2i(3,3), "color":"b79a73", "desc":"点击展开内部空间。\n放入鲜兽肉，次日制成烤肉。"},
- "alembic": {"name":"炼药锅", "category":"设备", "value":180, "size":Vector2i(3,4), "color":"89bdb0", "desc":"按配方放入材料和燃料，隔天炼制药水。\n只看材料种类与数量，不要求摆放位置。"},
+ "alembic": {"name":"炼药器", "category":"设备", "value":180, "size":Vector2i(3,4), "color":"89bdb0", "desc":"按配方放入材料和燃料，隔天炼制药水。\n只看材料种类与数量，不要求摆放位置。"},
  "furnace": {"name":"工作台", "category":"设备", "value":240, "size":Vector2i(4,4), "color":"bd8964", "desc":"打开工作台，按配方摆放矿石与燃料。\n隔天生成装备；燃料决定纯度与耐久。"},
  "iron_sword": {"name":"辉铁剑", "attack":10, "base_durability":20, "category":"武器", "value":140, "size":Vector2i(2,6), "color":"a2d7dc", "desc":"攻击 10 · 耐久 20 / 20\n辉铁打造的剑，可在工作台制作。"},
- "herb": {"name": "月光草", "category": "材料", "value": 18, "size": Vector2i(2,3), "color": "98bfad", "desc": "在月色中生长的草药。\n可投入炼药锅，按配方炼制药剂。"},
+ "herb": {"name": "月光草", "category": "材料", "value": 18, "size": Vector2i(2,3), "color": "98bfad", "desc": "在月色中生长的草药。\n可投入炼药器，按配方炼制药剂。"},
  "berry": {"name": "绯红果", "category": "材料", "value": 12, "size": Vector2i(1,1), "color": "d98683", "desc": "风栖镇郊外采摘的甜果。\n可烹饪，也可直接出售。"},
  "meat": {"name": "鲜兽肉", "category": "材料", "value": 24, "size": Vector2i(3,2), "color": "ce927e", "desc": "适合烹饪的鲜肉。\n投入烹饪锅可制成烤肉。"},
  "bread": {"name": "蜜糖面包", "category": "食物", "value": 26, "size": Vector2i(3,2), "color": "dfb779", "desc": "松软的旅行口粮。\n战斗中消耗：恢复 12 点生命。"},
@@ -498,7 +498,7 @@ func placement_error(item: Dictionary, zone: String) -> String:
    return "设备不存在。"
   if items[device_index].key == "alembic":
    if item.owner != "player":
-    return "只有自己的材料可以放入炼药锅。"
+    return "只有自己的材料可以放入炼药器。"
    if zone == machine_output_zone(id):
     return "产出区只能领取成品。"
    if zone == machine_fuel_zone(id):
@@ -509,7 +509,7 @@ func placement_error(item: Dictionary, zone: String) -> String:
       return "燃料区只可放一种燃料。"
     return ""
    if zone != machine_zone(id) or CATALOG[item.key].category != "材料":
-    return "炼药锅只能放入材料类物品。"
+    return "炼药器只能放入材料类物品。"
    return ""
   if items[device_index].key == "furnace":
    if item.owner != "player":

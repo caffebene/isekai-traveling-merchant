@@ -73,7 +73,7 @@ static func draw_window(shop: Control, rect: Rect2, id: int) -> void:
  shop.draw_rect(Rect2(p+Vector2(16,10),Vector2(width-32,34)),Color("20292f"))
  shop.draw_line(p+Vector2(18,11),p+Vector2(width-19,11),Color("8c918e"))
  shop.draw_rect(Rect2(p+Vector2(16,12),Vector2(6,30)),Chrome.ORANGE)
- shop._text("炼药锅" if alchemy_window else "工作台",p+Vector2(32,34),21,Chrome.PAPER)
+ shop._text("炼药器" if alchemy_window else "工作台",p+Vector2(32,34),21,Chrome.PAPER)
  shop._text("A L C H E M Y" if alchemy_window else "W O R K B E N C H",p+Vector2(132,33),8,Color("879498"))
  for side in [8,width-14]:
   for y in [68,244,296]:
