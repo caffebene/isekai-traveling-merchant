@@ -181,11 +181,13 @@ func _draw() -> void:
 	draw_line(Vector2(0,85),Vector2(1600,85),Color("a18c5866"))
 	label("月下森林",Vector2(800,55),30,GOLD,true,true)
 	if combat.encounter > 0:
-		label("第 %d 次遭遇" % combat.encounter,Vector2(1488,52),17,INK,true)
+		var threat := "首领" if combat.boss else "精英" if combat.elite else "普通"
+		label("深度 %d · %s" % [combat.depth,threat],Vector2(1488,52),17,INK,true)
 	var panel := inventory_panel()
 	leather_panel(panel)
 	label("旅行背包",Vector2(panel.get_center().x,panel.position.y+39),20,INK,true,true)
 	grid("bag")
+	_draw_bag_layout_guides()
 	var dims: Vector2i = state.zone_size("bag")
 	label("%d × %d" % [dims.x,dims.y],Vector2(panel.get_center().x,panel.end.y-19),12,Color("bca884"),true)
 	if combat.phase == "victory" and not traveling:
@@ -199,8 +201,10 @@ func _draw() -> void:
 		var r := item_rect(item)
 		draw_rect(r.grow(-1),Color(Color(state.CATALOG[item.key].color),0.09))
 		_draw_item(item,r,r.has_point(pointer))
+		if item.zone == "bag":
+			_draw_item_effect_badge(item,r)
 		if item.zone == "bag" and combat.phase == "battle" and item.key in combat.WEAPON_KEYS:
-			var progress: float = float(combat.basic_clock)/2.0
+			var progress: float = float(combat.basic_clock)/combat.weapon_interval(item)
 			draw_rect(Rect2(r.position+Vector2(2,r.size.y-4),Vector2((r.size.x-4)*progress,2)),GOLD)
 	if drag >= 0:
 		_draw_drag()
@@ -214,7 +218,9 @@ func _draw() -> void:
 	if not combat.enemy.is_empty() and not traveling:
 		_health_card(Vector2(ENEMY_FEET.x, ENEMY_FEET.y - ENEMY_HEIGHT[enemy_art_index()] - 85),combat.enemy.name,combat.enemy_hp,combat.enemy.hp)
 	if combat.phase in ["ready","victory"] and not traveling:
-		label("发现敌人，选择是否战斗" if combat.phase == "ready" else "战斗胜利",Vector2(UI_CENTER_X,755),29,GOLD,true,true)
+		var decision := "发现敌人，选择战斗或撤退" if combat.phase == "ready" else "胜利 · 继续深入将提高收益与风险"
+		label(decision,Vector2(UI_CENTER_X,755),29,GOLD,true,true)
+	label(combat.build_summary(),Vector2(panel.get_center().x,panel.end.y+24),13,Color("d5c59b"),true)
 	if combat.phase == "defeat" and not traveling:
 		_defeat_popup()
 	if notice != "":
@@ -233,6 +239,44 @@ func _health_card(at: Vector2, title: String, hp: int, maximum: int, shield := 0
 	label("%d / %d" % [hp,maximum],at+Vector2(0,47),14,INK,true)
 	if shield > 0:
 		label("护盾 %d" % shield,at+Vector2(97,47),12,Color("a7d1dc"),true)
+
+func _draw_bag_layout_guides() -> void:
+	var rect := zone_rect("bag")
+	var belt := Rect2(rect.position,Vector2(CELL_SIZE*2.0,rect.size.y))
+	draw_rect(belt,Color("55bdb51f"),true)
+	draw_rect(belt,Color("74d9cf99"),false,2.0)
+	label("腰包 0行动",Vector2(belt.get_center().x,belt.position.y+15),10,Color("9fe4db"),true)
+	for weapon in state.items:
+		if weapon.zone != "bag" or weapon.key not in combat.WEAPON_KEYS:
+			continue
+		for support in state.bag_adjacent_items(weapon):
+			if state.CATALOG[support.key].category != "矿石" and support.key != "power":
+				continue
+			var color := Color("e0ad70cc") if state.CATALOG[support.key].category == "矿石" else Color("b798e0cc")
+			draw_line(item_rect(weapon).get_center(),item_rect(support).get_center(),color,4.0,true)
+
+func _draw_item_effect_badge(item: Dictionary, rect: Rect2) -> void:
+	var effects: Dictionary = state.bag_effects(item)
+	var badges: Array[String] = []
+	if int(effects.damage_bonus) > 0:
+		badges.append("+%d攻" % effects.damage_bonus)
+		if float(effects.attack_interval) > 2.0:
+			badges.append("%.2f秒" % effects.attack_interval)
+	elif int(effects.adjacent_weapons) > 0 and int(effects.support_bonus) > 0:
+		badges.append("邻武+%d" % effects.support_bonus)
+	if effects.free_use:
+		badges.append("0行动")
+	if effects.protected:
+		badges.append("保留")
+	if int(effects.base_heal) > 0 and int(effects.final_heal) > int(effects.base_heal):
+		badges.append("回%d" % effects.final_heal)
+	if badges.is_empty():
+		return
+	var text_value := " · ".join(badges)
+	var width := font.get_string_size(text_value,HORIZONTAL_ALIGNMENT_LEFT,-1,11).x+12.0
+	var badge_rect := Rect2(rect.position+Vector2(2,2),Vector2(width,19))
+	draw_style_box(_style(Color("13201ff2"),Color("83d3c7"),3),badge_rect)
+	label(text_value,badge_rect.position+Vector2(6,14),11,Color("d9fff7"))
 
 func _defeat_popup() -> void:
 	draw_rect(Rect2(0,86,1600,814),Color("07100dc2"))

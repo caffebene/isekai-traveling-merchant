@@ -66,6 +66,8 @@ const CUSTOMERS = [
 	{"name":"布洛克","role":"矿石商人","portrait":"res://assets/customers/miner.png","buy_category":"","sell_key":"*","goods":["ore","ore","ore","copper_ore","copper_ore","copper_ore","slime_mucus","slime_mucus","ancient_wood","ancient_wood"],"funds":100,"conversation":["让开一点，矿箱很重。","我带来了矿石和燃料，正好能用来打造装备。","看过成色之后，我们再谈报价。"]}]
 var exploration: Control
 var modal: Panel
+var market_board: Control
+var module_shop: Control
 var tip_layer: Control
 var trade_visible := false
 var open_machine := -1
@@ -122,6 +124,8 @@ func _ready() -> void:
 	add_child(hover_tip)
 	_install_scene_art()
 	_button("营业中",Rect2(1400,20,158,36),func(): _notify("收摊后可从左侧车门外出，或在右侧床铺休息。"))
+	_button("行情",Rect2(305,20,86,36),_open_market_board)
+	_button("改装",Rect2(401,20,86,36),_open_module_shop)
 	_button("?",Rect2(1350,20,36,36),_show_help)
 	next_button = _button("下一位客人",Rect2(1430,795,150,36),_next_trade)
 	recorder_button = _button("历史对话",Rect2(1430,837,150,28),_open_recorder)
@@ -180,7 +184,8 @@ func _popup_close(host: Control, action: Callable) -> Button:
 func _process(delta: float) -> void:
 	mouse = get_local_mouse_position()
 	_step_counter_physics(delta)
-	var next_hover_id := -1 if drag_id >= 0 or modal != null or is_instance_valid(exploration) else _item_at(mouse)
+	var build_summary_over := open_bag and _bag_build_summary_rect().has_point(mouse)
+	var next_hover_id := -1 if drag_id >= 0 or _full_overlay_open() or is_instance_valid(exploration) or build_summary_over else _item_at(mouse)
 	if next_hover_id != hover_id:
 		if hover_id >= 0:
 			_hide_hover_tip("item:%d" % hover_id)
@@ -201,12 +206,12 @@ func _process(delta: float) -> void:
 			machine_over = true
 			break
 	var recorder_over := recorder_panel != null and is_instance_valid(recorder_panel) and recorder_panel.get_global_rect().has_point(mouse)
-	var over_popup := modal == null and not is_instance_valid(exploration) and ((open_bag and bag_popup.has_point(mouse)) or machine_over or recorder_over or (customer_bag_open and customer_bag_rect.has_point(mouse)))
+	var over_popup := not _full_overlay_open() and not is_instance_valid(exploration) and ((open_bag and (bag_popup.has_point(mouse) or _bag_build_summary_rect().has_point(mouse))) or machine_over or recorder_over or (customer_bag_open and customer_bag_rect.has_point(mouse)))
 	for child in get_children():
 		if child is Button:
 			child.mouse_filter = Control.MOUSE_FILTER_IGNORE if over_popup else Control.MOUSE_FILTER_STOP
 	for b in art_buttons:
-		var art_blocked := drag_id >= 0 or modal != null or is_instance_valid(exploration) or shutter_animating or over_popup
+		var art_blocked := drag_id >= 0 or _full_overlay_open() or is_instance_valid(exploration) or shutter_animating or over_popup
 		b.mouse_filter = Control.MOUSE_FILTER_IGNORE if art_blocked else Control.MOUSE_FILTER_STOP
 	if toast_time > 0:
 		toast_time -= delta
@@ -370,8 +375,8 @@ func _draw() -> void:
 	_panel(status_rect,PopupSkin.PANEL,PopupSkin.BRASS)
 	draw_rect(Rect2(status_rect.position,Vector2(6,status_rect.size.y)),PopupSkin.ORANGE)
 	draw_line(status_rect.position+Vector2(16,47),status_rect.position+Vector2(status_rect.size.x-16,47),PopupSkin.CYAN,1.0)
-	_text("第 %02d 天 · 风栖镇" % state.day,status_rect.position+Vector2(20,27),18,PopupSkin.PAPER)
-	_text("距启程 %d 天  ·  金币 %d G" % [7-(state.day-1)%7,state.gold],status_rect.position+Vector2(20,50),14,PopupSkin.MUTED)
+	_text("第 %02d 天 · %s" % [state.day,state.economy.city_name()],status_rect.position+Vector2(20,27),18,PopupSkin.PAPER)
+	_text("距启程 %d 天  ·  金币 %d G" % [state.economy.days_until_departure(state.day),state.gold],status_rect.position+Vector2(20,50),14,PopupSkin.MUTED)
 	if bell_hold_active and bell_art != null:
 		var progress := clampf(bell_hold_time / BELL_HOLD_DURATION,0.0,1.0)
 		var bell_center := bell_art.position + bell_art.size*0.5
@@ -391,11 +396,16 @@ func _draw() -> void:
 			if item.id != drag_id and item.zone == "customer":
 				_draw_item(item,_item_rect(item),false)
 	if open_bag:
-		_draw_bag_shell(bag_popup,"旅行背包","拖动物品收纳")
+		var installed := " · ".join(state.economy.modules.map(func(id): return state.economy.module_name(id)))
+		_draw_bag_shell(bag_popup,"旅行背包 · %d×%d" % [state.bag_size.x,state.bag_size.y],installed if installed != "" else "拖动物品收纳")
 		_draw_zone("bag",true)
+		_draw_bag_layout_guides_shop()
 		for item in state.items:
 			if item.id != drag_id and item.zone == "bag":
-				_draw_item(item,_item_rect(item),false)
+				var bag_item_rect := _item_rect(item)
+				_draw_item(item,bag_item_rect,false)
+				_draw_bag_effect_badge_shop(item,bag_item_rect)
+		_draw_bag_build_summary()
 	var machine_draw_order := _machine_ids_topmost()
 	machine_draw_order.reverse()
 	for machine_id in machine_draw_order:
@@ -466,6 +476,84 @@ func _draw_zone(zone: String, visible_grid: bool) -> void:
 	for y in range(dims.y+1):
 		draw_line(rect.position+Vector2(0,y*config.cell.y),rect.position+Vector2(rect.size.x,y*config.cell.y),Color("b39b603e") if visible_grid else Color("ead5a71b"))
 	draw_rect(rect,GOLD.darkened(0.35),false,1)
+
+func _draw_bag_layout_guides_shop() -> void:
+	if not ZONES.has("bag"):
+		return
+	var rect: Rect2 = ZONES.bag.rect
+	var belt := Rect2(rect.position,Vector2(BAG_CELL.x*2.0,rect.size.y))
+	draw_rect(belt,Color("55bdb51f"),true)
+	draw_rect(belt,Color("74d9cf99"),false,2.0)
+	_text("腰包 0行动",belt.position+Vector2(4,14),9,Color("9fe4db"))
+	for weapon in state.items:
+		if weapon.zone != "bag" or State.CATALOG[weapon.key].category != "武器":
+			continue
+		for support in state.bag_adjacent_items(weapon):
+			if State.CATALOG[support.key].category != "矿石" and support.key != "power":
+				continue
+			var color := Color("e0ad70cc") if State.CATALOG[support.key].category == "矿石" else Color("b798e0cc")
+			draw_line(_item_rect(weapon).get_center(),_item_rect(support).get_center(),color,4.0,true)
+
+func _draw_bag_effect_badge_shop(item: Dictionary, rect: Rect2) -> void:
+	var effects: Dictionary = state.bag_effects(item)
+	var badges: Array[String] = []
+	if int(effects.damage_bonus) > 0:
+		badges.append("+%d攻" % effects.damage_bonus)
+		if float(effects.attack_interval) > 2.0:
+			badges.append("%.2f秒" % effects.attack_interval)
+	elif int(effects.adjacent_weapons) > 0 and int(effects.support_bonus) > 0:
+		badges.append("邻武+%d" % effects.support_bonus)
+	if effects.free_use:
+		badges.append("0行动")
+	if effects.protected:
+		badges.append("保留")
+	if int(effects.base_heal) > 0 and int(effects.final_heal) > int(effects.base_heal):
+		badges.append("回%d" % effects.final_heal)
+	if badges.is_empty():
+		return
+	var value := " · ".join(badges)
+	var width := font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,9).x+10.0
+	var badge := Rect2(rect.position+Vector2(2,2),Vector2(width,17))
+	draw_style_box(PopupSkin.box(Color("13201ff2"),Color("83d3c7"),3),badge)
+	_text(value,badge.position+Vector2(5,12),9,Color("d9fff7"))
+
+func _draw_bag_build_summary() -> void:
+	var bag_items: Array[Dictionary] = state.items.filter(func(i): return i.zone == "bag")
+	var weapons: Array[Dictionary] = bag_items.filter(func(i): return State.CATALOG[i.key].category == "武器")
+	var protected_ids: Array[int] = state.protected_bag_ids()
+	var protected_names: Array[String] = []
+	for item in bag_items:
+		if protected_ids.has(item.id):
+			protected_names.append(str(State.CATALOG[item.key].name))
+	var belt_names: Array[String] = []
+	for item in bag_items:
+		if state.bag_effects(item).free_use:
+			belt_names.append(str(State.CATALOG[item.key].name))
+	var summary := _bag_build_summary_rect()
+	_panel(summary,Color("142123f2"),Color("6e8f8c"))
+	_text("当前组合效果",summary.position+Vector2(18,28),17,PopupSkin.PAPER)
+	var y := 54.0
+	if weapons.is_empty():
+		_text("武器：徒手攻击 5",summary.position+Vector2(18,y),13,PopupSkin.MUTED)
+		y += 24
+	else:
+		for weapon in weapons:
+			var effects: Dictionary = state.bag_effects(weapon)
+			var base_attack: int = int(State.CATALOG[weapon.key].get("attack",8))
+			var color := PopupSkin.CYAN if int(effects.damage_bonus) > 0 else PopupSkin.MUTED
+			_text("%s：攻击 %d → %d · %.2f 秒" % [State.CATALOG[weapon.key].name,base_attack,effects.final_attack,effects.attack_interval],summary.position+Vector2(18,y),13,color)
+			y += 24
+	_text("腰包：%s" % ("、".join(belt_names)+" · 0 行动力" if not belt_names.is_empty() else "未放入消耗品"),summary.position+Vector2(18,y),13,PopupSkin.MUTED)
+	y += 24
+	if state.economy.has_module("hidden_compartment"):
+		_text("夹层保护：%s" % ("、".join(protected_names) if not protected_names.is_empty() else "等待装入物品"),summary.position+Vector2(18,y),13,PopupSkin.CYAN)
+		y += 24
+	if state.economy.has_module("roof_rack"):
+		_text("车顶货架：36 → 48 格",summary.position+Vector2(18,y),13,PopupSkin.CYAN)
+
+func _bag_build_summary_rect() -> Rect2:
+	var weapon_count: int = state.items.filter(func(i): return i.zone == "bag" and State.CATALOG[i.key].category == "武器").size()
+	return Rect2(bag_popup.end.x+12,bag_popup.position.y,350,maxf(154,(weapon_count+3)*25+62))
 func _item_rect(item: Dictionary) -> Rect2:
 	if item.zone == "counter":
 		var counter_position := _ensure_counter_position(item)
@@ -633,6 +721,11 @@ func _finish_drag(point: Vector2) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if is_instance_valid(exploration):
 		return
+	if is_instance_valid(market_board) or is_instance_valid(module_shop):
+		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+			_close_market_board()
+			_close_module_shop()
+		return
 	if modal != null:
 		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 			_close_modal()
@@ -777,7 +870,8 @@ func _apply_customer_profile() -> void:
 		str(profile.get("buy_category","")),
 		str(profile.get("sell_key","")),
 		Array(profile.get("goods",[])),
-		int(profile.get("funds",150))
+		int(profile.get("funds",150)),
+		str(profile.name)
 	)
 	_close_customer_bag()
 	customer_bag_button.visible = state.customer_sell_key != ""
@@ -795,6 +889,7 @@ func _show_customer_reaction() -> void:
 		_start_conversation([state.last_reaction])
 func _is_interest_reaction(value: String) -> bool:
 	return value in [
+		"顾客眼睛一亮：眼下正缺这个。",
 		"顾客眼睛一亮：我很喜欢这个。",
 		"顾客点头：这个正合我意。",
         "顾客有点兴趣：这个可以看看。"
@@ -803,7 +898,10 @@ func _start_customer_conversation() -> void:
 	if not _customer_present():
 		return
 	var profile: Dictionary = CUSTOMERS[customer_index]
-	_start_conversation(Array(profile.conversation))
+	var lines: Array = Array(profile.conversation).duplicate()
+	if state.economy.relationship(str(profile.name)) > 0:
+		lines[-1] = "%s\n行情：%s" % [lines[-1],state.economy.intelligence(state.day,str(profile.name)).replace("\n","；")]
+	_start_conversation(lines)
 func _start_conversation(lines: Array) -> void:
 	dialogue_lines.clear()
 	for line in lines:
@@ -1167,7 +1265,64 @@ func _end_day() -> void:
 	if next_day_ready and not business_active:
 		_notify("请先打开卷帘门开始今日营业。")
 		return
-	_open_modal("今日营业结束", "第 %d 天 · 风栖镇南门集市\n\n完成交易     %d 笔\n经营收支     %+d G\n持有金币     %d G\n\n本原型可继续下一天营业。\n可从车门前往野外探索。" % [state.day,state.completed,state.earnings,state.gold],"休息 · 开始下一天",_begin_day)
+	var travel_line := "\n商路今日开放，可在行情板启程。" if state.can_travel() else ""
+	_open_modal("今日营业结束", "第 %d 天 · %s%s\n\n完成交易     %d 笔\n经营收支     %+d G\n持有金币     %d G\n\n可休息进入下一天，或从车门外出探索。" % [state.day,state.economy.city_name(),travel_line,state.completed,state.earnings,state.gold],"休息 · 开始下一天",_begin_day)
+
+func _open_market_board() -> void:
+	if is_instance_valid(market_board):
+		_close_market_board()
+		return
+	_close_module_shop()
+	market_board = preload("res://scripts/market_board.gd").new()
+	market_board.setup(state,ITEM_TEXTURES)
+	market_board.close_requested.connect(_close_market_board)
+	market_board.travel_requested.connect(_travel_city)
+	add_child(market_board)
+
+func _close_market_board() -> void:
+	if is_instance_valid(market_board):
+		market_board.queue_free()
+	market_board = null
+
+func _travel_city() -> void:
+	if not shutter_closed:
+		_close_market_board()
+		_notify("请先结束营业并关闭卷帘门。")
+		return
+	var result := state.travel_to_next_city()
+	if result.begins_with("已抵达"):
+		customer_index = 0
+		_prepare_next_day()
+	_close_market_board()
+	_sync()
+	_notify(result)
+
+func _open_module_shop() -> void:
+	if is_instance_valid(module_shop):
+		_close_module_shop()
+		return
+	_close_market_board()
+	module_shop = preload("res://scripts/module_shop.gd").new()
+	module_shop.setup(state)
+	module_shop.close_requested.connect(_close_module_shop)
+	module_shop.purchase_requested.connect(_buy_module)
+	add_child(module_shop)
+
+func _close_module_shop() -> void:
+	if is_instance_valid(module_shop):
+		module_shop.queue_free()
+	module_shop = null
+
+func _full_overlay_open() -> bool:
+	return modal != null or is_instance_valid(market_board) or is_instance_valid(module_shop)
+
+func _buy_module(module_id: String) -> void:
+	var result := state.install_module(module_id)
+	if open_bag:
+		_sync_bag_window()
+	if is_instance_valid(module_shop):
+		module_shop.refresh(result)
+	_notify(result)
 func _smoke_ui() -> void:
 	await get_tree().process_frame
 	assert(mouse_filter == Control.MOUSE_FILTER_IGNORE)
@@ -1347,7 +1502,7 @@ func _toggle_shutter() -> void:
 		return
 	_request_close_shutter()
 func _request_close_shutter() -> void:
-	if modal != null:
+	if _full_overlay_open():
 		return
 	_open_modal("关闭今日营业？", "关闭卷帘门将结束今日营业，是否关闭？", "关闭并结束营业", _close_shutter, "继续营业")
 func _close_shutter() -> void:
@@ -1467,7 +1622,7 @@ func _valid_drop(item: Dictionary, zone: String, at: Vector2i) -> bool:
 		return _customer_present()
 	return state.fits(item,zone,at,item.id)
 func _input(event: InputEvent) -> void:
-	if modal != null:
+	if _full_overlay_open():
 		return
 	if is_instance_valid(exploration):
 		return
@@ -1475,6 +1630,9 @@ func _input(event: InputEvent) -> void:
 		return
 	if open_bag:
 		var local_mouse := get_local_mouse_position()
+		if _bag_build_summary_rect().has_point(local_mouse):
+			get_viewport().set_input_as_handled()
+			return
 		var title_rect := Rect2(bag_popup.position, Vector2(bag_popup.size.x, 48))
 		var close_rect := Rect2(bag_popup.position + bag_close.position, bag_close.size)
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -1807,7 +1965,7 @@ func _open_recipe_drawings(machine_key: String = "furnace") -> void:
 		drawing.add_child(button)
 
 func _show_workbench_preview() -> bool:
-	if drag_id < 0 and modal == null and not is_instance_valid(exploration):
+	if drag_id < 0 and not _full_overlay_open() and not is_instance_valid(exploration):
 		for machine_id in _machine_ids_topmost():
 			if not machine_popups[machine_id].has_point(mouse):
 				continue

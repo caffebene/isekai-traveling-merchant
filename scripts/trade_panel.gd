@@ -92,7 +92,7 @@ func _ready() -> void:
  columns.position = Vector2(28,158)
  columns.add_theme_constant_override("separation",0)
  add_child(columns)
- for entry in [["商品",202],["类别",66],["估值",76]]:
+ for entry in [["商品",202],["类别",66],["行情",76]]:
   var l := Label.new()
   l.text = entry[0]
   l.custom_minimum_size.x = entry[1]
@@ -235,7 +235,7 @@ func refresh(state) -> void:
   row.add_theme_constant_override("separation",0)
   row_panel.add_child(row)
   var item_name: String = ("✓ " if item.get("settled",false) else "") + str(data.name)
-  for entry in [[item_name,202],[data.category,66],[str(data.value)+" G",60]]:
+  for entry in [[item_name,202],[data.category,66],[str(state.market_value(item.key))+" G",60]]:
    var l := Label.new()
    l.text = entry[0]
    l.custom_minimum_size.x = entry[1]
@@ -248,9 +248,9 @@ func refresh(state) -> void:
  if not buying_items.is_empty() and not selling_items.is_empty():
   summary.text = "购买 %d G  /  出售 %d G" % [state.buy_offer,state.sell_offer]
  elif not buying_items.is_empty():
-  summary.text = "估值 %d G   ·   对方报价 %d G" % [state.buying_value(),state.buy_offer]
+  summary.text = "行情 %d G   ·   对方报价 %d G" % [state.buying_value(),state.buy_offer]
  elif not selling_items.is_empty():
-  summary.text = "估值 %d G   ·   对方报价 %d G" % [state.selling_value(),state.sell_offer]
+  summary.text = "行情 %d G   ·   对方报价 %d G" % [state.selling_value(),state.sell_offer]
  elif awaiting_more:
   summary.text = "顾客余款 %d G · 可继续摆货" % state.customer_funds
  else:

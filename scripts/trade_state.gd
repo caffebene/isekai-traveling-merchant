@@ -6,6 +6,7 @@ extends RefCounted
 const SIZES = {"stock": Vector2i(30, 12), "display": Vector2i(10, 6), "customer": Vector2i(24, 4), "counter": Vector2i(43, 4), "loot": Vector2i(8, 4), "bag": Vector2i(6, 6)}
 const Alchemy = preload("res://scripts/alchemy_rules.gd")
 const Workbench = preload("res://scripts/workbench_rules.gd")
+const Economy = preload("res://scripts/city_economy.gd")
 # Retain the existing furnace item ID; its visible name and behavior are now workbench.
 const MACHINES = ["pot", "alembic", "furnace"]
 const CATALOG = {
@@ -55,6 +56,8 @@ var customer_funds_limit := 150
 var customer_funds := 150
 var customer_goods: Array[String] = ["herb","berry","potion","ore"]
 var loaded_day: Dictionary = {}
+var economy = Economy.new()
+var current_customer_name := ""
 
 func _init() -> void:
  for key in ["sword","herb","herb","bread","ore","potion","potion","power","berry","berry","meat","steak","ore","bread"]:
@@ -159,7 +162,10 @@ func customer_will_sell(item: Dictionary) -> bool:
  return (customer_sell_key == "*" and customer_goods.has(item.key)) or (customer_sell_key != "" and item.key == customer_sell_key)
 
 func customer_reaction(item: Dictionary) -> String:
- var value: int = CATALOG[item.key].value
+ var value: int = market_value(item.key)
+ var multiplier := market_multiplier(item.key)
+ if multiplier >= 1.35:
+  return "顾客眼睛一亮：眼下正缺这个。"
  if value >= 45:
   return "顾客眼睛一亮：我很喜欢这个。"
  if value >= 25:
@@ -169,20 +175,91 @@ func customer_reaction(item: Dictionary) -> String:
 func total_value() -> int:
  var value := 0
  for item in buying_items()+selling_items():
-  value += CATALOG[item.key].value
+  value += market_value(item.key)
  return value
 
 func buying_value() -> int:
  var value := 0
  for item in buying_items():
-  value += CATALOG[item.key].value
+  value += market_value(item.key)
  return value
 
 func selling_value() -> int:
  var value := 0
  for item in selling_items():
-  value += CATALOG[item.key].value
+  value += market_value(item.key)
  return value
+
+func market_multiplier(key: String) -> float:
+ var data: Dictionary = CATALOG[key]
+ return economy.multiplier(key,data.category,day)
+
+func market_value(key: String) -> int:
+ var data: Dictionary = CATALOG[key]
+ return economy.value(key,data.category,data.value,day)
+
+func market_report() -> String:
+ return economy.market_report(CATALOG,day)
+
+func bag_adjacent(a: Dictionary, b: Dictionary) -> bool:
+ if a.get("zone","") != "bag" or b.get("zone","") != "bag":
+  return false
+ var ar := Rect2i(a.cell,dimensions(a))
+ var br := Rect2i(b.cell,dimensions(b))
+ var horizontal := (ar.end.x == br.position.x or br.end.x == ar.position.x) and maxi(ar.position.y,br.position.y) < mini(ar.end.y,br.end.y)
+ var vertical := (ar.end.y == br.position.y or br.end.y == ar.position.y) and maxi(ar.position.x,br.position.x) < mini(ar.end.x,br.end.x)
+ return horizontal or vertical
+
+func bag_adjacent_items(item: Dictionary) -> Array[Dictionary]:
+ return items.filter(func(other): return other.zone == "bag" and other.id != item.id and bag_adjacent(item,other))
+
+func protected_bag_ids() -> Array[int]:
+ var result: Array[int] = []
+ if not economy.has_module("hidden_compartment"):
+  return result
+ var candidates: Array[Dictionary] = items.filter(func(i): return i.zone == "bag")
+ candidates.sort_custom(func(a,b): return market_value(a.key) > market_value(b.key))
+ for index in range(mini(2,candidates.size())):
+  result.append(candidates[index].id)
+ return result
+
+func bag_effects(item: Dictionary) -> Dictionary:
+ var neighbors := bag_adjacent_items(item)
+ var ore_count := neighbors.filter(func(i): return CATALOG[i.key].category == "矿石").size()
+ var power_count := neighbors.filter(func(i): return i.key == "power").size()
+ var adjacent_weapons := neighbors.filter(func(i): return CATALOG[i.key].category == "武器").size()
+ var base_attack: int = int(CATALOG[item.key].get("attack",8 if CATALOG[item.key].category == "武器" else 0))
+ var damage_bonus: int = ore_count*3 + power_count*2 if CATALOG[item.key].category == "武器" else 0
+ var base_heal := 12 if item.key == "bread" else 20 if item.key == "steak" else 0
+ return {
+  "damage_bonus":damage_bonus,
+  "final_attack":base_attack+damage_bonus,
+  "attack_interval":2.55 if ore_count > 0 and CATALOG[item.key].category == "武器" else 2.0,
+  "free_use":item.zone == "bag" and item.cell.x < 2 and item.key in ["bread","steak","potion","power"],
+  "adjacent_weapons":adjacent_weapons,
+  "support_bonus":3 if CATALOG[item.key].category == "矿石" else 2 if item.key == "power" else 0,
+  "protected":protected_bag_ids().has(item.id),
+  "final_heal":base_heal+(8 if base_heal > 0 and economy.has_module("field_kitchen") else 0),
+  "base_heal":base_heal,
+ }
+
+func bag_effect_text(item: Dictionary) -> String:
+ if item.get("zone","") != "bag":
+  return ""
+ var effects := bag_effects(item)
+ var lines: Array[String] = []
+ if CATALOG[item.key].category == "武器":
+  var base_attack: int = int(CATALOG[item.key].get("attack",8))
+  lines.append("当前布局：攻击 %d → %d · 间隔 %.2f 秒" % [base_attack,effects.final_attack,effects.attack_interval])
+ elif int(effects.adjacent_weapons) > 0 and int(effects.support_bonus) > 0:
+  lines.append("已连接 %d 把武器：每把攻击 +%d" % [effects.adjacent_weapons,effects.support_bonus])
+ if effects.free_use:
+  lines.append("腰包生效：战斗中使用不消耗行动力")
+ if int(effects.base_heal) > 0:
+  lines.append("实际恢复：%d → %d 生命" % [effects.base_heal,effects.final_heal])
+ if effects.protected:
+  lines.append("隐藏夹层：战败时保留")
+ return "\n".join(lines)
 
 func refresh_offer() -> void:
  buy_offer = roundi(buying_value() * 1.12)
@@ -204,12 +281,13 @@ func select_trade_tab(tab: String) -> void:
   active_trade_tab = "sell"
  refresh_offer()
 
-func configure_customer(buy_category: String, sell_key: String, goods: Array, funds := 150) -> void:
+func configure_customer(buy_category: String, sell_key: String, goods: Array, funds := 150, customer_name := "") -> void:
  customer_buy_category = buy_category
  customer_sell_key = sell_key
  customer_funds_limit = clampi(int(funds),100,200)
  customer_funds = customer_funds_limit
  customer_goods.clear()
+ current_customer_name = customer_name
  for key in goods:
   customer_goods.append(str(key))
  active_trade_tab = "buy" if customer_buy_category != "" else "sell"
@@ -374,6 +452,7 @@ func settle() -> String:
   item.owner = "customer"
   item.origin = {}
   item.settled = true
+  economy.record_sale(str(CATALOG[item.key].category))
  for item in buying_batch:
   item.owner = "player"
   item.origin = {}
@@ -383,6 +462,7 @@ func settle() -> String:
  customer_funds = clampi(customer_funds - sell_offer + buy_offer,0,customer_funds_limit)
  earnings += sell_offer - buy_offer
  completed += 1
+ economy.record_trade(current_customer_name)
  patience = 3
  buy_offer = 0
  sell_offer = 0
@@ -475,12 +555,15 @@ func item_hover_details(item: Dictionary, action_hint := "") -> String:
  var dimensions_value: Vector2i = dimensions(item)
  var details := [
   ("未拥有" if item.owner == "customer" else "已拥有")+"  /  "+str(data.category),
-  "估值 %d G  ·  占用 %d × %d" % [data.value,dimensions_value.x,dimensions_value.y],
+  "本地行情 %d G（基础估值 %d G） · 占用 %d × %d" % [market_value(item.key),data.value,dimensions_value.x,dimensions_value.y],
   item_description(item),
  ]
  if action_hint == "":
   action_hint = "双击展开 · 拖动原料" if MACHINES.has(item.key) else "拖动放置 · 双击移入 / 移出柜台"
  details.append(action_hint)
+ var layout_effect := bag_effect_text(item)
+ if layout_effect != "":
+  details.append(layout_effect)
  return "\n".join(details)
 
 func placement_error(item: Dictionary, zone: String) -> String:
@@ -536,6 +619,7 @@ func placement_error(item: Dictionary, zone: String) -> String:
 func advance_day() -> void:
  cancel_trade()
  day += 1
+ economy.advance_day()
  for device in items.duplicate():
   if not MACHINES.has(device.key):
    continue
@@ -574,3 +658,30 @@ func advance_day() -> void:
  completed = 0
  earnings = 0
  restock_customer()
+
+func can_travel() -> bool:
+ return economy.can_travel(day)
+
+func travel_to_next_city() -> String:
+ if not can_travel():
+  return "商路只在每个周期第 7 天开放。"
+ if gold < Economy.TRAVEL_COST:
+  return "前往下一座城市需要 %d G 路费。" % Economy.TRAVEL_COST
+ gold -= Economy.TRAVEL_COST
+ economy.travel()
+ advance_day()
+ return "已抵达%s。" % economy.city_name()
+
+func install_module(module_id: String) -> String:
+ var cost := economy.module_cost(module_id)
+ if economy.has_module(module_id):
+  return "该模块已经安装。"
+ if economy.modules.size() >= 2:
+  return "商车最多安装两个模块。"
+ if gold < cost:
+  return "金币不足，需要 %d G。" % cost
+ gold -= cost
+ economy.install_module(module_id)
+ if module_id == "roof_rack":
+  bag_size = Vector2i(8,6)
+ return "已安装%s。" % economy.module_name(module_id)

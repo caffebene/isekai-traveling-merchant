@@ -23,6 +23,10 @@ var clocks: Dictionary = {}
 var message := ""
 var last_fled := false
 var last_lost_item_name := ""
+var depth := 0
+var elite := false
+var boss := false
+var weapon_cycle := 0
 var rng := RandomNumberGenerator.new()
 
 const MAX_HP := 60
@@ -33,6 +37,7 @@ func start(store) -> void:
  inventory = store
  rng.randomize()
  encounter = 0
+ depth = 0
  hp = MAX_HP
  phase = "idle"
  enemy = {}
@@ -49,8 +54,22 @@ func next_encounter() -> void:
  if phase not in ["idle","victory"]:
   return
  clear_loot()
- enemy = ENEMIES[encounter % ENEMIES.size()].duplicate()
  encounter += 1
+ depth = encounter
+ boss = depth % 7 == 0
+ elite = not boss and depth % 3 == 0
+ enemy = ENEMIES[(encounter-1) % ENEMIES.size()].duplicate()
+ var hp_scale := 1.0 + float(depth-1) * 0.08
+ var attack_scale := 1.0 + float(depth-1) * 0.045
+ if elite:
+  enemy.name = "精英·%s" % enemy.name
+  hp_scale *= 1.35
+  attack_scale *= 1.20
+ if boss:
+  enemy = {"name":"月蚀古树王","hp":110,"attack":14,"color":"b99b65","drops":["ancient_wood","ore","herb"]}
+  hp_scale *= 1.0 + float(depth-7) * 0.035
+ enemy.hp = roundi(int(enemy.hp) * hp_scale)
+ enemy.attack = roundi(int(enemy.attack) * attack_scale)
  enemy_hp = enemy.hp
  energy = 3
  shield = 0
@@ -79,9 +98,10 @@ func attack(damage: int) -> void:
  if enemy_hp == 0:
   phase = "victory"
   var pool: Array = enemy.get("drops",["herb"])
-  for i in range(rng.randi_range(2,3)):
+  var loot_count := mini(6,rng.randi_range(2,3) + depth/2 + (1 if elite else 0) + (2 if boss else 0))
+  for i in range(loot_count):
    inventory.add_item(pool[rng.randi_range(0,pool.size()-1)],"loot","player")
-  message = "胜利！将掉落物拖入背包后，再继续探索或返回。"
+  message = "第 %d 层胜利！收益随深度提高，整理后决定继续或撤退。" % depth
 
 func basic_attack() -> void:
  if phase != "battle":
@@ -114,11 +134,10 @@ func use_item(id: int) -> void:
  if item.key == "power" and power:
   message = "力量药剂已经生效。"
   return
- if phase == "battle":
+ if phase == "battle" and not _in_belt(item):
   energy -= 1
  match item.key:
-  "bread": hp = mini(MAX_HP,hp+12)
-  "steak": hp = mini(MAX_HP,hp+20)
+  "bread","steak": hp = mini(MAX_HP,hp+int(inventory.bag_effects(item).final_heal))
   "potion": shield += 15
   "power": power = true
  message = "使用了%s。" % inventory.CATALOG[item.key].name
@@ -156,7 +175,8 @@ func flee() -> Dictionary:
  return lost
 
 func _discard_bag() -> void:
- inventory.items = inventory.items.filter(func(i): return i.zone != "bag")
+ var protected_ids: Array[int] = inventory.protected_bag_ids()
+ inventory.items = inventory.items.filter(func(i): return i.zone != "bag" or protected_ids.has(i.id))
  clocks.clear()
 
 func pickup(id: int, cell: Vector2i, rotated: bool) -> String:
@@ -171,6 +191,30 @@ func leave() -> void:
 func cooldown(key: String) -> float:
  return 2.0 if key in WEAPON_KEYS else 5.0
 
+func _adjacent(a: Dictionary, b: Dictionary) -> bool:
+ return inventory.bag_adjacent(a,b)
+
+func _adjacent_items(item: Dictionary) -> Array[Dictionary]:
+ return inventory.items.filter(func(other): return other.zone == "bag" and other.id != item.id and _adjacent(item,other))
+
+func weapon_damage(item: Dictionary) -> int:
+ return int(inventory.bag_effects(item).final_attack)
+
+func weapon_interval(item: Dictionary) -> float:
+ return float(inventory.bag_effects(item).attack_interval)
+
+func _in_belt(item: Dictionary) -> bool:
+ return bool(inventory.bag_effects(item).free_use)
+
+func build_summary() -> String:
+ var weapons: Array[Dictionary] = inventory.items.filter(func(i): return i.zone == "bag" and i.key in WEAPON_KEYS)
+ if weapons.is_empty():
+  return "徒手 · 5 伤害"
+ var parts: Array[String] = []
+ for weapon in weapons:
+  parts.append("%s %d伤害/%.1f秒" % [inventory.CATALOG[weapon.key].name,weapon_damage(weapon),weapon_interval(weapon)])
+ return " · ".join(parts)
+
 func tick(delta: float) -> void:
  if phase != "battle":
   return
@@ -178,13 +222,15 @@ func tick(delta: float) -> void:
  enemy_clock += delta
  basic_clock += delta
  var armed: Array[Dictionary] = inventory.items.filter(func(i): return i.zone == "bag" and i.key in WEAPON_KEYS and i.get("durability",20) > 0)
- if basic_clock >= 2.0:
+ var interval := 2.0 if armed.is_empty() else weapon_interval(armed[weapon_cycle % armed.size()])
+ if basic_clock >= interval:
   basic_clock = 0.0
   energy = 3
   if armed.is_empty():
    basic_attack()
   else:
-   _auto_weapon_attack(armed[0])
+   _auto_weapon_attack(armed[weapon_cycle % armed.size()])
+   weapon_cycle = (weapon_cycle+1) % armed.size()
  if phase == "battle" and enemy_clock >= 3.0:
   enemy_clock = 0.0
   end_turn()
@@ -193,4 +239,4 @@ func _auto_weapon_attack(item: Dictionary) -> void:
  if phase != "battle" or item.is_empty() or item.get("durability",20) <= 0:
   return
  item.durability = item.get("durability",20)-1
- attack(inventory.CATALOG[item.key].get("attack",8))
+ attack(weapon_damage(item))
