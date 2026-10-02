@@ -24,18 +24,7 @@ var drag_offset := Vector2.ZERO
 var keep_open := false
 
 func _draw() -> void:
- var rect := Rect2(Vector2.ZERO,size)
- var shadow := PopupSkin.window_points(Rect2(rect.position+Vector2(5,5),rect.size),10)
- draw_colored_polygon(shadow,Color(0,0,0,0.58))
- draw_colored_polygon(PopupSkin.window_points(rect,10),PopupSkin.PANEL)
- var outline := PopupSkin.window_points(rect,10)
- outline.append(outline[0])
- draw_polyline(outline,PopupSkin.BRASS,1.0,true)
- var header_rect := Rect2(Vector2.ZERO,Vector2(size.x,48))
- draw_colored_polygon(PopupSkin.header_points(header_rect,10),PopupSkin.PANEL_ALT)
- draw_rect(Rect2(0,0,7,48),PopupSkin.ORANGE)
- draw_rect(Rect2(size.x-44,16,26,2),PopupSkin.CYAN)
- draw_line(Vector2(12,48),Vector2(size.x-12,48),PopupSkin.BRASS,1.0)
+ PopupSkin.draw_window(self,Rect2(Vector2.ZERO,size))
 
 func _ready() -> void:
  size = Vector2(400,460)
@@ -48,28 +37,19 @@ func _ready() -> void:
  header.mouse_default_cursor_shape = Control.CURSOR_MOVE
  add_child(header)
  var accent := ColorRect.new()
- accent.position = Vector2(0,0)
- accent.size = Vector2(4,48)
+ accent.position = Vector2(0,8)
+ accent.size = Vector2(3,32)
  accent.color = PopupSkin.ORANGE
  accent.mouse_filter = Control.MOUSE_FILTER_IGNORE
  header.add_child(accent)
- var signal_mark := ColorRect.new()
- signal_mark.position = Vector2(352,12)
- signal_mark.size = Vector2(28,2)
- signal_mark.color = PopupSkin.CYAN
- signal_mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
- header.add_child(signal_mark)
  heading = _label("交易清单",Vector2(20,12),20)
- heading.add_theme_color_override("font_color",PopupSkin.PAPER)
+ heading.add_theme_color_override("font_color",PopupSkin.HEADER_TEXT)
+ heading.add_theme_font_override("font",PopupSkin.font(true))
  heading.mouse_filter = Control.MOUSE_FILTER_IGNORE
  close = Button.new()
  close.text = "×"
  close.position = Vector2(350,8)
- close.size = Vector2(30,30)
- close.add_theme_font_size_override("font_size",18)
- PopupSkin.button(close)
- close.add_theme_stylebox_override("normal",PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.BRASS,0))
- close.add_theme_stylebox_override("hover",PopupSkin.box(PopupSkin.ORANGE,PopupSkin.DARK,0))
+ PopupSkin.close_button(close)
  close.pressed.connect(func(): close_requested.emit())
  header.add_child(close)
  header.gui_input.connect(func(e):
@@ -81,7 +61,7 @@ func _ready() -> void:
    position = (get_global_mouse_position()-drag_offset).clamp(Vector2(8,8),Vector2(1592,860)-size)
    header.accept_event()
  )
- intent = _label("",Vector2(20,62),13)
+ intent = _label("",Vector2(20,62),14)
  intent.size = Vector2(360,44)
  intent.add_theme_color_override("font_color",PopupSkin.MUTED)
  buy_tab = _button("买入",Vector2(20,112),Vector2(176,32))
@@ -96,7 +76,7 @@ func _ready() -> void:
   var l := Label.new()
   l.text = entry[0]
   l.custom_minimum_size.x = entry[1]
-  l.add_theme_font_size_override("font_size",12)
+  l.add_theme_font_size_override("font_size",14)
   l.add_theme_color_override("font_color",PopupSkin.MUTED)
   columns.add_child(l)
  scroll = ScrollContainer.new()
@@ -119,9 +99,9 @@ func _ready() -> void:
  price.add_theme_font_size_override("font_size",18)
  var line := price.get_line_edit()
  line.alignment = HORIZONTAL_ALIGNMENT_CENTER
- line.add_theme_stylebox_override("normal",PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.BRASS,0))
+ line.add_theme_stylebox_override("normal",PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.FRAME,0))
  line.add_theme_stylebox_override("focus",PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.ORANGE,0))
- line.add_theme_color_override("font_color",PopupSkin.INK)
+ line.add_theme_color_override("font_color",PopupSkin.TEXT)
  add_child(price)
  haggle = _button("提出还价",Vector2.ZERO,Vector2(158,38))
  haggle.pressed.connect(func(): offer_submitted.emit(int(price.value)))
@@ -134,7 +114,7 @@ func _label(value: String, pos: Vector2, font_size := 15) -> Label:
  var l := Label.new()
  l.text = value
  l.position = pos
- l.add_theme_color_override("font_color",PopupSkin.INK)
+ l.add_theme_color_override("font_color",PopupSkin.TEXT)
  l.add_theme_font_size_override("font_size",font_size)
  add_child(l)
  return l
@@ -212,13 +192,13 @@ func refresh(state) -> void:
   child.queue_free()
  if awaiting_more:
   var hint := Label.new()
-  hint.text = "顾客还有 %d G，可以继续上货。" % state.customer_funds
+  hint.text = "暂无待交易物品"
   hint.add_theme_font_size_override("font_size",14)
   hint.add_theme_color_override("font_color",PopupSkin.MUTED)
   rows.add_child(hint)
  elif active_items.is_empty() and not settled_items.is_empty():
   var hint := Label.new()
-  hint.text = "已支付物品仍在柜台，请手动收纳。"
+  hint.text = "柜台物品已支付"
   hint.add_theme_font_size_override("font_size",14)
   hint.add_theme_color_override("font_color",PopupSkin.MUTED)
   rows.add_child(hint)
@@ -226,7 +206,7 @@ func refresh(state) -> void:
   var data: Dictionary = state.CATALOG[item.key]
   var row_panel := PanelContainer.new()
   row_panel.custom_minimum_size.y = 32
-  var row_skin := PopupSkin.box(PopupSkin.PANEL_ALT,Color("39464c"),0)
+  var row_skin := PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.DIVIDER,0)
   row_skin.content_margin_left = 8
   row_skin.content_margin_right = 8
   row_panel.add_theme_stylebox_override("panel",row_skin)
@@ -240,8 +220,10 @@ func refresh(state) -> void:
    l.text = entry[0]
    l.custom_minimum_size.x = entry[1]
    l.add_theme_font_size_override("font_size",14)
-   l.add_theme_color_override("font_color",PopupSkin.INK)
+   l.add_theme_color_override("font_color",PopupSkin.TEXT)
    l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+   if row.get_child_count() == 2:
+    l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
    row.add_child(l)
  var heading_name := "继续交易" if awaiting_more else ("交易清单" if both else ("买入清单" if not buying_items.is_empty() else "卖出清单"))
  heading.text = "%s · %d 件" % [heading_name,state.counter_items().size()]
@@ -252,9 +234,9 @@ func refresh(state) -> void:
  elif not selling_items.is_empty():
   summary.text = "行情 %d G   ·   对方报价 %d G" % [state.selling_value(),state.sell_offer]
  elif awaiting_more:
-  summary.text = "顾客余款 %d G · 可继续摆货" % state.customer_funds
+  summary.text = "顾客余款 %d G" % state.customer_funds
  else:
-  summary.text = "已支付物品：请手动拖回库存"
+  summary.text = "已支付"
  price.visible = not awaiting_more
  offer_label.visible = not awaiting_more
  haggle.visible = not awaiting_more

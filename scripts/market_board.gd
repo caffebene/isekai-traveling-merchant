@@ -4,11 +4,11 @@ signal close_requested
 signal travel_requested
 
 const PopupSkin = preload("res://scripts/popup_style.gd")
-const INK := Color("eaddbd")
-const MUTED := Color("aaa58f")
-const GOLD := Color("d0ad70")
-const UP := Color("ee9a70")
-const DOWN := Color("7fc9c0")
+const INK = PopupSkin.TEXT
+const MUTED = PopupSkin.MUTED
+const GOLD = PopupSkin.TEXT
+const UP = PopupSkin.ORANGE
+const DOWN = PopupSkin.CYAN
 
 var state
 var item_textures: Dictionary
@@ -25,36 +25,36 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	z_index = 80
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	font = SystemFont.new()
-	font.font_names = PackedStringArray(["PingFang SC","Noto Sans CJK SC","Microsoft YaHei"])
+	font = PopupSkin.font()
+	theme = PopupSkin.theme()
 	var shade := ColorRect.new()
-	shade.color = Color("081014d6")
+	shade.color = PopupSkin.SHADE
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(shade)
 	var window := Panel.new()
 	window.position = Vector2(180,72)
 	window.size = Vector2(1240,756)
-	window.add_theme_stylebox_override("panel",PopupSkin.box(Color("182326fa"),GOLD,10))
+	PopupSkin.window(window)
 	add_child(window)
-	var title := _label(window,"商路行情簿",Vector2(32,20),27,GOLD)
+	var title := _label(window,"商路行情簿",Vector2(24,8),24,PopupSkin.HEADER_TEXT)
 	var city := _label(window,"%s · 周期第 %d 天" % [state.economy.city_name(),state.economy.cycle_day(state.day)],Vector2(32,57),16,INK)
 	city.add_theme_color_override("font_color",INK)
 	var departure := "商路今日开放" if state.can_travel() else "%d 天后开放商路" % state.economy.days_until_departure(state.day)
-	_label(window,departure,Vector2(970,28),15,DOWN if state.can_travel() else MUTED)
-	var close := _button(window,"×",Vector2(1184,18),Vector2(34,34),false)
+	_label(window,departure,Vector2(900,14),14,PopupSkin.HEADER_TEXT)
+	var close := _button(window,"×",Vector2(1184,8),Vector2(34,34),false)
 	close.pressed.connect(func(): close_requested.emit())
 
 	var left := Panel.new()
 	left.position = Vector2(24,94)
 	left.size = Vector2(760,578)
-	left.add_theme_stylebox_override("panel",PopupSkin.box(Color("111a1de8"),Color("526267"),6))
+	left.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.BACKGROUND,PopupSkin.DIVIDER))
 	window.add_child(left)
 	_label(left,"当前商品行情",Vector2(20,14),19,INK)
-	_label(left,"商品",Vector2(76,48),12,MUTED)
-	_label(left,"基础",Vector2(322,48),12,MUTED)
-	_label(left,"现价",Vector2(392,48),12,MUTED)
-	_label(left,"涨跌",Vector2(466,48),12,MUTED)
-	_label(left,"价格原因",Vector2(548,48),12,MUTED)
+	_label(left,"商品",Vector2(76,48),14,MUTED)
+	_label(left,"基础",Vector2(322,48),14,MUTED)
+	_label(left,"现价",Vector2(392,48),14,MUTED)
+	_label(left,"涨跌",Vector2(466,48),14,MUTED)
+	_label(left,"价格原因",Vector2(548,48),14,MUTED)
 	var scroll := ScrollContainer.new()
 	scroll.position = Vector2(12,70)
 	scroll.size = Vector2(736,494)
@@ -68,7 +68,7 @@ func _ready() -> void:
 	var right := Panel.new()
 	right.position = Vector2(800,94)
 	right.size = Vector2(416,578)
-	right.add_theme_stylebox_override("panel",PopupSkin.box(Color("111a1de8"),Color("526267"),6))
+	right.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.BACKGROUND,PopupSkin.DIVIDER))
 	window.add_child(right)
 	_label(right,"事件日历 · 精确预测",Vector2(20,14),19,INK)
 	var event_scroll := ScrollContainer.new()
@@ -84,7 +84,6 @@ func _ready() -> void:
 	travel_button = _button(window,"前往%s · %d G" % [state.economy.other_city_name(),state.economy.TRAVEL_COST],Vector2(958,690),Vector2(258,44),true)
 	travel_button.visible = state.can_travel()
 	travel_button.pressed.connect(func(): travel_requested.emit())
-	_label(window,"行情价直接用于柜台报价；连续倾销会继续压低同类商品价格。",Vector2(32,703),13,MUTED)
 	refresh()
 
 func refresh() -> void:
@@ -113,7 +112,7 @@ func _add_market_row(key: String) -> void:
 	var quote: Dictionary = state.economy.price_breakdown(key,data.category,data.value,state.day)
 	var row := Panel.new()
 	row.custom_minimum_size = Vector2(716,58)
-	row.add_theme_stylebox_override("panel",PopupSkin.box(Color("1d2a2dcf") if rows.get_child_count()%2 == 0 else Color("172326cf"),Color("334448"),3))
+	row.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.PANEL_ALT if rows.get_child_count()%2 == 0 else PopupSkin.PANEL,Color.TRANSPARENT))
 	rows.add_child(row)
 	if item_textures.has(key):
 		var icon_clip := Control.new()
@@ -124,6 +123,8 @@ func _add_market_row(key: String) -> void:
 		icon_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(icon_clip)
 		var icon := TextureRect.new()
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.texture = item_textures[key]
 		icon.position = Vector2.ZERO
 		icon.size = Vector2(44,44)
@@ -133,14 +134,14 @@ func _add_market_row(key: String) -> void:
 		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		icon_clip.add_child(icon)
 	_label(row,str(data.name),Vector2(64,8),15,INK)
-	_label(row,str(data.category),Vector2(64,31),11,MUTED)
-	_label(row,"%d G" % int(quote.base),Vector2(310,19),14,MUTED)
-	_label(row,"%d G" % int(quote.current),Vector2(380,19),16,INK)
+	_label(row,str(data.category),Vector2(64,31),14,MUTED)
+	_amount(row,int(quote.base),Vector2(290,19),14,MUTED)
+	_amount(row,int(quote.current),Vector2(364,19),16,INK)
 	var percent: int = int(quote.percent)
 	var color := UP if percent > 0 else DOWN if percent < 0 else MUTED
 	_label(row,"%+d%%" % percent,Vector2(454,19),16,color)
 	var reason := "；".join(Array(quote.reasons))
-	var reason_label := _label(row,reason,Vector2(526,10),12,color)
+	var reason_label := _label(row,reason,Vector2(526,10),14,color)
 	reason_label.size = Vector2(178,42)
 	reason_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
@@ -153,7 +154,7 @@ func _add_event_card(event: Dictionary) -> void:
 	var state_text := "今日生效" if active else "%d 天后" % wait if wait > 0 else "本周期已结束"
 	var card := PanelContainer.new()
 	card.custom_minimum_size = Vector2(370,220)
-	card.add_theme_stylebox_override("panel",PopupSkin.box(Color("26322df0") if active else Color("192427e8"),UP if active else Color("46585c"),5))
+	card.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.PANEL_ALT if active else PopupSkin.BACKGROUND,PopupSkin.DIVIDER))
 	events_column.add_child(card)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation",4)
@@ -171,7 +172,7 @@ func _add_event_card(event: Dictionary) -> void:
 		var line := Label.new()
 		line.text = "%s  %+.0f%%  →  %d G" % [data.name,percent,price]
 		line.add_theme_font_override("font",font)
-		line.add_theme_font_size_override("font_size",12)
+		line.add_theme_font_size_override("font_size",14)
 		line.add_theme_color_override("font_color",UP if percent > 0 else DOWN)
 		column.add_child(line)
 
@@ -179,7 +180,7 @@ func _label(parent: Node, value: String, at: Vector2, size_value: int, color: Co
 	var label := Label.new()
 	label.text = value
 	label.position = at
-	label.add_theme_font_override("font",font)
+	label.add_theme_font_override("font",PopupSkin.font(size_value >= 20))
 	label.add_theme_font_size_override("font_size",size_value)
 	label.add_theme_color_override("font_color",color)
 	parent.add_child(label)
@@ -194,3 +195,8 @@ func _button(parent: Node, value: String, at: Vector2, dimensions: Vector2, prim
 	PopupSkin.button(button,primary)
 	parent.add_child(button)
 	return button
+
+func _amount(parent: Node, value: int, at: Vector2, size_value: int, color: Color) -> void:
+	var amount := _label(parent,"%d G" % value,at,size_value,color)
+	amount.size.x = 68
+	amount.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT

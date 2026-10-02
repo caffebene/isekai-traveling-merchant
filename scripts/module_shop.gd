@@ -4,11 +4,11 @@ signal close_requested
 signal purchase_requested(module_id: String)
 
 const PopupSkin = preload("res://scripts/popup_style.gd")
-const INK := Color("eaddbd")
-const MUTED := Color("aaa58f")
-const GOLD := Color("d0ad70")
-const ACTIVE := Color("7fc9c0")
-const LOCKED := Color("6e7370")
+const INK = PopupSkin.TEXT
+const MUTED = PopupSkin.MUTED
+const GOLD = PopupSkin.TEXT
+const ACTIVE = PopupSkin.CYAN
+const LOCKED = PopupSkin.DISABLED
 const MODULES := [
 	{"id":"roof_rack","name":"车顶货架","tag":"空间","effect":"旅行背包","before":"6 × 6 · 36 格","after":"8 × 6 · 48 格","proof":"安装后背包立即增加两列"},
 	{"id":"hidden_compartment","name":"隐藏夹层","tag":"保险","effect":"探索战败","before":"背包物品全部遗失","after":"保留价值最高的 2 件","proof":"受保护物品显示锁形标记"},
@@ -28,27 +28,27 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	z_index = 80
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	font = SystemFont.new()
-	font.font_names = PackedStringArray(["PingFang SC","Noto Sans CJK SC","Microsoft YaHei"])
+	font = PopupSkin.font()
+	theme = PopupSkin.theme()
 	var shade := ColorRect.new()
-	shade.color = Color("081014d6")
+	shade.color = PopupSkin.SHADE
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(shade)
 	var window := Panel.new()
-	window.position = Vector2(190,150)
-	window.size = Vector2(1220,600)
-	window.add_theme_stylebox_override("panel",PopupSkin.box(Color("182326fa"),GOLD,10))
+	window.position = Vector2(190,180)
+	window.size = Vector2(1220,508)
+	PopupSkin.window(window)
 	add_child(window)
-	_label(window,"商车改装台",Vector2(32,22),28,GOLD)
-	_label(window,"选择会改变规则的模块 · 最多安装 2 个",Vector2(32,62),15,MUTED)
-	gold_label = _label(window,"",Vector2(1000,30),16,INK)
-	var close := _button(window,"×",Vector2(1164,18),Vector2(34,34),false)
+	_label(window,"商车改装台",Vector2(24,8),24,PopupSkin.HEADER_TEXT)
+	_label(window,"模块插槽 2",Vector2(32,62),15,MUTED)
+	gold_label = _label(window,"",Vector2(890,14),16,PopupSkin.HEADER_TEXT)
+	var close := _button(window,"×",Vector2(1164,8),Vector2(34,34),false)
 	close.pressed.connect(func(): close_requested.emit())
 	cards.position = Vector2(30,108)
-	cards.size = Vector2(1160,390)
+	cards.size = Vector2(1160,312)
 	cards.add_theme_constant_override("separation",18)
 	window.add_child(cards)
-	status_label = _label(window,"",Vector2(32,536),15,ACTIVE)
+	status_label = _label(window,"",Vector2(32,452),15,ACTIVE)
 	refresh()
 
 func refresh(message := "") -> void:
@@ -56,7 +56,7 @@ func refresh(message := "") -> void:
 		return
 	for child in cards.get_children():
 		child.queue_free()
-	gold_label.text = "金币  %d G  ·  插槽 %d / 2" % [state.gold,state.economy.modules.size()]
+	gold_label.text = "%d G  ·  插槽 %d / 2" % [state.gold,state.economy.modules.size()]
 	status_label.text = message
 	for definition in MODULES:
 		_add_card(definition)
@@ -66,16 +66,17 @@ func _add_card(definition: Dictionary) -> void:
 	var full: bool = state.economy.modules.size() >= 2
 	var affordable: bool = state.gold >= state.economy.module_cost(definition.id)
 	var card := PanelContainer.new()
-	card.custom_minimum_size = Vector2(374,390)
-	card.add_theme_stylebox_override("panel",PopupSkin.box(Color("20332ff0") if installed else Color("151f22ef"),ACTIVE if installed else Color("526267"),7))
+	card.custom_minimum_size = Vector2(374,312)
+	card.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.PANEL_ALT,ACTIVE if installed else PopupSkin.DIVIDER))
 	cards.add_child(card)
+	card.draw.connect(func(): PopupSkin.draw_module_icon(card,str(definition.id),Vector2(card.size.x-64,12)))
 	var body := VBoxContainer.new()
 	body.add_theme_constant_override("separation",10)
 	card.add_child(body)
 	var tag := Label.new()
 	tag.text = "%s  ·  %s" % [definition.tag,"已启用" if installed else "未安装"]
 	tag.add_theme_font_override("font",font)
-	tag.add_theme_font_size_override("font_size",13)
+	tag.add_theme_font_size_override("font_size",14)
 	tag.add_theme_color_override("font_color",ACTIVE if installed else MUTED)
 	body.add_child(tag)
 	var title := Label.new()
@@ -92,14 +93,6 @@ func _add_card(definition: Dictionary) -> void:
 	body.add_child(effect)
 	_add_rule(body,"改装前",definition.before,MUTED)
 	_add_rule(body,"改装后",definition.after,ACTIVE)
-	var proof := Label.new()
-	proof.text = definition.proof
-	proof.custom_minimum_size.y = 52
-	proof.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	proof.add_theme_font_override("font",font)
-	proof.add_theme_font_size_override("font_size",13)
-	proof.add_theme_color_override("font_color",INK)
-	body.add_child(proof)
 	var price: int = state.economy.module_cost(definition.id)
 	var button := Button.new()
 	button.text = "已安装" if installed else "插槽已满" if full else "金币不足 · %d G" % price if not affordable else "安装 · %d G" % price
@@ -112,7 +105,7 @@ func _add_card(definition: Dictionary) -> void:
 
 func _add_rule(parent: Node, key: String, value: String, color: Color) -> void:
 	var panel := PanelContainer.new()
-	panel.add_theme_stylebox_override("panel",PopupSkin.box(Color("11191cd9"),Color("39494c"),3))
+	panel.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.BACKGROUND,Color.TRANSPARENT))
 	parent.add_child(panel)
 	var label := Label.new()
 	label.text = "%s\n%s" % [key,value]
@@ -125,7 +118,7 @@ func _label(parent: Node, value: String, at: Vector2, size_value: int, color: Co
 	var label := Label.new()
 	label.text = value
 	label.position = at
-	label.add_theme_font_override("font",font)
+	label.add_theme_font_override("font",PopupSkin.font(size_value >= 20))
 	label.add_theme_font_size_override("font_size",size_value)
 	label.add_theme_color_override("font_color",color)
 	parent.add_child(label)

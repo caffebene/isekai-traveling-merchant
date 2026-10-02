@@ -1,3 +1,5 @@
+> 历史生成记录，不作为当前生成依据。全局规范：docs/game-design/整体视觉与UI规范.md。
+
 # 旅商背面战斗素材
 
 2026-09-11 已按 [低噪声 v2 提示词](prompts-clean-v2.json) 重新生成并替换；当前成品与检查记录见 [generation-results-hero.md](generation-results-hero.md)。以下是上一版素材的生成记录。

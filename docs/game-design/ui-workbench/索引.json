@@ -1,5 +1,5 @@
 {
-  "name": "异世界旅商经营页 UI 换皮工作区",
+  "name": "异世界旅商统一UI工作区",
   "workflow": [
     "01_原图分析/参考说明.md",
     "02_结构与布局/语义合约.json",
@@ -8,12 +8,17 @@
     "03_风格规范生成/UI规范.md",
     "08_网页组装/交互状态.md"
   ],
-  "validation": "../../testing/ui-workbench/验收记录.json",
+  "validation": "../../testing/统一UI改版验收.md",
   "implementation": [
+    "scripts/popup_style.gd",
     "scripts/shop.gd",
     "scripts/trade_panel.gd",
-    "scripts/scene_layers.gd",
-    "scripts/interact_hover_tip.gd",
-    "assets/ui/dialogue-frame.png"
-  ]
+    "scripts/exploration.gd",
+    "scripts/market_board.gd",
+    "scripts/module_shop.gd",
+    "scripts/workbench_view.gd",
+    "scripts/interact_hover_tip.gd"
+  ],
+  "style_authority": "../整体视觉与UI规范.md",
+  "baseline": "../../testing/previews/unified-ui/"
 }

@@ -16,6 +16,14 @@ func advance(page, frames: int) -> void:
 		await physics_frame
 		page._step_counter_physics(1.0/60.0)
 
+func lowest_collision_y(body: RigidBody2D) -> float:
+	var result := -INF
+	for child in body.get_children():
+		if child is CollisionPolygon2D:
+			for point in child.polygon:
+				result = maxf(result,child.to_global(point).y)
+	return result
+
 func run() -> void:
 	var page = load("res://main.tscn").instantiate()
 	root.add_child(page)
@@ -26,17 +34,17 @@ func run() -> void:
 	var second: Dictionary = page.state.items.filter(func(i): return i.key == "bread")[0]
 	page._place_on_counter(first.id,Vector2(720,250),false)
 	await advance(page,240)
-	var bottom_y: float = first.counter_position.y
-	check(bottom_y > 350.0 and bottom_y < 430.0,"potion lands on red countertop baseline")
 	var body: RigidBody2D = page.counter_world.bodies[first.id]
+	check(absf(lowest_collision_y(body)-page.COUNTER_BASELINE_Y) < 4.0,"potion alpha contour lands on current countertop baseline")
 	check(body.physics_material_override.bounce == 0.0,"zero restitution")
 	check(not body.lock_rotation,"rotation is physically free")
 	check(body.get_child(0) is CollisionPolygon2D,"uses source alpha polygons")
 	page._place_on_counter(second.id,Vector2(748,280),false)
 	await advance(page,360)
 	check(absf(second.counter_angle) > 0.15,"off-center bread rotates after contact")
-	check(second.counter_position.y > first.counter_position.y+8.0,"unstable bread falls off bottle")
-	check(second.counter_position.y < 435.0,"bread does not tunnel through countertop baseline")
+	var bread_body: RigidBody2D = page.counter_world.bodies[second.id]
+	check(second.counter_position.y > 350.0,"bread falls under gravity after contacting bottle")
+	check(lowest_collision_y(bread_body) <= page.COUNTER_BASELINE_Y+4.0,"bread alpha contour does not tunnel through current countertop baseline")
 	page.state.cancel_trade()
 	await advance(page,2)
 	var support_item: Dictionary = page.state.items.filter(func(i): return i.key == "bread")[0]

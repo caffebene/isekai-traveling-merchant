@@ -18,7 +18,7 @@ func run() -> void:
  await process_frame
  check(shop.door_art != null and shop.bed_art != null and shop.table_art != null,"scene props are installed")
  check(shop.computer_art != null and shop.phone_art != null and shop.bell_art != null and shop.door_closer_art != null,"new interaction props are installed")
- check(shop.computer_art.size == Vector2(240,210) and shop.phone_art.size == Vector2(160,104),"computer and phone match the reference layout proportions")
+ check(shop.computer_art.size == Vector2(240,210) and shop.phone_art.size.is_equal_approx(Vector2(66.1538,43)),"computer and phone match the reference layout proportions")
  check(shop.shutter_clip != null and shop.shutter_clip.size.y == 0.0 and shop.shutter_clip.position.y == 84.0,"roller shutter starts open at the original window position")
  shop.computer_art.emit_signal("pressed")
  check(shop.trade_panel.keep_open and shop.trade_panel.visible,"computer click opens the trade panel")
@@ -29,7 +29,7 @@ func run() -> void:
  shop.trade_panel.close.emit_signal("pressed")
  check(not shop.trade_panel.visible and not shop.trade_panel.keep_open,"trade panel close button closes only the trade panel")
  shop.phone_art.emit_signal("pressed")
- check(shop.recorder_panel != null and shop.recorder_panel.size == Vector2(320,540),"phone click opens the phone-styled history panel")
+ check(shop.recorder_panel != null and shop.recorder_panel.size == Vector2(320,540),"phone click opens the shared history panel")
  shop.phone_art.emit_signal("pressed")
  check(shop.recorder_panel == null,"clicking the phone again closes the history panel")
  var bell_press := InputEventMouseButton.new()

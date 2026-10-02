@@ -51,5 +51,7 @@
     }
   },
   "next_generation_prompts": "assets/exploration/prompts-clean-v2.json",
-  "next_generation_note": "新版减噪提示词，尚未生成；以上 assets 条目记录已生成素材的历史提示词。"
+  "next_generation_note": "新版减噪提示词，尚未生成；以上 assets 条目记录已生成素材的历史提示词。",
+  "authority": "docs/game-design/整体视觉与UI规范.md",
+  "reference_status": "historical generation record; not current style authority"
 }

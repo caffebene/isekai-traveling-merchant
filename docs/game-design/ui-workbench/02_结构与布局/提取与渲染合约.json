@@ -1,22 +1,168 @@
 {
   "rendering": "Godot runtime composition",
-  "background": {"mode": "fixed_texture", "path": "assets/trade-walnut/main-trade-background-split.png", "stretch": "viewport_exact", "z_index": -100},
-  "city_exterior": {"mode": "window_clipped_texture", "path": "assets/trade-walnut/main-trade-exterior-city.png", "rect": [294, 90, 1006, 360], "replaceable": true, "z_index": -99},
-  "scene_overlays": {
-    "door": {"path": "assets/interaction/door-metal.png", "rect": [-35, -5, 217, 950], "z_index": -30, "interaction": "open_exploration", "hover": "white_outline"},
-    "bed": {"path": "assets/interaction/bed-metal.png", "rect": [1360, 468, 660, 594], "z_index": -20, "interaction": "end_day", "hover": "white_outline"},
-    "table": {"path": "assets/interaction/table-metal.png", "rect": [155, 168, 1362, 876], "z_index": -10, "mouse_filter": "ignore", "note": "topmost among scene overlays; runtime items remain above it"},
-    "roller_shutter_clip": {"path": "assets/interaction/roller_shutter.png", "rect": [288, 84, 1024, 362], "z_index": -15, "animation": "height 0_to_362 from top to bottom", "covers": "window"},
-    "computer": {"path": "assets/interaction/computer.png", "rect": [1160, 245, 240, 210], "z_index": -5, "interaction": "open_trade_panel", "hover": "white_outline"},
-    "phone": {"path": "assets/interaction/phone.png", "rect": [1238, 382, 160, 104], "z_index": -5, "interaction": "open_phone_history", "hover": "white_outline"},
-    "call_bell": {"path": "assets/interaction/call_bell.png", "rect": [1374, 382, 112, 96], "z_index": -5, "interaction": "click_empty_or_hold_present_customer", "hover": "white_outline"},
-    "door_closer": {"path": "assets/interaction/door_closer.png", "rect": [1360, 170, 64, 128], "z_index": -5, "interaction": "close_roller_shutter", "hover": "white_outline"}
+  "background": {
+    "mode": "fixed_texture",
+    "path": "assets/trade-walnut/main-trade-background-split.png",
+    "stretch": "viewport_exact",
+    "z_index": -100
   },
-  "customer_portrait": {"mode": "independent_texture_rect", "clip": "window", "fade_in": 0.3},
-  "window_shells": {"mode": "runtime_draw", "nine_slice": false, "reason": "窗口尺寸由清单或网格内容控制，避免把整页 PNG 拉伸"},
-  "item_icons": {"mode": "runtime_draw", "grid_sized": true, "drag_ghost_uses_target_cell": true},
-  "text_and_values": {"mode": "runtime_labels", "baked": false},
-  "hover_feedback": {"mode": "runtime_name_tip", "scene_props": "white_outline_plus_name_only_tip", "item": "flat_full_info_tip", "animation": "scale_0.18_to_1_from_bottom_left_0.16s_fade_0.10s", "chrome": "black_white_border_red_bottom_layer", "scene_anchor": "object_top_left_or_right_topmost_z", "z_index": "topmost", "prop_alignment": {"door": "vertical_center_y_keep_x", "bed": "horizontal_center_x_keep_y"}},
-  "dialogue_box": {"mode": "runtime_asset_frame", "asset": "assets/ui/dialogue-frame.png", "placement": "window_upper_right_marked_region", "navigation": "previous_next_buttons_in_frame_bottom_right", "after_last_line": "keep_open_for_browsing"},
-  "interaction_rules": {"door_and_bed_require": "shutter_closed", "open_shutter_click_message": "请先关闭卷帘门后再交互"}
+  "city_exterior": {
+    "mode": "window_clipped_texture",
+    "path": "assets/trade-walnut/main-trade-exterior-city.png",
+    "rect": [
+      294,
+      90,
+      1006,
+      360
+    ],
+    "replaceable": true,
+    "z_index": -99
+  },
+  "scene_overlays": {
+    "door": {
+      "path": "assets/interaction/door-metal.png",
+      "rect": [
+        -35,
+        -5,
+        217,
+        950
+      ],
+      "z_index": -30,
+      "interaction": "open_exploration",
+      "hover": "white_outline"
+    },
+    "bed": {
+      "path": "assets/interaction/bed-metal.png",
+      "rect": [
+        1360,
+        468,
+        660,
+        594
+      ],
+      "z_index": -20,
+      "interaction": "end_day",
+      "hover": "white_outline"
+    },
+    "table": {
+      "path": "assets/interaction/table-metal.png",
+      "rect": [
+        155,
+        168,
+        1362,
+        876
+      ],
+      "z_index": -10,
+      "mouse_filter": "ignore",
+      "note": "topmost among scene overlays; runtime items remain above it"
+    },
+    "roller_shutter_clip": {
+      "path": "assets/interaction/roller_shutter.png",
+      "rect": [
+        288,
+        84,
+        1024,
+        362
+      ],
+      "z_index": -15,
+      "animation": "height 0_to_362 from top to bottom",
+      "covers": "window"
+    },
+    "computer": {
+      "path": "assets/interaction/computer.png",
+      "rect": [
+        1136,
+        281,
+        240,
+        210
+      ],
+      "z_index": -5,
+      "interaction": "open_trade_panel",
+      "hover": "white_outline"
+    },
+    "phone": {
+      "path": "assets/interaction/phone.png",
+      "rect": [
+        1138,
+        462,
+        66.1538,
+        43
+      ],
+      "z_index": -5,
+      "interaction": "open_phone_history",
+      "hover": "white_outline"
+    },
+    "call_bell": {
+      "path": "assets/interaction/call_bell.png",
+      "rect": [
+        1346,
+        449,
+        60.6666,
+        52
+      ],
+      "z_index": -5,
+      "interaction": "click_empty_or_hold_present_customer",
+      "hover": "white_outline"
+    },
+    "door_closer": {
+      "path": "assets/interaction/door_closer.png",
+      "rect": [
+        1360,
+        170,
+        64,
+        128
+      ],
+      "z_index": -5,
+      "interaction": "close_roller_shutter",
+      "hover": "white_outline"
+    }
+  },
+  "customer_portrait": {
+    "mode": "independent_texture_rect",
+    "clip": "window",
+    "fade_in": 0.3
+  },
+  "window_shells": {
+    "mode": "runtime_draw",
+    "nine_slice": false,
+    "reason": "窗口尺寸由清单或网格内容控制，避免把整页 PNG 拉伸"
+  },
+  "item_icons": {
+    "mode": "runtime_draw",
+    "grid_sized": true,
+    "drag_ghost_uses_target_cell": true
+  },
+  "text_and_values": {
+    "mode": "runtime_labels",
+    "baked": false
+  },
+  "hover_feedback": {
+    "mode": "runtime_name_tip",
+    "scene_props": "white_outline_plus_horizontal_name_tip",
+    "item": "flat_full_info_tip",
+    "animation": "scale_0.18_to_1_from_bottom_left_0.16s_fade_0.10s",
+    "chrome": "shared dark panel, grey 1px frame, short orange edge",
+    "scene_anchor": "object_top_left_or_right_topmost_z",
+    "z_index": "topmost",
+    "prop_alignment": {
+      "door": "vertical_center_y_keep_x",
+      "bed": "horizontal_center_x_keep_y"
+    }
+  },
+  "dialogue_box": {
+    "mode": "runtime_panel",
+    "style": "scripts/popup_style.gd",
+    "rect": [
+      960,
+      104,
+      360,
+      170
+    ],
+    "navigation": "bottom_right",
+    "after_last_line": "keep_open_for_browsing"
+  },
+  "interaction_rules": {
+    "door_and_bed_require": "shutter_closed",
+    "open_shutter_click_message": "请先关闭卷帘门后再交互"
+  },
+  "style_authority": "docs/game-design/整体视觉与UI规范.md"
 }

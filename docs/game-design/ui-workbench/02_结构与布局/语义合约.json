@@ -1,31 +1,113 @@
 {
   "screen": "经营页",
-  "fixed_layers": ["wagon_interior", "city_exterior", "customer_portrait"],
-  "runtime_slots": [
-    {"id": "customer_tray", "type": "grid", "size": "24x4", "owner": "customer", "source": "window_sill"},
-    {"id": "counter", "type": "grid", "size": "43x4", "owner": "mixed", "source": "tabletop"},
-    {"id": "stock", "type": "grid", "size": "30x12", "owner": "player", "source": "lower_storage"},
-    {"id": "display", "type": "grid", "size": "10x6", "owner": "player", "source": "side_shelf"},
-    {"id": "trade_panel", "type": "draggable_window", "content": "customer_intent_and_purchase_sale_tabs"},
-    {"id": "bag_window", "type": "draggable_window", "content": "6x6_grid", "source": "small_bag_item"},
-    {"id": "machine_window", "type": "draggable_window", "content": "machine_grid_and_next_day_recipe", "independent_instances": true, "close_button_parent": "window_host"},
-    {"id": "dialogue_box", "type": "runtime_dialogue_window", "content": "asset_frame_typewriter_and_paging", "source": "assets/ui/dialogue-frame.png", "placement": "window_upper_right_marked_region", "after_last_line": "keep_open"},
-    {"id": "recorder_window", "type": "phone_window", "content": "completed_dialogue_history", "source": "phone_hotspot"},
-    {"id": "computer_hotspot", "type": "scene_prop", "content": "open_trade_panel", "source": "assets/interaction/computer.png"},
-    {"id": "phone_hotspot", "type": "scene_prop", "content": "open_phone_history", "source": "assets/interaction/phone.png"},
-    {"id": "call_bell_hotspot", "type": "scene_prop", "content": "click_when_empty_or_hold_to_replace_customer", "source": "assets/interaction/call_bell.png"},
-    {"id": "door_closer_hotspot", "type": "scene_prop", "content": "close_roller_shutter", "source": "assets/interaction/door_closer.png"},
-    {"id": "roller_shutter", "type": "animated_scene_overlay", "content": "top_to_bottom_window_cover", "source": "assets/interaction/roller_shutter.png"}
+  "fixed_layers": [
+    "wagon_interior",
+    "city_exterior",
+    "customer_portrait"
   ],
-  "never_bake": ["item_names", "prices", "offer_values", "customer_dialogue", "grid_state", "hover_state", "window_position", "processing_state"],
+  "runtime_slots": [
+    {
+      "id": "customer_bag",
+      "type": "draggable_window",
+      "size": "24x4",
+      "owner": "customer",
+      "source": "customer_inventory"
+    },
+    {
+      "id": "counter",
+      "type": "continuous_physics_surface",
+      "owner": "mixed",
+      "source": "tabletop"
+    },
+    {
+      "id": "stock",
+      "type": "grid",
+      "size": "30x12",
+      "owner": "player",
+      "source": "lower_storage"
+    },
+    {
+      "id": "trade_panel",
+      "type": "draggable_window",
+      "content": "customer_intent_and_purchase_sale_tabs"
+    },
+    {
+      "id": "bag_window",
+      "type": "draggable_window",
+      "content": "6x6_grid",
+      "source": "small_bag_item"
+    },
+    {
+      "id": "machine_window",
+      "type": "draggable_window",
+      "content": "machine_grid_and_next_day_recipe",
+      "independent_instances": true,
+      "close_button_parent": "window_host"
+    },
+    {
+      "id": "dialogue_box",
+      "type": "runtime_dialogue_window",
+      "content": "runtime_panel_typewriter_and_paging",
+      "source": "scripts/popup_style.gd",
+      "placement": "right_of_customer",
+      "after_last_line": "keep_open"
+    },
+    {
+      "id": "recorder_window",
+      "type": "draggable_window",
+      "content": "completed_dialogue_history",
+      "source": "phone_hotspot"
+    },
+    {
+      "id": "computer_hotspot",
+      "type": "scene_prop",
+      "content": "open_trade_panel",
+      "source": "assets/interaction/computer.png"
+    },
+    {
+      "id": "phone_hotspot",
+      "type": "scene_prop",
+      "content": "open_phone_history",
+      "source": "assets/interaction/phone.png"
+    },
+    {
+      "id": "call_bell_hotspot",
+      "type": "scene_prop",
+      "content": "click_when_empty_or_hold_to_replace_customer",
+      "source": "assets/interaction/call_bell.png"
+    },
+    {
+      "id": "door_closer_hotspot",
+      "type": "scene_prop",
+      "content": "close_roller_shutter",
+      "source": "assets/interaction/door_closer.png"
+    },
+    {
+      "id": "roller_shutter",
+      "type": "animated_scene_overlay",
+      "content": "top_to_bottom_window_cover",
+      "source": "assets/interaction/roller_shutter.png"
+    }
+  ],
+  "never_bake": [
+    "item_names",
+    "prices",
+    "offer_values",
+    "customer_dialogue",
+    "grid_state",
+    "hover_state",
+    "window_position",
+    "processing_state"
+  ],
   "interaction_owners": {
     "bell": "call_next_customer_or_replace_on_long_press",
-    "door": "open_exit_information_when_shutter_closed",
+    "door": "open_exploration_modal_when_shutter_closed",
     "bed": "end_day_when_shutter_closed",
     "computer": "open_trade_panel",
     "phone": "open_phone_history",
     "door_closer": "close_roller_shutter",
     "small_bag": "open_bag_window",
     "machine_item": "open_machine_window"
-  }
+  },
+  "style_authority": "docs/game-design/整体视觉与UI规范.md"
 }

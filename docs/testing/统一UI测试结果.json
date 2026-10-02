@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-02",
+  "style": "urban-fantasy-v1",
+  "engine": "Godot 4.7.1",
+  "programs": 12,
+  "checks": 516,
+  "results": [
+    {
+      "name": "test_trade",
+      "exit": 0,
+      "result": [
+        "PASS: 110 trade and inventory checks"
+      ]
+    },
+    {
+      "name": "test_counter_physics",
+      "exit": 0,
+      "result": [
+        "PASS: 9 rigid-body checks (0 failures)"
+      ]
+    },
+    {
+      "name": "test_trade_overlay_interactions",
+      "exit": 0,
+      "result": [
+        "PASS: 51 trade overlay interaction checks"
+      ]
+    },
+    {
+      "name": "test_workbench_window",
+      "exit": 0,
+      "result": [
+        "WORKBENCH WINDOW PASS: 41 checks (0 failures)"
+      ]
+    },
+    {
+      "name": "test_alchemy",
+      "exit": 0,
+      "result": [
+        "ALCHEMY PASS: 159 checks (0 failures)"
+      ]
+    },
+    {
+      "name": "test_dialogue",
+      "exit": 0,
+      "result": [
+        "PASS: 11 dialogue checks"
+      ]
+    },
+    {
+      "name": "test_game_depth",
+      "exit": 0,
+      "result": [
+        "PASS: 31 game-depth checks"
+      ]
+    },
+    {
+      "name": "test_game_depth_ui",
+      "exit": 0,
+      "result": [
+        "PASS: 10 game-depth UI checks"
+      ]
+    },
+    {
+      "name": "test_exploration",
+      "exit": 0,
+      "result": [
+        "PASS: 46 exploration checks"
+      ]
+    },
+    {
+      "name": "test_exploration_interactions",
+      "exit": 0,
+      "result": [
+        "PASS: 19 exploration interaction checks"
+      ]
+    },
+    {
+      "name": "test_exploration_loot_autopick",
+      "exit": 0,
+      "result": [
+        "PASS: 6 exploration loot auto-pickup checks"
+      ]
+    },
+    {
+      "name": "test_exploration_travel",
+      "exit": 0,
+      "result": [
+        "PASS: 23 travel checks"
+      ]
+    }
+  ]
+}

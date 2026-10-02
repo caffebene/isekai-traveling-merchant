@@ -1,4 +1,6 @@
-# 已确认主图
+# 当前商车资源
+
+全局风格遵循 [整体视觉与UI规范](../../docs/game-design/整体视觉与UI规范.md)。当前柜台支撑基线为 y=485、连续台面 Rect2(382,485,1032,96)，以 shop.gd 为准。以下旧日期说明为历史记录，坐标不作为新布局依据。
 
 2026-09-16：交易页改用拆分后的 `main-trade-background-split.png`（1672×941，运行时按 1600×900 视口缩放）作为纯商车内景；`main-trade-exterior-city.png`（1672×941）通过 `ArtLayers/Window/Exterior` 叠加到橱窗开口，可由 `ArtLayers.set_city(texture)` 运行时替换。柜台改为连续无格线物理台面，落台区域为 x=382、y=424、w=1032、h=96；橱柜区定位为 x=462、y=531（30×12），背景图不绘制格子。旧版 `main-trade-background.png`、`main-trade-background-1694x928.png`、`main-trade-background-previous.png`、`main-trade-background-v2.png`、`main-zzz-metal-zoomed-layout-preview.png`、`main-anime.png` 与原图均保留作版本归档。
 

@@ -1,114 +1,32 @@
-# 异世界旅商 · 经营页原型
+# 异世界旅商
 
-原生 Godot 4 项目。用 Godot 打开 `project.godot`，按 F6/F5 运行；也可以在本目录执行 `godot --path .`。
+原生 Godot 4 项目。用 Godot 打开 `project.godot`，按 F5 运行；或执行 `godot --path .`。
 
-游戏玩法、系统规则与物品资料见 [游戏 Wiki](docs/game-design/wiki/README.md)。
+当前玩法包括空间库存、自由物理柜台、买卖与议价、跨日加工、城市行情、商车改装、跨城旅行和野外探索。玩法及版本范围见 [游戏 Wiki](docs/game-design/wiki/README.md)。当前不包含持久化存档。
 
-## 已确认交易页主图（2026-09-09）
+## 统一设计
 
-主场景使用拆分后的 `assets/trade-walnut/main-trade-background-split.png` 作为交易页商车内景，并将 `assets/trade-walnut/main-trade-exterior-city.png` 作为独立可替换的橱窗外景：绝区零风格的现代都市商业街与金属商车内景，采用大色块、稳定细线稿、成组阴影和少量高光。UI 代码将柜台作为连续无格线台面处理，台面物理区域定位在 (382,424,1032,96)，其中 y=424 是截图红线对应的掉落基线；30×12 橱柜区定位在 (462,531)；橱柜直接接地面。此前的 `main-trade-background.png`、`main-trade-background-1694x928.png`、`main-trade-background-previous.png`、`main-trade-background-v2.png`、`main-zzz-metal-zoomed-layout-preview.png`、`main-anime.png` 与原图 `main.png` 均保留为归档版本。柜台、橱柜、门、卧铺和独立顾客立绘沿用既有布局。人物不在背景里。
+当前风格为“复古都市 × 异世界旅商”。唯一全局依据：[整体视觉与UI规范](docs/game-design/整体视觉与UI规范.md)。经营、探索、行情、改装、设备、对白、历史及悬停共用 `scripts/popup_style.gd`。生成美术前读取总规范，再读取 [场景提示词](docs/game-design/玩家主世界画风提示词.md) 或 [道具提示词](docs/game-design/道具生成提示词.md)。
 
-- 移除左上展示柜，其初始物品并入橱柜。
-- 柜台取消格子区；将物品拖入橱柜上方的连续台面区域后，会受重力落台。复用 Godot RigidBody2D，按素材透明轮廓生成碰撞多边形、按可见像素估算重心，支持旋转倾倒、滑落与相互堆叠；碰撞弹性为零。抽走支撑物会唤醒其余物品继续下落。橱柜仍为 30×12 格，背包/仓库/设备等网格道具格统一为 24 px。
-- 取消实体顾客台；有出售物品的顾客使用独立的 24×4 背包窗口，自动打开、可拖动和关闭，并可通过“顾客背包”重新打开。
-- 交易清单仍为独立窗口；一体机可切换打开/关闭交易面板，面板提供关闭按钮；平放手机可切换打开/关闭手机样式的历史记录；呼叫铃支持点击叫来空场顾客、长按更换当前顾客；关门器控制橱窗卷帘门。
-- 最新运行截图：`docs/testing/previews/经营页面.png`、`docs/testing/previews/交易页面.png`、`docs/testing/previews/customer-1.png`。
+运行资产与历史边界见 [美术资源](docs/game-design/美术资源.md)。旧概念稿和生成记录仅供追溯，不作为当前风格默认参考。
 
-## 弹窗优化（2026-09-10）
+## 结构
 
-背包、设备、顾客背包、交易清单与历史对话窗口共用 `scripts/popup_style.gd` 的暗色工业标题栏、橙色框线、青色状态线和按钮样式，延续金属交易场景的绝区零风格。旅行背包设定最小窗口宽度，标题、关闭按钮、物品区及底部提示留出独立空间；设备窗口复用相同的窗口壳体，标题栏可拖动，网格与关闭按钮同步移动。顾客背包默认放左上，旅行背包放左下，交易窗口默认放左中，均避开对应设备。背包容量保持不变。
+- `scripts/trade_state.gd` 管理库存、交易、加工与物品数据；界面不改变规则。
+- `scripts/shop.gd` 组织经营输入、窗口与实体道具；交易清单靠右、背包靠左，窗口可拖动且独立关闭。
+- `scripts/scene_layers.gd` 保留内景、城市与顾客分层及替换接口；柜台支撑基线 y=485，主库存30×12、格子24 px。
+- `scenes/battle_multilayer.tscn` 与森林空间层负责旅途画面；探索界面复用全局组件。
+- [UI 工作区](docs/game-design/ui-workbench/索引.json) 记录当前语义和布局；玩家可感知改动同次同步 Wiki。
 
-背包、顾客背包与三台加工设备均为独立弹窗，可同时打开；关闭其中一个只移除自己的窗口和投放区，不会关闭其他窗口。关闭按钮作为窗口宿主的子节点创建，始终与标题栏同层并跟随窗口移动。交易面板与历史记录也支持通过对应设备再次点击关闭。
-
-交易窗口将顾客信息、清单、对方报价、我的还价和结算依次排列；仅混合交易显示买入/卖出切换，主按钮明确显示支付或收取金额，撤回为次要按钮。清单多项时滚动。弹窗覆盖区域屏蔽底层场景按钮，避免点背包误开车门。
-
-组合预览：`godot --path . --script tests/preview_popups.gd` → `docs/testing/previews/弹窗优化.png`。
-
-## 当前实现
-
-- 独立商车内景、窗外城市、透明顾客立绘、柜台表面、交互与库存层。
-- 左侧车门可点击打开外出入口说明；右侧床铺可在关门后结算并进入下一营业日。卷帘门打开时两者点击会提示先关门，卷帘门关闭后恢复交互；睡觉后卷帘门保持关闭，次日点击关门器打开卷帘门并迎接第一位顾客。
-- 右侧一体机可切换交易面板；平放手机可切换手机样式历史记录；呼叫铃在无顾客时点击呼叫下一位、有顾客时长按并显示圆圈进度后更换顾客；右上关门器点击后先确认“关闭将结束今日营业”，确认后以由上到下动画拉下卷帘门并遮住橱窗。
-- 顾客区 24×4、商车橱柜 30×12、侧边货架 10×6 使用空间格子；柜台是无格线的连续物理台面。
-- 拖放、拖动时 R 旋转、网格区占位冲突提示、双击快速上柜台、右键/Esc 取消拖动；物品拖至台面上方区域会自动落台并支持直接堆叠。
-- 非道具交互物悬停只显示名称；道具使用同一提示样式但保持水平，并显示完整物品信息。顾客物品买入、自有物品卖出、输入还价、顾客耐心、接受报价、撤回货物。
-- 顾客对白使用窗口右上方的科幻对话框素材逐字播放，逐句清空后继续下一句；右下角前后箭头可翻阅对白，最后一句结束后对话框保持打开，右下角“历史对话”按钮可打开历史对话。
-- 交易清单显示顾客购买意愿标签；非意愿物品仍可暂放柜台但不会进入交易清单，并会触发顾客反馈，意愿物品会显示喜欢程度。柜台可同时放置买入与出售物品，清单自动显示两个标签页。
-- 每位顾客带有 100–200 G 的当前资金上限，交易面板显示剩余资金，出售结算不会超过顾客可支付金额。
-- 普通成功操作（支付、结束交易、撤回物品）不弹角落提示；只有错误操作、空间/资金不足和必要指引才显示。玩家出售的物品会移到顾客格子，玩家买入的物品保留在柜台并标记为已支付，需手动拖回库存。顾客仍有预算时交易面板保持打开，并询问“还有没有更多货？”。
-- 买入时检查金币和仓库空间；失败不扣钱、不丢物品；撤回优先恢复原位置。
-- 商品包含材料、食物、矿石、燃料、武器、药剂及杂物；烹饪锅、炼药器和工作台是占用仓库格子的设备道具。
-- 双击设备打开可拖动窗口（单击仍兼容），工作台、炼药器、烹饪锅可同时独立打开。烹饪锅保留 8×5 格，隔天将兽肉制成烤肉。
-- 炼药器（内部仍用 `alembic` ID）分为材料区 8×8、产出区 4×8，底部燃料区 12×2。仅按全部材料的种类、数量精确匹配，与位置、旋转和放入顺序无关；每晚消耗一份完整组合及一份燃料；史莱姆粘液、古藤木分别产出1、2瓶（废水同样按燃料计算数量）。整批成品放不下时不消耗。
-- 当前两条已知炼药配方：月光草×2→防护药剂；月光草×1＋绯红果×2→力量药剂。图纸仅供查看，不提供摆放引导。未匹配已知配方的组合，产出区与悬浮提示均只显示“？？？”，次日消耗材料生成废水；空锅不生产，产出空间不足不消耗。废水没有药效，不能再次投入炼药。
-- 炼药规则及窗口验证：`godot --headless --path . --script tests/test_alchemy.gd`。移除 `--headless` 并追加 `-- --capture` 可输出炼药窗口截图。
-- 工作台初始赠送一台，附三块赤铜矿和一份史莱姆粘液。分为左侧燃料 4×8、中间材料 8×8、右侧产出 4×8；矿石保留 2×2 占格。每晚处理一份完整配方，产出一件装备。
-- 三种形状：竖放三块制剑，顶部侧加一块制斧，五块 T 型制镐；位置可平移，斧形可镜像。赤铜、辉铁各三条基础配方，另有两条指定古藤木的混合配方。形状正确但材质不匹配时降级为同类赤铜装备；形状错误、缺燃料或产出空间不足不消耗。
-- 史莱姆粘液/古藤木固定对应 60%/100% 纯度，最大耐久倍率为 1/1.5。燃料区只接受同一种燃料，每件成品消耗一份；成品使用独立耐久数据并能参与战斗。
-- 查看配方打开可翻页的静态图纸，展示材料位置、用量、燃料和产物；没有自动填入或摆放引导。矿石商人出售矿石与燃料，探索也可获得这些物品；旅剑士收购制作的武器。
-- 探索掉落按怪物特性限定为原材料：苔原史莱姆掉落月光草与史莱姆粘液，荆棘野狼和赤眼野狼掉落兽肉与绯红果，林地石怪掉落矿石，新增古木精掉落月光草与古藤木。探索不再掉落武器或药水。
-- 工作台逻辑验证：`godot --headless --path . --script tests/test_workbench.gd`；窗口流程验证：`godot --headless --path . --script tests/test_workbench_window.gd`，移除 `--headless` 并追加 `-- --capture` 可输出窗口截图。
-- 玩家初始拥有一件占用主库存 3×4 格的小背包；点击背包打开独立的可拖动 6×6 格窗口，确保 2×6 长剑可以完整收纳，窗口内容区只包含这组格子，物品可以在主库存与背包之间拖放、旋转和取出。
-- 移除分类、整理按钮与区域名称；保留当日收支和成交次数。
-- UI 结构、窗口尺寸和换皮 token 见 `docs/game-design/ui-workbench/索引.json`；验收记录见 `docs/testing/ui-workbench/验收记录.json`。
-
-## 场景与资源
-
-`main.tscn` 中的 `ArtLayers` 下包含：
-
-- `WagonInterior`：交易页使用的绝区零风格金属商车主图，含固定小镇外景。
-- `Window/Exterior`：默认启用的独立外景覆盖层，可通过 `ArtLayers.set_city(texture)` 替换或传入 `null` 隐藏。
-- `Window/Customer`：独立透明人物贴图，按服务窗口裁切。
-
-`scripts/scene_layers.gd` 保留人物切换、城市替换和整体光色接口。窗口外景已经从内景中拆出，`set_city(texture)` 可在运行时替换城市纹理；顾客仍是独立透明立绘。
-
-`scripts/trade_state.gd` 管理物品、归属、网格、交易与加工，和美术分离。`scripts/shop.gd` 实现经营页面输入与显示。
-
-## 范围
-
-当前有四位客人、一个城市。右下角“下一位客人”按钮呼叫下一位客人，切换立绘、对白与商品；未成交物品先退回。外出探索、战斗、跨城旅行、剧情和持久存档未实现。游戏关闭后重置原型状态。议价数值为本项目示例规则，并非对 Probably Stolen 未公开内部规则的复刻。
-
-交互依据用户两张截图及参考聊天；官方玩法说明：<https://store.steampowered.com/app/4348910/>。布局采用空间柜台交易，不使用双栏商品商店。
-
-## 验证
+## 验证与预览
 
 ```sh
 godot --headless --path . --script tests/test_trade.gd
-godot --headless --fixed-fps 60 --path . --script tests/test_counter_physics.gd
-godot --path . -- --smoke-ui
+godot --headless --path . --script tests/test_trade_overlay_interactions.gd
+godot --headless --path . --script tests/test_workbench_window.gd
+godot --headless --path . --script tests/test_exploration_interactions.gd
+godot --path . --resolution 1600x900 --script tests/preview_unified_ui.gd
+godot --path . --resolution 1440x810 --script tests/preview_unified_ui.gd
 ```
 
-`test_trade.gd` 验证交易与背包状态边界，`test_counter_physics.gd` 验证无格线柜台的落体、堆叠与撤回，`--smoke-ui` 验证交易界面和弹窗并输出 `docs/testing/previews/经营页面.png`。系统字体按 PingFang SC / Noto Sans CJK SC / Microsoft YaHei 回退，其他平台需有任一中文字体。
-
-柜台物理预览：`godot --path . --fixed-fps 60 --script tests/preview_counter_physics.gd`，输出 `docs/testing/previews/柜台物理.png`；依次投放七件物品，展示连续台面上的轮廓碰撞、自然倾倒与堆叠。
-
-美术由内置 imagegen 生成，场景提示词见 `docs/game-design/玩家主世界画风提示词.md`，道具图标提示词见 `docs/game-design/道具生成提示词.md`，资产路径见 `docs/game-design/美术资源.md`。废弃的一体式概念图仅归档于 `docs/game-design/concepts/`，不参与游戏运行。
-
-玩家主世界的统一画风提示词见 `docs/game-design/玩家主世界画风提示词.md`；生成新的主世界场景时应复用其中的正面与负面提示词。
-
-主场景已切换为 assets/trade-walnut 主图；第一位顾客使用 `assets/approved-layout/customer-sylvie.png`，新立绘与三视图参考保留在候选位置。
-
-交易清单可拖动标题栏移动，商品列表可滚动，底部提供紧凑的还价、成交与撤回按钮。门和卧铺使用与新主图对齐的透明交互区域。
-
-## 金属场景素材叠加（2026-09-12）
-
-交易页在现有金属商车背景上叠加独立素材：`assets/interaction/door-metal.png`、`assets/interaction/bed-metal.png`、`assets/interaction/table-metal.png`、`assets/interaction/computer.png`、`assets/interaction/phone.png`、`assets/interaction/call_bell.png`、`assets/interaction/door_closer.png`、`assets/interaction/roller_shutter.png` 和 `assets/ui/dialogue-frame.png`。门与卧铺按当前场景的窄门框、右侧睡眠舱做非等比形变；工作台保持最高的场景素材层，但低于运行时商品、对白和交易窗口。对白直接复用新的白色几何对话框素材，定位在橱窗右上方标注区域，姓名放在顶部白色标题片，正文限制在黑色内容区内并按字符换行，翻页按钮作为运行时层叠加；最后一句结束后保持面板可见。新增设备按截图位置放置；手机平放在台面，卷帘门基于用户提供的图 1 风格重做为完整不透明门板，在原橱窗区域使用裁剪容器从上向下展开，并在次日从下向上收起。所有可点击素材使用透明像素点击蒙版和悬停描边。
-
-场景预览：`docs/testing/previews/交易场景-金属素材.png`；悬停预览：`docs/testing/previews/交易场景-金属素材-hover.png`；手机历史记录：`docs/testing/previews/手机历史记录.png`；卷帘门关闭：`docs/testing/previews/交易场景-金属素材-shutter-closed.png`。交互回归：`godot --headless --path . --script tests/test_trade_overlay_interactions.gd`。
-
-## 野外探索与战斗
-
-点击车内小背包，将仓库里的武器、食物或药剂拖入 6×6 旅行背包，再从左侧车门选择前往野外。玩家可以无限探索，直到生命归零或主动返回；上下布局分别显示背包与战场。点击“探索”遭遇怪物后会先进入备战状态，底部提供“逃跑”和“开始战斗”：逃跑返回商车并随机遗失 1 件旅行背包物品，商车会弹窗显示成功逃回及遗失物品；开始战斗后武器每 2 秒自动攻击并消耗 1 耐久，无可用武器时每 2 秒徒手攻击 5 点，敌人每 3 秒攻击。备战和战斗中都可以双击背包里的食物或药剂手动使用，战斗不会自动消耗补给；满血不吃食物，力量效果不重复消耗。
-
-胜利随机掉落 2–3 件现有商品，底部显示“返回商车”和“继续探索”；默认可手动拖进背包，双击或 Ctrl+点击掉落物会自动按从左上到右下寻找背包中的首个可用位置，空间不足时提示“背包空间不足”。按 R 旋转；也可把背包物品拖到战利品区腾出空间。继续或返回会丢弃地面物品，存在未拾取物品时需确认。生命在同次探索中延续，每次新外出恢复 60；血条归零时弹窗提示已战败并清空旅行背包，点击“返回商车”结束本次探索。角色、五种怪物、夜晚深林背景与皮革面板均使用内置 imagegen 生成的独立素材，保存在 `assets/exploration/`。背包与战利品格子统一为 24 像素，容量读取 `TradeState.bag_size`，面板随格子数量扩展；初始容量为 6×6，以容纳 2×6 长剑。
-
-探索逻辑验证：`godot --headless --path . --script tests/test_exploration.gd`、`godot --headless --path . --script tests/test_exploration_interactions.gd`。界面预览：`godot --path . --script tests/preview_exploration.gd`，输出 `docs/testing/previews/exploration-idle.png`。附加 `-- --battle --enemy=2` 可预览备战后的交战，`-- --victory --large-bag` 可预览 12×8 背包与掉落同屏。
-
-## 独立战斗场景画面
-
-新增 `scenes/battle_multilayer.tscn` 仅负责场景画面：使用 `/Users/macmini/Open/素材` 的 8 张 RGBA 森林图，作为沿负 Z 轴排列的 `Sprite3D` 空间层；透明开口下方由 `assets/exploration/stage/forest-distance.png` 提供偏暗的夜林远景底板。为避免首尾层在同一帧跳变，Camera 保持稳定，前进由场景层的连续过渡和一个 `TransitionGhost` 完成；首层淡出、新增第 9 层淡入、队列提交统一到同一套过渡进度。外层探索逻辑会等背景过渡完成后才生成怪物。该场景不包含战斗 UI、战斗逻辑、角色、背包或旧场景引用；现有战斗功能保持不变。
-
-```sh
-godot --headless --path . --script tests/test_battle_multilayer.gd
-godot --path . --script tests/preview_battle_multilayer.gd
-```
+实际游戏基准保存在 `docs/testing/previews/unified-ui/`，检查记录见 [统一UI改版验收](docs/testing/统一UI改版验收.md)。历史预览仍保留，但不作为新风格依据。中文字体回退顺序为 PingFang SC / Noto Sans CJK SC / Microsoft YaHei。

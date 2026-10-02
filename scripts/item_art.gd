@@ -1,7 +1,8 @@
 extends Control
 const State = preload("res://scripts/trade_state.gd")
-const INK = Color("eaddbd")
-const GOLD = Color("d0ad70")
+const Chrome = preload("res://scripts/popup_style.gd")
+const INK = Chrome.TEXT
+const GOLD = Chrome.ORANGE
 const ITEM_OUTLINE = Color("171a17")
 const ITEM_OUTLINE_OFFSETS = [
  Vector2(-1.35,-1.35), Vector2(0,-1.65), Vector2(1.35,-1.35),
@@ -11,20 +12,20 @@ const ITEM_OUTLINE_OFFSETS = [
 const ITEM_TEXTURES = {
  "wastewater": preload("res://assets/items/workbench/wastewater.svg"),
  "copper_pickaxe": preload("res://assets/items/workbench/copper_pickaxe.svg"),
- "slime_mucus": preload("res://assets/items/workbench/slime_mucus.png"),
+ "slime_mucus": preload("res://assets/items/workbench/slime_mucus-unified.png"),
  "iron_pickaxe": preload("res://assets/items/workbench/iron_pickaxe.svg"),
  "copper_ore": preload("res://assets/items/workbench/copper_ore.svg"),
- "ancient_wood": preload("res://assets/items/workbench/ancient_wood.png"),
+ "ancient_wood": preload("res://assets/items/workbench/ancient_wood-unified.png"),
  "tempered_axe": preload("res://assets/items/workbench/tempered_axe.svg"),
  "tempered_sword": preload("res://assets/items/workbench/tempered_sword.svg"),
- "alembic": preload("res://assets/items/workbench/alembic-machine.png"),
+ "alembic": preload("res://assets/items/workbench/alembic-machine-unified.png"),
  "iron_axe": preload("res://assets/items/workbench/iron_axe.svg"),
  "copper_sword": preload("res://assets/items/workbench/copper_sword.svg"),
  "copper_axe": preload("res://assets/items/workbench/copper_axe.svg"),
  # Keep the ordinary-fantasy-v2 batch active; the previous generated batch is archived.
  "small_bag": preload("res://assets/items/candidates/generated/small_bag.png"),
  "pot": preload("res://assets/items/candidates/generated/pot.png"),
- "furnace": preload("res://assets/items/workbench/workbench-machine.png"),
+ "furnace": preload("res://assets/items/workbench/workbench-machine-unified.png"),
  "iron_sword": preload("res://assets/items/candidates/generated/iron_sword.png"),
  "herb": preload("res://assets/items/candidates/generated/herb.png"),
  "berry": preload("res://assets/items/candidates/generated/berry.png"),
@@ -67,7 +68,7 @@ func _draw_item(item: Dictionary, rect: Rect2, highlighted: bool) -> void:
   _icon(item.key,color,1.0)
   draw_set_transform(Vector2.ZERO)
  if highlighted:
-  draw_rect(rect.grow(-1),Color("f4ead2"),false,2)
+  draw_rect(rect.grow(-1),Chrome.TEXT,false,2)
 
 func _draw_texture_with_outline(texture: Texture2D, texture_size: Vector2, tint: Color = Color.WHITE) -> void:
  var texture_rect := Rect2(-texture_size*0.5,texture_size)

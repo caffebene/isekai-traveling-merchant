@@ -1,3 +1,5 @@
+> 历史生成记录，不作为当前生成依据。全局规范：docs/game-design/整体视觉与UI规范.md。
+
 # 低噪声怪物素材生成记录
 
 本轮使用 [prompts-clean-v2.json](prompts-clean-v2.json) 中的 `slime`、`wolf`、`golem`、`red_wolf`、`treant` 提示词，通过内置 image_gen 重新生成并替换了游戏中的五种怪物素材；棋盘格预览由 [remove_checkerboard.py](../../tools/remove_checkerboard.py) 转为真实 RGBA。

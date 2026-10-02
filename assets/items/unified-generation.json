@@ -1,0 +1,26 @@
+[
+  {
+    "name": "slime_mucus",
+    "source": "/Users/macmini/.codex/generated_images/01a0fb66-944a-76a1-aabf-a74ed3989cff/exec-f7975db5-0dcf-47cf-acdc-57507da436c5.png",
+    "target": "assets/items/workbench/slime_mucus-unified.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent 2D inventory game icon for 异世界旅商. Clean Japanese anime illustration: broad smooth color planes, stable continuous outlines, one connected shadow and at most one highlight per material. Non pixel art, no realistic texture, grain, scratches, neon bloom, tiny detail, UI, text, logo, watermark, scenery or hands. Centered isolated object occupying 90 percent canvas, genuine transparent alpha including gaps. Subject: one rounded fresh jade green gelatinous slime mucus blob with one small trailing droplet, readable at 48x48; smooth clean organic silhouette, one large pale soft highlight, no eyes or face. Square canvas."
+  },
+  {
+    "name": "ancient_wood",
+    "source": "/Users/macmini/.codex/generated_images/01a0fb66-944a-76a1-aabf-a74ed3989cff/exec-a740f74d-64bf-4eda-a3af-498ebbc70251.png",
+    "target": "assets/items/workbench/ancient_wood-unified.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent 2D inventory game icon for 异世界旅商. Clean Japanese anime illustration: broad smooth color planes, stable continuous outlines, one connected shadow and at most one highlight per material. Non pixel art, no realistic texture, grain, scratches, neon bloom, tiny detail, UI, text, logo, watermark, scenery or hands. Centered isolated object occupying 90 percent canvas, genuine transparent alpha including gaps. Subject: two compact cut chunks of ancient wood stacked diagonally with one small green leaf sprout, warm medium brown bark in three simple planes, pale amber end grain with only two broad growth rings, readable at 48x48. Square canvas."
+  },
+  {
+    "name": "workbench-machine",
+    "source": "/Users/macmini/.codex/generated_images/01a0fb66-944a-76a1-aabf-a74ed3989cff/exec-2d46f8cc-4072-4a07-a2e1-61731651587c.png",
+    "target": "assets/items/workbench/workbench-machine-unified.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent 2D inventory game icon for 异世界旅商. Clean Japanese anime illustration: broad smooth color planes, stable continuous outlines, one connected shadow and at most one highlight per material. Non pixel art, no realistic texture, grain, scratches, neon bloom, tiny detail, UI, text, logo, watermark, scenery or hands. Centered isolated object occupying 90 percent canvas, genuine transparent alpha including gaps. Subject: compact square fabrication machine; fully orthographic head-on front view, centered symmetrical chassis, no top or side faces. Graphite and gunmetal flat panels, warm white large corner guards, central orange processing hatch, two short muted cyan status strips. Simplify to large shapes with four main seams, no tiny screws or detailed vents. 1:1 silhouette matches 4x4 inventory footprint. No wooden bench, medieval furnace or flames."
+  },
+  {
+    "name": "alembic-machine",
+    "source": "/Users/macmini/.codex/generated_images/01a0fb66-944a-76a1-aabf-a74ed3989cff/exec-8a0033fb-f6cd-4394-bbe8-5a3f298fc7b5.png",
+    "target": "assets/items/workbench/alembic-machine-unified.png",
+    "prompt": "Use case: stylized-concept. Asset type: transparent 2D inventory game icon for 异世界旅商. Clean Japanese anime illustration: broad smooth color planes, stable continuous outlines, one connected shadow and at most one highlight per material. Non pixel art, no realistic texture, grain, scratches, neon bloom, tiny detail, UI, text, logo, watermark, scenery or hands. Centered isolated object occupying 90 percent canvas, genuine transparent alpha including gaps. Subject: tall narrow 3:4 alchemy processing machine; fully orthographic head-on front view, symmetrical graphite chassis, warm white side guards, single violet sealed chemical chamber and two compact reagent cartridges, two restrained cyan status bars, tiny orange label without lettering. Broad flat planes and simple large seams, no neon bloom, no tiny screws, no medieval cauldron, glass retort or exposed fire. Portrait 3:4 canvas matches 3x4 inventory footprint."
+  }
+]

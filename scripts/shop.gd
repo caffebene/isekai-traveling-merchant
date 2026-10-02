@@ -1,6 +1,6 @@
 extends "res://scripts/item_art.gd"
-const MUTED = Color("aeac92")
-const DARK = Color("202b29")
+const MUTED = Chrome.MUTED
+const DARK = Chrome.BACKGROUND
 const CELL = Vector2(24,24)
 const BAG_CELL = CELL
 const COUNTER_RECT := Rect2(382,485,1032,96)
@@ -19,7 +19,6 @@ var ZONES = {
 	"stock": {"rect":Rect2(Vector2(462,531),Vector2(State.SIZES.stock)*CELL),"cell":CELL}}
 var state = State.new()
 var font: SystemFont
-var serif: SystemFont
 var hover_id := -1
 var drag_id := -1
 var drag_rotated := false
@@ -42,11 +41,11 @@ var dialogue_history: Array[Dictionary] = []
 const DIALOGUE_CHAR_INTERVAL := 0.11
 const DIALOGUE_LINE_GAP := 0.32
 const DIALOGUE_END_GAP := 0.78
-const DIALOGUE_RECT := Rect2(880,105,480,170)
-const DIALOGUE_BODY_LIMIT := 14
+const DIALOGUE_RECT := Rect2(960,104,360,170)
+const DIALOGUE_BODY_LIMIT := 18
 var dialogue_prev_button: Button
 var dialogue_next_button: Button
-var dialogue_background: TextureRect
+var dialogue_background: Panel
 var dialogue_speaker_label: Label
 var dialogue_text_label: Label
 var dialogue_dot_nodes: Array[Panel] = []
@@ -81,7 +80,7 @@ var machine_drag_offset := Vector2.ZERO
 var bag_window_node: Control
 var bag_close: Button
 var open_bag := false
-var bag_popup := Rect2(40,340,200,250)
+var bag_popup := Rect2(24,320,200,250)
 var bag_dragging := false
 var bag_drag_offset := Vector2.ZERO
 var recorder_button: Button
@@ -111,14 +110,8 @@ const DOOR_ART_RECT := Rect2(-8,-8,225,928)
 const BED_ART_RECT := Rect2(1250,488,422,450)
 const TABLE_ART_RECT := Rect2(155,168,1362,876)
 func _ready() -> void:
-	font = SystemFont.new()
-	font.font_names = PackedStringArray(["PingFang SC","Noto Sans CJK SC","Microsoft YaHei"])
-	serif = SystemFont.new()
-	serif.font_names = PackedStringArray(["Songti SC","Noto Serif CJK SC","SimSun"])
-	var theme_ui := Theme.new()
-	theme_ui.default_font = font
-	theme_ui.default_font_size = 16
-	theme = theme_ui
+	font = PopupSkin.font()
+	theme = PopupSkin.theme()
 	hover_tip = HoverTip.new()
 	hover_tip.name = "InteractHoverTip"
 	add_child(hover_tip)
@@ -139,7 +132,8 @@ func _ready() -> void:
 	customer_bag_window_node.hide()
 	trade_panel = Panel.new()
 	trade_panel.set_script(preload("res://scripts/trade_panel.gd"))
-	trade_panel.position = Vector2(700,88)
+	trade_panel.position = Vector2(1180,354)
+	trade_panel.z_index = 40
 	add_child(trade_panel)
 	price = trade_panel.price
 	accept = trade_panel.accept
@@ -268,63 +262,61 @@ func _install_scene_art() -> void:
 	table_art.show_behind_parent = false
 	shutter_clip.visible = false
 	shutter_clip.size = Vector2(SHUTTER_SIZE.x,0)
-func _panel(rect: Rect2, bg := Color("202b29f5"), border := GOLD) -> void:
+func _panel(rect: Rect2, bg := PopupSkin.PANEL, border := PopupSkin.FRAME) -> void:
 	draw_colored_polygon(PopupSkin.window_points(Rect2(rect.position+Vector2(4,4),rect.size),8),Color(0,0,0,0.45))
 	draw_colored_polygon(PopupSkin.window_points(rect,8),bg)
 	var outline := PopupSkin.window_points(rect,8)
 	outline.append(outline[0])
 	draw_polyline(outline,border,1.0,true)
 func _text(value: String, at: Vector2, size_value := 16, color := INK, use_serif := false) -> void:
-	draw_string(serif if use_serif else font,at,value,HORIZONTAL_ALIGNMENT_LEFT,-1,size_value,color)
+	draw_string(font,at,value,HORIZONTAL_ALIGNMENT_LEFT,-1,size_value,color)
 func _create_dialogue_controls() -> void:
-	dialogue_background = TextureRect.new()
+	dialogue_background = Panel.new()
 	dialogue_background.name = "DialogueBackground"
 	dialogue_background.position = DIALOGUE_RECT.position
 	dialogue_background.size = DIALOGUE_RECT.size
-	dialogue_background.texture = preload("res://assets/ui/dialogue-frame.png")
-	dialogue_background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	dialogue_background.stretch_mode = TextureRect.STRETCH_SCALE
+	PopupSkin.window(dialogue_background)
 	dialogue_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	dialogue_background.z_index = 0
+	dialogue_background.z_index = 110
 	$ArtLayers.add_child(dialogue_background)
 	dialogue_speaker_label = Label.new()
 	dialogue_speaker_label.name = "DialogueSpeaker"
-	dialogue_speaker_label.position = DIALOGUE_RECT.position + Vector2(52,38)
-	dialogue_speaker_label.size = Vector2(162,25)
-	dialogue_speaker_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	dialogue_speaker_label.position = DIALOGUE_RECT.position + Vector2(20,12)
+	dialogue_speaker_label.size = Vector2(240,28)
+	dialogue_speaker_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	dialogue_speaker_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	dialogue_speaker_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	dialogue_speaker_label.add_theme_font_override("font",font)
-	dialogue_speaker_label.add_theme_font_size_override("font_size",17)
-	dialogue_speaker_label.add_theme_color_override("font_color",PopupSkin.DARK)
-	dialogue_speaker_label.z_index = 0
+	dialogue_speaker_label.add_theme_font_override("font",PopupSkin.font(true))
+	dialogue_speaker_label.add_theme_font_size_override("font_size",20)
+	dialogue_speaker_label.add_theme_color_override("font_color",PopupSkin.HEADER_TEXT)
+	dialogue_speaker_label.z_index = 110
 	$ArtLayers.add_child(dialogue_speaker_label)
 	dialogue_text_label = Label.new()
 	dialogue_text_label.name = "DialogueText"
-	dialogue_text_label.position = DIALOGUE_RECT.position + Vector2(87,75)
-	dialogue_text_label.size = Vector2(278,60)
+	dialogue_text_label.position = DIALOGUE_RECT.position + Vector2(20,52)
+	dialogue_text_label.size = Vector2(320,72)
 	dialogue_text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	dialogue_text_label.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 	dialogue_text_label.clip_text = true
 	dialogue_text_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dialogue_text_label.add_theme_font_override("font",font)
-	dialogue_text_label.add_theme_font_size_override("font_size",15)
-	dialogue_text_label.add_theme_color_override("font_color",PopupSkin.PAPER)
-	dialogue_text_label.z_index = 0
+	dialogue_text_label.add_theme_font_size_override("font_size",16)
+	dialogue_text_label.add_theme_color_override("font_color",PopupSkin.TEXT)
+	dialogue_text_label.z_index = 110
 	$ArtLayers.add_child(dialogue_text_label)
 	for i in range(5):
 		var dot := Panel.new()
 		dot.name = "DialogueDot%d" % i
 		dot.size = Vector2(8,8)
 		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		dot.z_index = 0
+		dot.z_index = 110
 		$ArtLayers.add_child(dot)
 		dialogue_dot_nodes.append(dot)
 	dialogue_prev_button = Button.new()
 	dialogue_prev_button.name = "DialoguePrevious"
 	dialogue_prev_button.text = "◀"
 	dialogue_prev_button.focus_mode = Control.FOCUS_NONE
-	dialogue_prev_button.z_index = 0
+	dialogue_prev_button.z_index = 110
 	_style_dialogue_nav_button(dialogue_prev_button)
 	dialogue_prev_button.pressed.connect(_dialogue_previous)
 	$ArtLayers.add_child(dialogue_prev_button)
@@ -332,7 +324,7 @@ func _create_dialogue_controls() -> void:
 	dialogue_next_button.name = "DialogueNext"
 	dialogue_next_button.text = "▶"
 	dialogue_next_button.focus_mode = Control.FOCUS_NONE
-	dialogue_next_button.z_index = 0
+	dialogue_next_button.z_index = 110
 	_style_dialogue_nav_button(dialogue_next_button)
 	dialogue_next_button.pressed.connect(_dialogue_next)
 	$ArtLayers.add_child(dialogue_next_button)
@@ -342,8 +334,8 @@ func _style_dialogue_nav_button(button: Button) -> void:
 	button.flat = true
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	button.add_theme_font_size_override("font_size",22)
-	button.add_theme_color_override("font_color",PopupSkin.PAPER)
-	button.add_theme_color_override("font_hover_color",PopupSkin.CYAN)
+	button.add_theme_color_override("font_color",PopupSkin.TEXT)
+	button.add_theme_color_override("font_hover_color",PopupSkin.ORANGE.lightened(0.12))
 	button.add_theme_color_override("font_pressed_color",PopupSkin.ORANGE)
 	button.add_theme_color_override("font_disabled_color",Color("667078"))
 	for mode in ["normal","hover","pressed","disabled","focus"]:
@@ -356,8 +348,8 @@ func _update_dialogue_controls() -> void:
 	dialogue_speaker_label.text = CUSTOMERS[customer_index].name
 	dialogue_text_label.visible = dialogue_active
 	dialogue_text_label.text = _dialogue_display_text()
-	dialogue_prev_button.position = DIALOGUE_RECT.position + Vector2(310,102)
-	dialogue_next_button.position = DIALOGUE_RECT.position + Vector2(350,102)
+	dialogue_prev_button.position = DIALOGUE_RECT.position + Vector2(256,128)
+	dialogue_next_button.position = DIALOGUE_RECT.position + Vector2(304,128)
 	dialogue_prev_button.visible = dialogue_active
 	dialogue_next_button.visible = dialogue_active
 	dialogue_prev_button.disabled = dialogue_line_index <= 0
@@ -365,24 +357,26 @@ func _update_dialogue_controls() -> void:
 	for i in range(dialogue_dot_nodes.size()):
 		var dot := dialogue_dot_nodes[i]
 		dot.visible = dialogue_active and i < dialogue_lines.size()
-		dot.position = DIALOGUE_RECT.position + Vector2(270+i*9,126)
+		dot.position = DIALOGUE_RECT.position + Vector2(20+i*12,145)
 		var dot_style := StyleBoxFlat.new()
 		dot_style.bg_color = PopupSkin.ORANGE if i == dialogue_line_index else Color("697277")
 		dot_style.set_corner_radius_all(4)
 		dot.add_theme_stylebox_override("panel",dot_style)
 func _draw() -> void:
 	var status_rect := Rect2(20,16,275,64)
-	_panel(status_rect,PopupSkin.PANEL,PopupSkin.BRASS)
+	PopupSkin.draw_window(self,status_rect,false)
+	draw_colored_polygon(PopupSkin.header_points(Rect2(status_rect.position,Vector2(status_rect.size.x,36))),PopupSkin.HEADER)
 	draw_rect(Rect2(status_rect.position,Vector2(6,status_rect.size.y)),PopupSkin.ORANGE)
-	draw_line(status_rect.position+Vector2(16,47),status_rect.position+Vector2(status_rect.size.x-16,47),PopupSkin.CYAN,1.0)
-	_text("第 %02d 天 · %s" % [state.day,state.economy.city_name()],status_rect.position+Vector2(20,27),18,PopupSkin.PAPER)
-	_text("距启程 %d 天  ·  金币 %d G" % [state.economy.days_until_departure(state.day),state.gold],status_rect.position+Vector2(20,50),14,PopupSkin.MUTED)
+	draw_line(status_rect.position+Vector2(16,39),status_rect.position+Vector2(status_rect.size.x-16,39),PopupSkin.DIVIDER,1.0)
+	PopupSkin.title(self,"第 %02d 天 · %s" % [state.day,state.economy.city_name()],status_rect.position+Vector2(20,26),20)
+	_text("距启程 %d 天" % state.economy.days_until_departure(state.day),status_rect.position+Vector2(20,56),14,PopupSkin.MUTED)
+	draw_string(PopupSkin.font(true),status_rect.position+Vector2(145,57),"%d G" % state.gold,HORIZONTAL_ALIGNMENT_RIGHT,114,18,PopupSkin.TEXT)
 	if bell_hold_active and bell_art != null:
 		var progress := clampf(bell_hold_time / BELL_HOLD_DURATION,0.0,1.0)
 		var bell_center := bell_art.position + bell_art.size*0.5
 		draw_arc(bell_center,62.0,0.0,TAU,64,Color(0.05,0.08,0.09,0.72),5.0,true)
 		draw_arc(bell_center,62.0,-PI*0.5,-PI*0.5+TAU*progress,64,PopupSkin.ORANGE,6.0,true)
-		_text("长按呼叫",bell_center+Vector2(-31,82),13,PopupSkin.PAPER)
+		_text("长按呼叫",bell_center+Vector2(-31,82),13,PopupSkin.TEXT)
 	# The counter is a continuous physical surface, not an inventory grid.
 	_draw_counter_items()
 	_draw_zone("stock",true)
@@ -390,14 +384,14 @@ func _draw() -> void:
 		if item.id != drag_id and ZONES.has(item.zone) and item.zone not in ["bag","customer"] and not item.zone.begins_with("machine_"):
 			_draw_item(item,_item_rect(item),false)
 	if customer_bag_open:
-		_draw_bag_shell(customer_bag_rect,"%s的背包" % CUSTOMERS[customer_index].name,"拖至柜台查看报价")
+		_draw_bag_shell(customer_bag_rect,"%s的背包" % CUSTOMERS[customer_index].name,"")
 		_draw_zone("customer",true)
 		for item in state.items:
 			if item.id != drag_id and item.zone == "customer":
 				_draw_item(item,_item_rect(item),false)
 	if open_bag:
 		var installed := " · ".join(state.economy.modules.map(func(id): return state.economy.module_name(id)))
-		_draw_bag_shell(bag_popup,"旅行背包 · %d×%d" % [state.bag_size.x,state.bag_size.y],installed if installed != "" else "拖动物品收纳")
+		_draw_bag_shell(bag_popup,"旅行背包 · %d×%d" % [state.bag_size.x,state.bag_size.y],installed)
 		_draw_zone("bag",true)
 		_draw_bag_layout_guides_shop()
 		for item in state.items:
@@ -417,17 +411,11 @@ func _draw() -> void:
 			WorkbenchView.draw_window(self,popup,machine_id)
 			continue
 		var machine_zone := state.machine_zone(machine_id)
-		_draw_bag_shell(popup,State.CATALOG[machine.key].name,"放入原料 · 次日完成")
+		_draw_bag_shell(popup,State.CATALOG[machine.key].name,"次日产出")
 		_draw_zone(machine_zone,true)
 		for item in state.items:
 			if item.id != drag_id and item.zone == machine_zone:
 				_draw_item(item,_item_rect(item),false)
-	draw_rect(Rect2(0,868,1600,32),Color("172523f5"))
-	_text("左键拖放  /  拖至台面上方自然落台",Vector2(40,890),12,MUTED)
-	_text("R  旋转物品",Vector2(397,890),12,MUTED)
-	_text("右键 / Esc  取消拖动",Vector2(561,890),12,MUTED)
-	_text("悬停查看物品",Vector2(813,890),12,MUTED)
-	_text("风会带来下一位客人。",Vector2(1370,890),12,PopupSkin.CYAN)
 	if drag_id >= 0:
 		var item := _find_item(drag_id).duplicate()
 		if not item.is_empty():
@@ -437,13 +425,13 @@ func _draw() -> void:
 			var zone := _zone_at(mouse)
 			if zone == "counter":
 				var ghost_rect := Rect2(mouse-drag_offset,Vector2(d)*CELL)
-				draw_rect(ghost_rect,Color(0.5,0.85,0.65,0.18),true)
-				draw_rect(ghost_rect.grow(-1),Color("f4ead2"),false,2)
+				draw_rect(ghost_rect,PopupSkin.placement(true,0.18),true)
+				draw_rect(ghost_rect.grow(-1),PopupSkin.TEXT,false,2)
 			elif zone != "":
 				var at := _cell_at(mouse-drag_offset,zone)
 				var pos: Vector2 = ZONES[zone].rect.position+Vector2(at)*ZONES[zone].cell
 				var valid: bool = _valid_drop(item,zone,at)
-				draw_rect(Rect2(pos,Vector2(d)*ZONES[zone].cell),Color(0.5,0.85,0.65,0.4) if valid else Color(0.9,0.3,0.2,0.4))
+				draw_rect(Rect2(pos,Vector2(d)*ZONES[zone].cell),PopupSkin.placement(valid))
 			var ghost_cell: Vector2 = BAG_CELL if item.zone == "bag" else CELL
 			if zone != "" and zone != "counter":
 				ghost_cell = ZONES[zone].cell
@@ -451,7 +439,7 @@ func _draw() -> void:
 	if toast_time > 0:
 		var w := font.get_string_size(toast,HORIZONTAL_ALIGNMENT_LEFT,-1,17).x+54
 		var toast_x := clampf(120.0,8.0,1600.0-w-8.0)
-		_panel(Rect2(toast_x,812,w,42),Color("20392af5"),GOLD)
+		_panel(Rect2(toast_x,812,w,42),PopupSkin.PANEL,PopupSkin.WARNING)
 		_text(toast,Vector2(toast_x+27,839),15)
 func _draw_zone(zone: String, visible_grid: bool) -> void:
 	if zone == "counter":
@@ -460,31 +448,16 @@ func _draw_zone(zone: String, visible_grid: bool) -> void:
 		return
 	var config: Dictionary = ZONES[zone]
 	var rect: Rect2 = config.rect
-	if zone in ["bag","customer"]:
-		draw_style_box(PopupSkin.box(Color("162825"),PopupSkin.BRASS,0),rect.grow(1))
-		var dimensions: Vector2i = state.zone_size(zone)
-		for x in range(1,dimensions.x):
-			draw_line(rect.position+Vector2(x*config.cell.x,0),rect.position+Vector2(x*config.cell.x,rect.size.y),Color(PopupSkin.CYAN,0.18))
-		for y in range(1,dimensions.y):
-			draw_line(rect.position+Vector2(0,y*config.cell.y),rect.position+Vector2(rect.size.x,y*config.cell.y),Color(PopupSkin.CYAN,0.18))
-		return
-	if visible_grid:
-		draw_rect(rect,Color("1a241e90"))
-	var dims: Vector2i = state.zone_size(zone)
-	for x in range(dims.x+1):
-		draw_line(rect.position+Vector2(x*config.cell.x,0),rect.position+Vector2(x*config.cell.x,rect.size.y),Color("b39b603e") if visible_grid else Color("ead5a71b"))
-	for y in range(dims.y+1):
-		draw_line(rect.position+Vector2(0,y*config.cell.y),rect.position+Vector2(rect.size.x,y*config.cell.y),Color("b39b603e") if visible_grid else Color("ead5a71b"))
-	draw_rect(rect,GOLD.darkened(0.35),false,1)
+	PopupSkin.draw_grid(self,rect,state.zone_size(zone),config.cell)
 
 func _draw_bag_layout_guides_shop() -> void:
 	if not ZONES.has("bag"):
 		return
 	var rect: Rect2 = ZONES.bag.rect
 	var belt := Rect2(rect.position,Vector2(BAG_CELL.x*2.0,rect.size.y))
-	draw_rect(belt,Color("55bdb51f"),true)
-	draw_rect(belt,Color("74d9cf99"),false,2.0)
-	_text("腰包 0行动",belt.position+Vector2(4,14),9,Color("9fe4db"))
+	draw_rect(belt,Color(PopupSkin.CYAN,0.08),true)
+	draw_rect(belt,Color(PopupSkin.CYAN,0.45),false,2.0)
+	_text("腰包 0行动",belt.position+Vector2(4,14),9,PopupSkin.CYAN)
 	for weapon in state.items:
 		if weapon.zone != "bag" or State.CATALOG[weapon.key].category != "武器":
 			continue
@@ -514,8 +487,8 @@ func _draw_bag_effect_badge_shop(item: Dictionary, rect: Rect2) -> void:
 	var value := " · ".join(badges)
 	var width := font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,9).x+10.0
 	var badge := Rect2(rect.position+Vector2(2,2),Vector2(width,17))
-	draw_style_box(PopupSkin.box(Color("13201ff2"),Color("83d3c7"),3),badge)
-	_text(value,badge.position+Vector2(5,12),9,Color("d9fff7"))
+	draw_style_box(PopupSkin.box(PopupSkin.BACKGROUND,PopupSkin.CYAN),badge)
+	_text(value,badge.position+Vector2(5,12),9,PopupSkin.TEXT)
 
 func _draw_bag_build_summary() -> void:
 	var bag_items: Array[Dictionary] = state.items.filter(func(i): return i.zone == "bag")
@@ -530,8 +503,8 @@ func _draw_bag_build_summary() -> void:
 		if state.bag_effects(item).free_use:
 			belt_names.append(str(State.CATALOG[item.key].name))
 	var summary := _bag_build_summary_rect()
-	_panel(summary,Color("142123f2"),Color("6e8f8c"))
-	_text("当前组合效果",summary.position+Vector2(18,28),17,PopupSkin.PAPER)
+	_panel(summary,PopupSkin.PANEL,PopupSkin.FRAME)
+	_text("当前组合效果",summary.position+Vector2(18,28),17,PopupSkin.TEXT)
 	var y := 54.0
 	if weapons.is_empty():
 		_text("武器：徒手攻击 5",summary.position+Vector2(18,y),13,PopupSkin.MUTED)
@@ -1103,53 +1076,36 @@ func _next_trade() -> void:
 	next_button.disabled = false
 	_sync()
 func _show_help() -> void:
-	_open_modal("商车经营指南","① 将顾客货物拖到台面上方，物品会自然落到柜台，开始买入。\n② 将自己的商品拖到台面上方，物品会自然落台，开始出售。\n③ 在交易单输入价格，提出还价或接受报价。\n④ 买入的商品自动进入商车仓库。\n\n点击一体机打开交易面板；点击平放的手机查看历史记录。\n无顾客时点击呼叫铃叫来下一位；有顾客时长按呼叫铃，让当前顾客离开。\n点击右上方关门器拉下卷帘门；卷帘门打开时，车门和卧铺暂不可交互。\n\n拖动时按 R 旋转；右键或 Esc 取消。\n双击商品可快速移入或移出柜台。\n柜台没有格子，物品会在台面或其他物品顶部直接停止，不会弹跳。\n点击设备展开格子，拖入原料，次日收取成品。\n\n这是经营页原型；夜间探索与跨城旅行尚未接入。", "开始经营",_close_modal)
+	_open_modal("商车经营指南","柜台 · 双击或拖放商品开始买卖\n交易 · 输入报价还价，或接受报价\n背包 · 双击打开；R 旋转，右键 / Esc 取消拖放\n设备 · 双击放入材料，休息后收取产物\n手机 · 查看历史对话\n呼叫铃 · 点击呼叫顾客；长按送走当前顾客\n卷帘门 · 关闭后可休息、探索或旅行\n行情 / 改装 · 查看物价、事件与商车模块", "开始经营",_close_modal)
+
 func _open_recorder() -> void:
 	if recorder_panel != null and is_instance_valid(recorder_panel):
 		_close_recorder()
 		return
 	recorder_panel = Panel.new()
-	recorder_panel.position = Vector2(760,140)
+	recorder_panel.position = Vector2(1180,292)
 	recorder_panel.size = Vector2(320,540)
-	recorder_panel.z_index = 20
+	recorder_panel.z_index = 50
 	recorder_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	recorder_panel.add_theme_stylebox_override("panel",PopupSkin.box(Color("0b1114f8"),Color("d9d8cf"),24))
+	PopupSkin.window(recorder_panel)
 	add_child(recorder_panel)
-	var screen := Panel.new()
-	screen.position = Vector2(12,56)
-	screen.size = Vector2(296,472)
-	screen.mouse_filter = Control.MOUSE_FILTER_STOP
-	screen.add_theme_stylebox_override("panel",PopupSkin.box(Color("203337"),PopupSkin.CYAN,18))
-	recorder_panel.add_child(screen)
 	var header := Panel.new()
-	header.position = Vector2(16,12)
-	header.size = Vector2(288,34)
+	header.size = Vector2(320,48)
 	header.mouse_default_cursor_shape = Control.CURSOR_MOVE
-	header.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.PANEL_ALT,Color("59666b"),12))
+	header.add_theme_stylebox_override("panel",StyleBoxEmpty.new())
 	recorder_panel.add_child(header)
-	var notch := Panel.new()
-	notch.position = Vector2(121,5)
-	notch.size = Vector2(46,5)
-	notch.add_theme_stylebox_override("panel",PopupSkin.box(Color("080c0e"),Color("080c0e"),4))
-	notch.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	header.add_child(notch)
 	var title := Label.new()
-	title.text = "历史记录"
-	title.position = Vector2(74,7)
-	title.size = Vector2(140,22)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size",13)
-	title.add_theme_color_override("font_color",INK)
+	title.text = "历史对话"
+	title.position = Vector2(16,10)
+	title.add_theme_font_size_override("font_size",20)
+	title.add_theme_color_override("font_color",PopupSkin.HEADER_TEXT)
+	title.add_theme_font_override("font",PopupSkin.font(true))
 	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	header.add_child(title)
 	recorder_close = Button.new()
 	recorder_close.text = "×"
-	recorder_close.position = Vector2(254,4)
-	recorder_close.size = Vector2(26,24)
-	recorder_close.add_theme_font_size_override("font_size",16)
-	PopupSkin.button(recorder_close)
-	recorder_close.add_theme_stylebox_override("normal",PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.BRASS,0))
-	recorder_close.add_theme_stylebox_override("hover",PopupSkin.box(PopupSkin.ORANGE,PopupSkin.DARK,0))
+	recorder_close.position = Vector2(276,8)
+	PopupSkin.close_button(recorder_close)
 	recorder_close.pressed.connect(_close_recorder)
 	header.add_child(recorder_close)
 	header.gui_input.connect(func(event):
@@ -1158,27 +1114,18 @@ func _open_recorder() -> void:
 			recorder_drag_offset = get_global_mouse_position()-recorder_panel.global_position
 			header.accept_event()
 		elif event is InputEventMouseMotion and recorder_dragging:
-			recorder_panel.position = (get_global_mouse_position()-recorder_drag_offset).clamp(
-				Vector2(8,8),Vector2(1600,868)-recorder_panel.size
-			)
+			recorder_panel.position = (get_global_mouse_position()-recorder_drag_offset).clamp(Vector2(8,8),Vector2(1600,868)-recorder_panel.size)
 			header.accept_event()
 	)
 	var scroll := ScrollContainer.new()
-	scroll.position = Vector2(16,44)
-	scroll.size = Vector2(264,390)
+	scroll.position = Vector2(16,64)
+	scroll.size = Vector2(288,460)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	screen.add_child(scroll)
+	recorder_panel.add_child(scroll)
 	recorder_rows = VBoxContainer.new()
 	recorder_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	recorder_rows.add_theme_constant_override("separation",6)
+	recorder_rows.add_theme_constant_override("separation",8)
 	scroll.add_child(recorder_rows)
-	var footer := Label.new()
-	footer.text = "来自旅商手机的本地记录"
-	footer.position = Vector2(18,438)
-	footer.add_theme_font_size_override("font_size",10)
-	footer.add_theme_color_override("font_color",PopupSkin.MUTED)
-	footer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	screen.add_child(footer)
 	_refresh_recorder()
 func _close_recorder() -> void:
 	recorder_dragging = false
@@ -1194,15 +1141,15 @@ func _refresh_recorder() -> void:
 		child.queue_free()
 	if dialogue_history.is_empty():
 		var empty := Label.new()
-		empty.text = "还没有完成的对话。\n对话播放完毕后会自动保存到这里。"
-		empty.add_theme_font_size_override("font_size",12)
+		empty.text = "暂无记录"
+		empty.add_theme_font_size_override("font_size",14)
 		empty.add_theme_color_override("font_color",MUTED)
 		recorder_rows.add_child(empty)
 		return
 	for entry in dialogue_history:
 		var row := PanelContainer.new()
 		row.custom_minimum_size.y = 54
-		var skin := PopupSkin.box(PopupSkin.PANEL_ALT if recorder_rows.get_child_count() % 2 == 0 else PopupSkin.PANEL,Color("39464c"),0)
+		var skin := PopupSkin.box(PopupSkin.PANEL_ALT if recorder_rows.get_child_count() % 2 == 0 else PopupSkin.PANEL,PopupSkin.DIVIDER,0)
 		row.add_theme_stylebox_override("panel",skin)
 		recorder_rows.add_child(row)
 		var column := VBoxContainer.new()
@@ -1210,13 +1157,13 @@ func _refresh_recorder() -> void:
 		row.add_child(column)
 		var speaker := Label.new()
 		speaker.text = "%s · %s" % [entry.speaker,entry.role]
-		speaker.add_theme_font_size_override("font_size",11)
-		speaker.add_theme_color_override("font_color",GOLD)
+		speaker.add_theme_font_size_override("font_size",14)
+		speaker.add_theme_color_override("font_color",PopupSkin.MUTED)
 		column.add_child(speaker)
 		var line := Label.new()
 		line.text = entry.text
 		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		line.add_theme_font_size_override("font_size",12)
+		line.add_theme_font_size_override("font_size",16)
 		line.add_theme_color_override("font_color",INK)
 		column.add_child(line)
 func _open_modal(title_value: String, body: String, action_text: String, action: Callable, cancel_text := "") -> void:
@@ -1224,34 +1171,43 @@ func _open_modal(title_value: String, body: String, action_text: String, action:
 		return
 	drag_id = -1
 	modal = Panel.new()
+	modal.z_index = 100
 	modal.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	modal.add_theme_stylebox_override("panel",_style(Color("101a20c9"),Color.TRANSPARENT))
+	modal.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.SHADE,Color.TRANSPARENT))
 	add_child(modal)
+	var line_count := 0
+	for body_line in body.split("\n"):
+		line_count += maxi(1,ceili(font.get_string_size(body_line,HORIZONTAL_ALIGNMENT_LEFT,-1,16).x/550.0))
+	var height := clampi(144+line_count*28,224,492)
 	var card := Panel.new()
-	card.position = Vector2(490,206)
-	card.size = Vector2(620,492)
-	card.add_theme_stylebox_override("panel",_style(DARK,GOLD,5))
+	card.position = Vector2(490,(900-height)/2.0)
+	card.size = Vector2(620,height)
+	PopupSkin.window(card)
 	modal.add_child(card)
 	var title_label := Label.new()
 	title_label.text = title_value
-	title_label.position = Vector2(35,25)
-	title_label.add_theme_font_size_override("font_size",26)
-	title_label.add_theme_color_override("font_color",GOLD)
+	title_label.position = Vector2(24,8)
+	title_label.add_theme_font_size_override("font_size",24)
+	title_label.add_theme_color_override("font_color",PopupSkin.HEADER_TEXT)
+	title_label.add_theme_font_override("font",PopupSkin.font(true))
 	card.add_child(title_label)
 	var label := Label.new()
 	label.text = body
-	label.position = Vector2(35,86)
-	label.add_theme_font_size_override("font_size",17)
+	label.position = Vector2(35,72)
+	label.size = Vector2(550,height-144)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.add_theme_font_size_override("font_size",16)
 	label.add_theme_color_override("font_color",INK)
 	card.add_child(label)
-	var b := _button(action_text,Rect2(525,633,550,42),action,true)
+	var action_y := card.position.y+height-64
+	var b := _button(action_text,Rect2(525,action_y,550,40),action,true)
 	remove_child(b)
 	if cancel_text != "":
-		b.position = Vector2(525,633)
-		b.size = Vector2(265,42)
+		b.position = Vector2(525,action_y)
+		b.size = Vector2(265,40)
 	modal.add_child(b)
 	if cancel_text != "":
-		var cancel_button := _button(cancel_text,Rect2(810,633,265,42),_close_modal)
+		var cancel_button := _button(cancel_text,Rect2(810,action_y,265,40),_close_modal)
 		remove_child(cancel_button)
 		modal.add_child(cancel_button)
 func _close_modal() -> void:
@@ -1473,7 +1429,8 @@ func _smoke_ui() -> void:
 		_quick_move(sale_items[n].id)
 	assert(trade_panel.rows.get_child_count() == state.selling_items().size())
 	assert(trade_panel.rows.get_child_count() > 8)
-	trade_panel.position = Vector2(700,88)
+	trade_panel.position = Vector2(1180,354)
+	trade_panel.z_index = 40
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png("res://docs/testing/previews/清单与轮廓.png")
 	print("UI_SMOKE_OK: walnut scene, customer backpack visibility/hit testing/return, four customers, trade and inventory")
@@ -1599,6 +1556,7 @@ func _start_exploration() -> void:
 	drag_id = -1
 	state.cancel_trade()
 	exploration = load("res://scripts/exploration.gd").new()
+	exploration.z_index = 200
 	exploration.state = state
 	exploration.finished.connect(func():
 		var fled: bool = exploration.combat.last_fled
@@ -1676,12 +1634,12 @@ func _machine_default_position(id: int) -> Vector2:
 	var machine := _find_item(id)
 	match str(machine.get("key", "")):
 		"furnace":
-			return Vector2(528,184)
+			return Vector2(280,492)
 		"alembic":
-			return Vector2(668,184)
+			return Vector2(816,470)
 		"pot":
-			return Vector2(1088,600)
-	return Vector2(1088,600)
+			return Vector2(24,600)
+	return Vector2(24,600)
 func _open_machine(id: int) -> void:
 	var machine := _find_item(id)
 	if machine.is_empty() or not State.MACHINES.has(machine.key):
@@ -1698,11 +1656,11 @@ func _open_machine(id: int) -> void:
 	var close := _popup_close(host,_close_machine.bind(id))
 	if machine.key in ["furnace","alembic"]:
 		var recipes := Button.new()
-		recipes.text = "▤  查看配方"
-		recipes.position = Vector2(370 if machine.key == "furnace" else 234,13)
-		recipes.size = Vector2(96,27)
+		recipes.text = "配方"
+		recipes.position = Vector2(370 if machine.key == "furnace" else 234,8)
+		recipes.size = Vector2(96,32)
 		PopupSkin.button(recipes)
-		recipes.add_theme_font_size_override("font_size",12)
+		recipes.add_theme_font_size_override("font_size",16)
 		recipes.pressed.connect(_open_recipe_drawings.bind(machine.key))
 		host.add_child(recipes)
 		recipe_buttons[id] = recipes
@@ -1864,7 +1822,7 @@ func _begin_day() -> void:
 	_notify("第 %d 天已开始，点击关门器打开卷帘门营业。" % state.day)
 # A customer inventory is an independent window; there is no physical customer tray.
 var customer_bag_open := false
-var customer_bag_rect := Rect2(40,110,616,186)
+var customer_bag_rect := Rect2(24,104,616,186)
 var customer_bag_button: Button
 var customer_bag_close: Button
 var customer_bag_window_node: Control
@@ -1915,24 +1873,12 @@ func _customer_bag_input(event: InputEvent) -> bool:
 		return true
 	return false
 func _style_popup_close(button: Button) -> void:
-	button.size = Vector2(30,30)
-	PopupSkin.button(button)
-	button.add_theme_stylebox_override("normal",PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.BRASS,0))
-	button.add_theme_stylebox_override("hover",PopupSkin.box(PopupSkin.ORANGE,PopupSkin.DARK,0))
-	button.add_theme_color_override("font_color",PopupSkin.PAPER)
+	PopupSkin.close_button(button)
 func _draw_bag_shell(rect: Rect2, title: String, hint: String) -> void:
-	draw_colored_polygon(PopupSkin.window_points(Rect2(rect.position+Vector2(5,5),rect.size),10),Color(0,0,0,0.58))
-	draw_colored_polygon(PopupSkin.window_points(rect,10),PopupSkin.PANEL)
-	var outline := PopupSkin.window_points(rect,10)
-	outline.append(outline[0])
-	draw_polyline(outline,PopupSkin.BRASS,1.0,true)
-	var header_rect := Rect2(rect.position,Vector2(rect.size.x,48))
-	draw_colored_polygon(PopupSkin.header_points(header_rect,10),PopupSkin.PANEL_ALT)
-	draw_rect(Rect2(rect.position,Vector2(7,48)),PopupSkin.ORANGE)
-	draw_rect(Rect2(rect.position+Vector2(rect.size.x-44,16),Vector2(26,2)),PopupSkin.CYAN)
-	_text(title,rect.position+Vector2(18,31),18,PopupSkin.PAPER)
-	draw_line(rect.position+Vector2(14,rect.size.y-31),rect.position+Vector2(rect.size.x-14,rect.size.y-31),Color(PopupSkin.BRASS,0.35),1)
-	_text(hint,rect.position+Vector2(18,rect.size.y-12),12,PopupSkin.MUTED)
+	PopupSkin.draw_window(self,rect)
+	PopupSkin.title(self,title,rect.position+Vector2(18,32))
+	if hint != "":
+		_text(hint,rect.position+Vector2(18,rect.size.y-12),14,PopupSkin.MUTED)
 
 func _open_recipe_drawings(machine_key: String = "furnace") -> void:
 	if modal != null:
@@ -1941,9 +1887,9 @@ func _open_recipe_drawings(machine_key: String = "furnace") -> void:
 	machine_dragging_id = -1
 	_hide_hover_tip()
 	modal = Panel.new()
-	modal.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	modal.z_index = 100
-	modal.add_theme_stylebox_override("panel",PopupSkin.box(Color("090e14bd"),Color.TRANSPARENT))
+	modal.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	modal.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.SHADE,Color.TRANSPARENT))
 	add_child(modal)
 	var drawing := WorkbenchView.new()
 	drawing.alchemy = machine_key == "alembic"

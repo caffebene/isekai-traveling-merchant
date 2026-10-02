@@ -1,0 +1,63 @@
+# 历史资源与提示词归档
+
+状态：归档，不作为当前生成依据。当前规范见 [整体视觉与UI规范](../整体视觉与UI规范.md)，运行资产见 [美术资源](../美术资源.md)。以下描述包含已替换的视角、材质、坐标与占格，仅保留追溯。
+
+# 分层美术资源
+
+玩家主世界统一画风提示词：`docs/game-design/玩家主世界画风提示词.md`。主世界及其室内场景生成时复用该文件的风格、正面和负面提示词；道具图标生成规则见 `docs/game-design/道具生成提示词.md`；交易车的金属室内是当前场景的具体材质落地。
+
+工具：内置 imagegen。最终资源保存在项目 assets 内；原始生成文件保留在 Codex generated_images 中。
+
+- `assets/interior.png`：无人物、无外景的车内背景。左侧门口、右侧床铺。
+- `assets/town.png`：独立风栖镇街景。
+- `assets/sylvie.png`：带真实 alpha 通道的精灵顾客立绘。
+
+生成提示词如下。
+
+## 车内
+
+Game asset only, a 16:9 anime fantasy traveling merchant wagon INTERIOR BACKGROUND, 1600x900 composition. First person inside merchant wagon. Wide spacious utilitarian mobile shop suitable for a game, rich cozy amber wood hand-painted anime RPG art. NO PEOPLE. STRICT game scene spatial layout: LEFTMOST quarter x0-300 has a full height closed wooden EXIT DOOR with brass handle and small glass upper panel, door clearly visible y110-570 with empty clickable floor in front. RIGHTMOST quarter x1280-1600 has a clearly visible small cozy BED with green blanket and cream pillow against right wall at y320-590, visible sleep interaction object. CENTRAL x360-1220 y95-405 a large EMPTY plain dark rectangular service window aperture with unobstructed straight rectangular borders; do not paint any outdoor scenery in window, just flat dark teal as it is replaced by dynamic game layer. CENTRAL and across width x310-1270 y410-640 has a VERY LARGE EMPTY front facing merchant wooden counter, spacious cleared work surface designed for a 20 by 4 inventory grid, minimal perspective, no goods clutter. BOTTOM y660-900 simple dark wood storage cabinet facade that will be covered by game inventory UI. Small lantern and modest ivy accents, tidy practical space, beautiful cel-shaded anime environment, no text, no UI, no grids. Door and bed are essential and must be spacious, window smaller than counter.
+
+## 外景
+
+Game asset: standalone exterior background for a fantasy merchant wagon's service window, wide 2:1 landscape. Beautiful anime painted cozy medieval European fantasy town market, windmill in distance, blue sky, green trees, pale plaster red roof houses, cobblestone street, warm morning sunlight, lively but NO people in foreground, no interior, no window frame, no UI, no text. Designed as an independent interchangeable city backdrop layer in a game. Detailed high quality anime game scenery.
+
+## 顾客
+
+Game asset: isolated standalone 2D anime visual novel character sprite, a friendly young adult elf woman merchant customer, silver-white long hair, violet eyes, green travel cape with brass brooch, cream blouse, brown leather belt and shoulder satchel strap. Front-facing, symmetrical calm standing pose, gentle smile, head to upper thighs fully in frame, hands gently together at waist, polished anime cel shading with detailed fabric and clear silhouette. Genuine transparent background, no scenery, no furniture, no counter, no text. Character occupies most of canvas, ample margin above head and either side of shoulders. This must be a reusable independent customer sprite with transparent alpha.
+
+## 野外探索美术更新
+
+使用内置 imagegen 生成并接入 8 张独立素材，位于 `assets/exploration/`。2026-09-11 已按低噪声提示词重新生成并替换，旧版本保存在 `assets/exploration/archive-v1/`：
+
+- `deep-forest-night-v2.png`：16:9 夜晚深林战场背景素材，前方视线深入密林，左下角保留开阔战斗区；使用明显外轮廓、大块面和低对比远景。
+- `stage/forest-distance.png`：当前战斗分层场景透明开口下方的夜晚远景底板，整体压暗以衬托近景森林和角色。
+- `forest.png`：原暮色森林战场背景，保留作为备用版本。
+- `merchant-back.png`：背面三分之四视角的全身旅行商人立绘，真实 RGBA。
+- `slime.png`、`wolf.png`、`golem.png`、`red_wolf.png`、`ancient_tree.png`：五种向左怪物立绘；树木怪物名称为“古木精”。
+- `panel.png`：低纹理皮革与黄铜面板，运行时以九宫格绘制，扩容时不拉伸四角。
+
+所有角色与怪物保留真实 RGBA 通道。完整新版提示词见 `assets/exploration/prompts-clean-v2.json`；原始生成路径及历史版本见 `assets/exploration/generation.json` 与 `assets/exploration/archive-v1/`。界面截图为 `docs/testing/previews/exploration-battle.png` 和 `docs/testing/previews/exploration-victory-large.png`。
+
+战斗场景运行时使用 `assets/battle/scene_layers/` 中的 8 张 RGBA 森林图，并在透明开口下方绘制 `assets/exploration/stage/forest-distance.png`，由 `scenes/battle_multilayer.tscn` 以固定镜头和 `TransitionGhost` 实现空间过渡。旧版 `assets/exploration/stage/` 分层素材仍保留作为历史参考，旧场景入口已移除。修正经验记录于 `docs/testing/战斗场景过渡修正经验.md`。
+## 道具资源更新（2026-09-10）
+
+经营页与探索页的 14 种道具已改为独立 RGBA PNG，保存在 assets/items/，并由 scripts/item_art.gd 统一加载。道具占格按实物比例调整：长剑与强化长剑为 2×6，草药和药剂为 2×3，果实与矿石为 2×2，食物为 3×2，设备为 3×3、3×4、4×4；不再存在 1×1 道具。
+
+道具资源按 96 px/格处理，去除 alpha 小于 12 的生成雾边，并将本体限制在目标画布 94% 以内，保留透明安全边距。2×6 长剑需要 6×6 旅行背包；顾客与战利品区不足 6 行时会自动横放，玩家仍可按 R 手动旋转。生成提示词见 `docs/game-design/道具生成提示词.md`，生成映射、源文件和处理规则见 `assets/items/generation.json`。
+
+2026-09-12 已将运行时使用的 14 个道具替换为 `ordinary-fantasy-v2` 普通异世界批次，旧生成批次保留在 `assets/items/archive/generated-v1/`。鲜兽肉和香草烤肉均为无骨肉块/肉排，不再出现骨头。
+
+本轮工作台与炼药器补充了透明 PNG 图标：`assets/items/workbench/alembic-machine.png`、`workbench-machine.png`、`slime_mucus.png`、`ancient_wood.png`。两台设备统一为绝区零风格并采用完全正面正交视角：工作台匹配 `4×4` 正方形占格，炼药器匹配 `3×4` 纵向占格；正面居中对称，不显示顶部或左右侧面。工作台使用橙色加工舱，炼药器使用独立的紫色化学处理舱；不再使用中世纪锅炉、木制工作台或玻璃炼金器皿造型。史莱姆粘液来自史莱姆掉落，古藤木来自古木精掉落。
+
+## 交易页交互道具更新（2026-09-12）
+
+按 `docs/game-design/玩家主世界画风提示词.md` 的大色块、稳定线稿和成组阴影规则，在现有金属商车场景中新增独立 RGBA 素材：
+
+- `assets/interaction/computer.png`：一体机电脑，运行时尺寸 240×210。
+- `assets/interaction/phone.png`：平放在桌面的手机，运行时尺寸 160×104。
+- `assets/interaction/call_bell.png`：呼叫铃，运行时尺寸 112×96。
+- `assets/interaction/door_closer.png`：右上方关门器，运行时尺寸 64×128。
+- `assets/interaction/roller_shutter.png`：基于用户提供图 1 风格重做的完整不透明橱窗卷帘门板，运行时放入原窗口 1024×362 区域，由上到下裁剪展开，次日由下到上收起。
+
+新增素材均保留透明安全边距并使用透明像素点击蒙版；手机打开手机样式历史记录，呼叫铃按空场点击/有客长按分流，关门器经确认后控制卷帘门覆盖窗口。
