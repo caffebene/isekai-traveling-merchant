@@ -1,9 +1,9 @@
 {
   "date": "2026-10-02",
-  "style": "urban-fantasy-v1",
+  "style": "merchant-ledger-v2",
   "engine": "Godot 4.7.1",
-  "programs": 12,
-  "checks": 516,
+  "programs": 15,
+  "checks": 823,
   "results": [
     {
       "name": "test_trade",
@@ -23,14 +23,14 @@
       "name": "test_trade_overlay_interactions",
       "exit": 0,
       "result": [
-        "PASS: 51 trade overlay interaction checks"
+        "PASS: 58 trade overlay interaction checks"
       ]
     },
     {
       "name": "test_workbench_window",
       "exit": 0,
       "result": [
-        "WORKBENCH WINDOW PASS: 41 checks (0 failures)"
+        "WORKBENCH WINDOW PASS: 51 checks (0 failures)"
       ]
     },
     {
@@ -44,28 +44,28 @@
       "name": "test_dialogue",
       "exit": 0,
       "result": [
-        "PASS: 11 dialogue checks"
+        "PASS: 12 dialogue checks"
       ]
     },
     {
       "name": "test_game_depth",
       "exit": 0,
       "result": [
-        "PASS: 31 game-depth checks"
+        "PASS: 40 game-depth checks"
       ]
     },
     {
       "name": "test_game_depth_ui",
       "exit": 0,
       "result": [
-        "PASS: 10 game-depth UI checks"
+        "PASS: 20 game-depth UI checks"
       ]
     },
     {
       "name": "test_exploration",
       "exit": 0,
       "result": [
-        "PASS: 46 exploration checks"
+        "PASS: 50 exploration checks"
       ]
     },
     {
@@ -88,6 +88,57 @@
       "result": [
         "PASS: 23 travel checks"
       ]
+    },
+    {
+      "name": "test_item_card_data",
+      "exit": 0,
+      "result": [
+        "PASS: 36 item card and purchase cost checks"
+      ]
+    },
+    {
+      "name": "test_weapon_footprints",
+      "exit": 0,
+      "result": [
+        "PASS: 42 weapon footprint checks"
+      ]
+    },
+    {
+      "name": "test_weapon_quality",
+      "exit": 0,
+      "result": [
+        "PASS: 188 weapon quality checks"
+      ]
     }
-  ]
+  ],
+  "scope": "统一UI、图示配方册、物品卡精简与生肉回血",
+  "latest_validation": {
+    "scope": "fuel_percentage_interval_bonus_and_ore_interval_removal",
+    "programs": [
+      "test_game_depth",
+      "test_weapon_quality",
+      "test_item_card_data",
+      "test_weapon_footprints",
+      "test_game_depth_ui",
+      "test_exploration"
+    ],
+    "checks": 376,
+    "exit": 0,
+    "resolutions": [
+      "1600x900",
+      "1440x810"
+    ],
+    "fuel_reduction_percent": {
+      "slime_mucus": 10,
+      "ancient_wood": 20
+    },
+    "stacking": "multiply interval factors, then divide by swift speed factor",
+    "preview_completed": true,
+    "preview_asset_warnings": [
+      "assets/exploration/logging.png",
+      "assets/exploration/mining.png",
+      "assets/exploration/camp.png",
+      "assets/exploration/snail.png"
+    ]
+  }
 }

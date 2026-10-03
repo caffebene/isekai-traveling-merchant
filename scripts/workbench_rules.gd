@@ -24,7 +24,7 @@ static func recipes() -> Array[Dictionary]:
  return result
 
 static func evaluate(state, id: int) -> Dictionary:
- var result := {"ready":false,"output":"","status":"摆放材料 · 隔天完成","inputs":[],"fuel_id":-1,"purity":0,"max_durability":0,"cell":Vector2i(-1,-1),"rotated":false,"fallback":false}
+ var result := {"ready":false,"output":"","status":"摆放材料 · 隔天完成","inputs":[],"fuel_id":-1,"purity":0,"max_durability":0,"cell":Vector2i(-1,-1),"rotated":false,"fallback":false,"fuel_key":"","quality_probabilities":[]}
  var inputs: Array = state.items.filter(func(i): return i.zone == state.machine_zone(id))
  if inputs.is_empty():
   return result
@@ -85,6 +85,8 @@ static func evaluate(state, id: int) -> Dictionary:
  if required_fuel != "" and fuel.key != required_fuel:
   result.status = "需要「%s」" % state.CATALOG[required_fuel].name
   return result
+ result.fuel_key = fuel.key
+ result.quality_probabilities = state.Quality.PROBABILITIES[fuel.key].duplicate()
  result.fuel_id = fuel.id
  result.purity = FUELS[fuel.key].purity
  result.max_durability = roundi(state.CATALOG[result.output].get("base_durability",20)*FUELS[fuel.key].multiplier)

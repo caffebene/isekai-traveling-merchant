@@ -122,14 +122,14 @@ func window_checks() -> void:
  shop._hide_hover_tip()
  await shot("炼药器-未知组合")
  shop.recipe_buttons[id].emit_signal("pressed")
- var drawing = shop.modal.get_child(0)
- check(drawing.alchemy and drawing.recipe_count() == 2,"alchemy recipe drawings share modal")
+ var drawing = shop.recipe_book
+ check(drawing.alchemy and drawing.recipe_count() == 2,"alchemy recipes use the standalone notebook")
  for child in drawing.get_children():
   if child is Button and child.text == "下一张":
    child.emit_signal("pressed")
  check(drawing.page == 1,"alchemy recipe paging")
  await shot("炼药器-配方图纸")
- shop._close_modal()
+ shop._close_recipe_book()
  shop._close_machine(id)
  shop._open_machine(id)
  check(shop.state.alchemy_preview(id).unknown,"closing preserves input")

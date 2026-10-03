@@ -20,5 +20,6 @@
     "scripts/interact_hover_tip.gd"
   ],
   "style_authority": "../整体视觉与UI规范.md",
-  "baseline": "../../testing/previews/unified-ui/"
+  "baseline": "../../testing/previews/unified-ui/",
+  "style_version": "merchant-ledger-v2"
 }

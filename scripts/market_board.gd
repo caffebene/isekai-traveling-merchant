@@ -1,202 +1,130 @@
 extends Control
-
+## Newspaper reports stories, never item quotes or event multipliers.
 signal close_requested
 signal travel_requested
-
 const PopupSkin = preload("res://scripts/popup_style.gd")
-const INK = PopupSkin.TEXT
-const MUTED = PopupSkin.MUTED
-const GOLD = PopupSkin.TEXT
-const UP = PopupSkin.ORANGE
-const DOWN = PopupSkin.CYAN
-
 var state
-var item_textures: Dictionary
-var font: SystemFont
-var rows: VBoxContainer
-var events_column: VBoxContainer
+var window: Panel
+var masthead: Label
+var dateline: Label
+var articles_column: VBoxContainer
+var local_column: VBoxContainer
 var travel_button: Button
+var travel_notice: Label
 
-func setup(store, textures: Dictionary) -> void:
-	state = store
-	item_textures = textures
+func setup(store, _textures: Dictionary) -> void:
+ state = store
 
 func _ready() -> void:
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	z_index = 80
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	font = PopupSkin.font()
-	theme = PopupSkin.theme()
-	var shade := ColorRect.new()
-	shade.color = PopupSkin.SHADE
-	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(shade)
-	var window := Panel.new()
-	window.position = Vector2(180,72)
-	window.size = Vector2(1240,756)
-	PopupSkin.window(window)
-	add_child(window)
-	var title := _label(window,"商路行情簿",Vector2(24,8),24,PopupSkin.HEADER_TEXT)
-	var city := _label(window,"%s · 周期第 %d 天" % [state.economy.city_name(),state.economy.cycle_day(state.day)],Vector2(32,57),16,INK)
-	city.add_theme_color_override("font_color",INK)
-	var departure := "商路今日开放" if state.can_travel() else "%d 天后开放商路" % state.economy.days_until_departure(state.day)
-	_label(window,departure,Vector2(900,14),14,PopupSkin.HEADER_TEXT)
-	var close := _button(window,"×",Vector2(1184,8),Vector2(34,34),false)
-	close.pressed.connect(func(): close_requested.emit())
+ set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+ z_index = 80
+ mouse_filter = Control.MOUSE_FILTER_STOP
+ theme = PopupSkin.theme()
+ var shade := ColorRect.new()
+ shade.color = PopupSkin.SHADE
+ shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+ add_child(shade)
+ window = Panel.new()
+ window.position = Vector2(280,78)
+ window.size = Vector2(1040,744)
+ window.add_theme_stylebox_override("panel",PopupSkin.newspaper_panel())
+ add_child(window)
+ masthead = _label(window,"",Rect2(32,14,700,56),36,true)
+ dateline = _label(window,"",Rect2(32,80,650,24),16)
+ var edition := _label(window,"市集版",Rect2(860,80,148,24),16)
+ edition.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+ var close := Button.new()
+ close.text = "×"
+ PopupSkin.close_button(close)
+ PopupSkin.place_close(close,window.size.x)
+ close.pressed.connect(func(): close_requested.emit())
+ window.add_child(close)
+ _rule(Rect2(32,112,976,2))
+ _rule(Rect2(32,118,976,1))
+ _rule(Rect2(652,140,1,496))
+ _rule(Rect2(32,658,976,1))
+ articles_column = _column(Rect2(32,140,592,496))
+ local_column = _column(Rect2(680,140,328,496))
+ travel_notice = _label(window,"",Rect2(32,676,656,44),16)
+ travel_button = Button.new()
+ travel_button.position = Vector2(724,684)
+ travel_button.size = Vector2(284,40)
+ PopupSkin.button(travel_button,true)
+ travel_button.pressed.connect(func(): travel_requested.emit())
+ window.add_child(travel_button)
+ refresh()
 
-	var left := Panel.new()
-	left.position = Vector2(24,94)
-	left.size = Vector2(760,578)
-	left.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.BACKGROUND,PopupSkin.DIVIDER))
-	window.add_child(left)
-	_label(left,"当前商品行情",Vector2(20,14),19,INK)
-	_label(left,"商品",Vector2(76,48),14,MUTED)
-	_label(left,"基础",Vector2(322,48),14,MUTED)
-	_label(left,"现价",Vector2(392,48),14,MUTED)
-	_label(left,"涨跌",Vector2(466,48),14,MUTED)
-	_label(left,"价格原因",Vector2(548,48),14,MUTED)
-	var scroll := ScrollContainer.new()
-	scroll.position = Vector2(12,70)
-	scroll.size = Vector2(736,494)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	left.add_child(scroll)
-	rows = VBoxContainer.new()
-	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	rows.add_theme_constant_override("separation",4)
-	scroll.add_child(rows)
+func _column(bounds: Rect2) -> VBoxContainer:
+ var scroll := ScrollContainer.new()
+ scroll.position = bounds.position
+ scroll.size = bounds.size
+ scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+ window.add_child(scroll)
+ var column := VBoxContainer.new()
+ column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+ column.add_theme_constant_override("separation",24)
+ scroll.add_child(column)
+ return column
 
-	var right := Panel.new()
-	right.position = Vector2(800,94)
-	right.size = Vector2(416,578)
-	right.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.BACKGROUND,PopupSkin.DIVIDER))
-	window.add_child(right)
-	_label(right,"事件日历 · 精确预测",Vector2(20,14),19,INK)
-	var event_scroll := ScrollContainer.new()
-	event_scroll.position = Vector2(12,50)
-	event_scroll.size = Vector2(392,514)
-	event_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	right.add_child(event_scroll)
-	events_column = VBoxContainer.new()
-	events_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	events_column.add_theme_constant_override("separation",10)
-	event_scroll.add_child(events_column)
+func _rule(bounds: Rect2) -> void:
+ var line := ColorRect.new()
+ line.position = bounds.position
+ line.size = bounds.size
+ line.color = PopupSkin.NEWS_RULE
+ line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ window.add_child(line)
 
-	travel_button = _button(window,"前往%s · %d G" % [state.economy.other_city_name(),state.economy.TRAVEL_COST],Vector2(958,690),Vector2(258,44),true)
-	travel_button.visible = state.can_travel()
-	travel_button.pressed.connect(func(): travel_requested.emit())
-	refresh()
+func _label(parent: Node, value: String, bounds: Rect2, font_size: int, title := false) -> Label:
+ var label := Label.new()
+ label.text = value
+ label.position = bounds.position
+ label.size = bounds.size
+ label.add_theme_font_override("font",PopupSkin.font(title))
+ label.add_theme_font_size_override("font_size",font_size)
+ label.add_theme_color_override("font_color",PopupSkin.NEWS_INK)
+ label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ parent.add_child(label)
+ return label
+
+func _article(column: VBoxContainer, article: Dictionary, lead := false) -> void:
+ var story := VBoxContainer.new()
+ story.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+ story.add_theme_constant_override("separation",12)
+ column.add_child(story)
+ for field in ["section","title","body"]:
+  var label := Label.new()
+  label.text = str(article[field])
+  label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+  label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+  label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+  label.add_theme_font_override("font",PopupSkin.font(field == "title"))
+  label.add_theme_font_size_override("font_size",28 if field == "title" and lead else 22 if field == "title" else 18 if field == "body" and lead else 16 if field == "body" else 14)
+  label.add_theme_color_override("font_color",PopupSkin.NEWS_MUTED if field == "section" else PopupSkin.NEWS_INK)
+  if field == "body":
+   label.add_theme_constant_override("line_spacing",8)
+  story.add_child(label)
+ var divider := ColorRect.new()
+ divider.color = Color(PopupSkin.NEWS_RULE,0.55)
+ divider.custom_minimum_size.y = 1
+ divider.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ story.add_child(divider)
 
 func refresh() -> void:
-	if state == null or rows == null:
-		return
-	for child in rows.get_children():
-		child.queue_free()
-	var keys: Array[String] = []
-	for key in state.CATALOG:
-		if str(state.CATALOG[key].category) not in ["设备","容器","杂物"]:
-			keys.append(str(key))
-	keys.sort_custom(func(a,b):
-		var ad: Dictionary = state.economy.price_breakdown(a,state.CATALOG[a].category,state.CATALOG[a].value,state.day)
-		var bd: Dictionary = state.economy.price_breakdown(b,state.CATALOG[b].category,state.CATALOG[b].value,state.day)
-		return absi(int(ad.percent)) > absi(int(bd.percent)) if absi(int(ad.percent)) != absi(int(bd.percent)) else str(state.CATALOG[a].name) < str(state.CATALOG[b].name)
-	)
-	for key in keys:
-		_add_market_row(key)
-	for child in events_column.get_children():
-		child.queue_free()
-	for event in state.economy.CITIES[state.economy.city_id].events:
-		_add_event_card(event)
-
-func _add_market_row(key: String) -> void:
-	var data: Dictionary = state.CATALOG[key]
-	var quote: Dictionary = state.economy.price_breakdown(key,data.category,data.value,state.day)
-	var row := Panel.new()
-	row.custom_minimum_size = Vector2(716,58)
-	row.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.PANEL_ALT if rows.get_child_count()%2 == 0 else PopupSkin.PANEL,Color.TRANSPARENT))
-	rows.add_child(row)
-	if item_textures.has(key):
-		var icon_clip := Control.new()
-		icon_clip.position = Vector2(12,7)
-		icon_clip.size = Vector2(44,44)
-		icon_clip.custom_minimum_size = Vector2(44,44)
-		icon_clip.clip_contents = true
-		icon_clip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		row.add_child(icon_clip)
-		var icon := TextureRect.new()
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.texture = item_textures[key]
-		icon.position = Vector2.ZERO
-		icon.size = Vector2(44,44)
-		icon.custom_minimum_size = Vector2(44,44)
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		icon_clip.add_child(icon)
-	_label(row,str(data.name),Vector2(64,8),15,INK)
-	_label(row,str(data.category),Vector2(64,31),14,MUTED)
-	_amount(row,int(quote.base),Vector2(290,19),14,MUTED)
-	_amount(row,int(quote.current),Vector2(364,19),16,INK)
-	var percent: int = int(quote.percent)
-	var color := UP if percent > 0 else DOWN if percent < 0 else MUTED
-	_label(row,"%+d%%" % percent,Vector2(454,19),16,color)
-	var reason := "；".join(Array(quote.reasons))
-	var reason_label := _label(row,reason,Vector2(526,10),14,color)
-	reason_label.size = Vector2(178,42)
-	reason_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-
-func _add_event_card(event: Dictionary) -> void:
-	var local_day: int = state.economy.cycle_day(state.day)
-	var start: int = int(event.start)
-	var finish: int = start + int(event.duration) - 1
-	var active: bool = local_day >= start and local_day <= finish
-	var wait: int = start-local_day
-	var state_text := "今日生效" if active else "%d 天后" % wait if wait > 0 else "本周期已结束"
-	var card := PanelContainer.new()
-	card.custom_minimum_size = Vector2(370,220)
-	card.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.PANEL_ALT if active else PopupSkin.BACKGROUND,PopupSkin.DIVIDER))
-	events_column.add_child(card)
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation",4)
-	card.add_child(column)
-	var heading := Label.new()
-	heading.text = "%s  ·  第 %d–%d 天  ·  %s" % [event.name,start,finish,state_text]
-	heading.add_theme_font_override("font",font)
-	heading.add_theme_font_size_override("font_size",16)
-	heading.add_theme_color_override("font_color",UP if active else GOLD)
-	column.add_child(heading)
-	for key in state.economy.event_items(event,state.CATALOG):
-		var data: Dictionary = state.CATALOG[key]
-		var price: int = state.economy.event_price(key,event,state.CATALOG)
-		var percent: int = state.economy.event_change_percent(key,event)
-		var line := Label.new()
-		line.text = "%s  %+.0f%%  →  %d G" % [data.name,percent,price]
-		line.add_theme_font_override("font",font)
-		line.add_theme_font_size_override("font_size",14)
-		line.add_theme_color_override("font_color",UP if percent > 0 else DOWN)
-		column.add_child(line)
-
-func _label(parent: Node, value: String, at: Vector2, size_value: int, color: Color) -> Label:
-	var label := Label.new()
-	label.text = value
-	label.position = at
-	label.add_theme_font_override("font",PopupSkin.font(size_value >= 20))
-	label.add_theme_font_size_override("font_size",size_value)
-	label.add_theme_color_override("font_color",color)
-	parent.add_child(label)
-	return label
-
-func _button(parent: Node, value: String, at: Vector2, dimensions: Vector2, primary: bool) -> Button:
-	var button := Button.new()
-	button.text = value
-	button.position = at
-	button.size = dimensions
-	button.add_theme_font_override("font",font)
-	PopupSkin.button(button,primary)
-	parent.add_child(button)
-	return button
-
-func _amount(parent: Node, value: int, at: Vector2, size_value: int, color: Color) -> void:
-	var amount := _label(parent,"%d G" % value,at,size_value,color)
-	amount.size.x = 68
-	amount.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+ if state == null or articles_column == null:
+  return
+ masthead.text = "%s商报" % state.economy.city_name()
+ dateline.text = "第 %d 天  ·  %s" % [state.day,state.economy.market_name()]
+ for column in [articles_column,local_column]:
+  for child in column.get_children():
+   column.remove_child(child)
+   child.queue_free()
+ var articles: Array[Dictionary] = state.economy.news_articles(state.day)
+ if articles.is_empty():
+  articles.append({"section":"本城新闻","title":"市集照常开张","body":"晨钟响过，摊主陆续支起棚子，往来的商车在城门边歇脚。街上还没有传来新的大事，人们正忙着各自的营生。"})
+ for article in articles:
+  _article(articles_column,article,true)
+ for article in state.economy.local_dispatches():
+  _article(local_column,article)
+ travel_notice.text = "商路通告\n班车已到城门，收摊后可启程。" if state.economy.can_travel(state.day) else "商路通告\n每逢周期末，班车往返两城。"
+ travel_button.text = "前往%s · %d G" % [state.economy.other_city_name(),state.economy.TRAVEL_COST]
+ travel_button.visible = state.can_travel()

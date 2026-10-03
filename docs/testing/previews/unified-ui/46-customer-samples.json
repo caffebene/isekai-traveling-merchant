@@ -1,0 +1,93 @@
+[
+	{
+		"faction": "forest",
+		"funds": 120,
+		"goods": [],
+		"name": "希尔薇"
+	},
+	{
+		"faction": "watch",
+		"funds": 190,
+		"goods": [
+			"sword",
+			"copper_sword"
+		],
+		"name": "莱昂"
+	},
+	{
+		"faction": "forest",
+		"funds": 192,
+		"goods": [
+			"berry",
+			"berry"
+		],
+		"name": "绫叶"
+	},
+	{
+		"faction": "craft",
+		"funds": 116,
+		"goods": [
+			"ancient_wood",
+			"copper_ore",
+			"copper_ore",
+			"ancient_wood"
+		],
+		"name": "布洛克"
+	},
+	{
+		"faction": "forest",
+		"funds": 127,
+		"goods": [
+			"meat",
+			"meat"
+		],
+		"name": "奥林"
+	},
+	{
+		"faction": "town",
+		"funds": 149,
+		"goods": [
+			"meat",
+			"berry",
+			"berry"
+		],
+		"name": "米菈"
+	},
+	{
+		"faction": "watch",
+		"funds": 192,
+		"goods": [
+			"bread",
+			"potion"
+		],
+		"name": "诺拉"
+	},
+	{
+		"faction": "night",
+		"funds": 134,
+		"goods": [
+			"slime_mucus",
+			"slime_mucus"
+		],
+		"name": "阿雀"
+	},
+	{
+		"faction": "craft",
+		"funds": 151,
+		"goods": [
+			"ore",
+			"ore",
+			"copper_ore"
+		],
+		"name": "赫伯特"
+	},
+	{
+		"faction": "town",
+		"funds": 105,
+		"goods": [
+			"berry",
+			"herb"
+		],
+		"name": "伊芙"
+	}
+]

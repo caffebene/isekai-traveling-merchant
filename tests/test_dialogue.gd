@@ -32,6 +32,15 @@ func run() -> void:
 	shop._start_conversation(["这是一段需要被限制在对话框黑色内容区内的较长测试对白。"])
 	shop._advance_dialogue(10.0)
 	check(shop.dialogue_text_label.text.contains("\n"),"long dialogue text wraps inside the content area")
+	shop.state.day = 4
+	shop.state.economy.record_trade("希尔薇")
+	shop.state.economy.record_trade("希尔薇")
+	shop._start_customer_conversation()
+	var readable := true
+	for index in range(shop.dialogue_lines.size()):
+		shop._set_dialogue_line(index,true)
+		readable = readable and shop.dialogue_text_label.text.split("\n").size() <= 3
+	check(readable,"trusted customer news is paged into readable dialogue sentences")
 	shop._clear_dialogue()
 	check(not shop.dialogue_active and not shop.dialogue_background.visible,"clearing the customer hides the dialogue frame")
 	print("PASS: %d dialogue checks" % checks if failures == 0 else "FAIL: %d dialogue checks (%d failures)" % [checks,failures])

@@ -51,7 +51,18 @@
       "name": "辉铁强化·旅人长剑",
       "grid": "2x6",
       "file": "iron_sword.png",
-      "source": "exec-70549ec6-69ad-42d0-a746-cdecb8383c5b.png"
+      "path": "assets/items/workbench/generated/iron_sword.png",
+      "source": "/Users/macmini/.codex/generated_images/01a0fb66-944a-76a1-aabf-a74ed3989cff/exec-7e8ec8fb-b845-4359-a265-365c50f1cb51.png",
+      "prompt": "Edit target is the FIRST reference image. The SECOND reference is only the upright composition and current game's item-art style guide. Produce one production-ready transparent item illustration for 异世界旅商. Redraw the target sword into a perfectly STRAIGHT, VERTICAL, front orthographic view: pointed blade at the TOP, grip and pommel at the BOTTOM, continuous centerline exactly vertical, blade sides symmetrical, crossguard horizontal. Entire tip, guard, grip and pommel must be visible. No diagonal orientation, no tilt, no bending, no foreshortening. Match clean Japanese anime 2D fantasy game illustration: stable charcoal contours, large grouped material shadows, restrained highlights, natural handmade metals and dark leather, readable at 48px. Portrait 1:3 composition for final 192x576 inventory asset, centered single sword, 6% transparent safe margins. Genuine transparent RGBA background. No floor or cast shadow, text, logo, watermark, grids, UI, border, hands, scenery, extra objects, photorealism, pixel art, grain, blur, neon or sci-fi. Preserve the iron sword's cool silver-blue steel blade, modest golden brass crossguard, small tasteful gold central blade fittings, round brass pommel and dark brown leather grip. Keep the fuller blade shape and sober materials; no sheath. ONLY one unsheathed perfectly straight upright iron longsword.",
+      "orientation": "upright_front_tip_up",
+      "batch": "straight-swords-v1",
+      "generation_manifest": "assets/items/workbench/generated/straight-swords-generation.json",
+      "archived_previous": {
+        "name": "辉铁强化·旅人长剑",
+        "grid": "2x6",
+        "file": "iron_sword.png",
+        "source": "exec-70549ec6-69ad-42d0-a746-cdecb8383c5b.png"
+      }
     },
     "herb": {
       "name": "月光草",
@@ -93,7 +104,18 @@
       "name": "旅人长剑",
       "grid": "2x6",
       "file": "sword.png",
-      "source": "exec-3eafd87e-2bea-4532-b8d0-ae71c078be2f.png"
+      "path": "assets/items/workbench/generated/sword.png",
+      "source": "/Users/macmini/.codex/generated_images/01a0fb66-944a-76a1-aabf-a74ed3989cff/exec-c5e612a2-1f36-4155-9ff0-d016473b767b.png",
+      "prompt": "Edit target is the FIRST reference image. The SECOND reference is only the upright composition and current game's item-art style guide. Produce one production-ready transparent item illustration for 异世界旅商. Redraw the target sword into a perfectly STRAIGHT, VERTICAL, front orthographic view: pointed blade at the TOP, grip and pommel at the BOTTOM, continuous centerline exactly vertical, blade sides symmetrical, crossguard horizontal. Entire tip, guard, grip and pommel must be visible. No diagonal orientation, no tilt, no bending, no foreshortening. Match clean Japanese anime 2D fantasy game illustration: stable charcoal contours, large grouped material shadows, restrained highlights, natural handmade metals and dark leather, readable at 48px. Portrait 1:3 composition for final 192x576 inventory asset, centered single sword, 6% transparent safe margins. Genuine transparent RGBA background. No floor or cast shadow, text, logo, watermark, grids, UI, border, hands, scenery, extra objects, photorealism, pixel art, grain, blur, neon or sci-fi. Preserve the traveller sword's practical slightly worn warm silver steel, central ridge, modest brass crossguard, diamond-shaped brass pommel and brown leather wrap. Remove the scabbard, strap and all attached secondary objects so this is ONLY one unsheathed straight upright traveller longsword. Keep it visibly different from the copper and blue iron swords.",
+      "orientation": "upright_front_tip_up",
+      "batch": "straight-swords-v1",
+      "generation_manifest": "assets/items/workbench/generated/straight-swords-generation.json",
+      "archived_previous": {
+        "name": "旅人长剑",
+        "grid": "2x6",
+        "file": "sword.png",
+        "source": "exec-3eafd87e-2bea-4532-b8d0-ae71c078be2f.png"
+      }
     },
     "potion": {
       "name": "防护药剂",
@@ -108,5 +130,14 @@
       "source": "exec-238a53e8-1942-4a84-8b7e-e027b643146b.png"
     }
   },
-  "unified_overrides": "assets/items/unified-generation.json"
+  "unified_overrides": "assets/items/unified-generation.json",
+  "workbench_raster_supplement": {
+    "manifest": "assets/items/workbench/generated/generation.json",
+    "prompts": "assets/items/workbench/generated/prompts.json",
+    "style": "ordinary-fantasy-v2",
+    "tool": "built-in image_gen",
+    "runtime_mapping": "scripts/item_art.gd:ITEM_TEXTURES",
+    "legacy_svg": "archive only, not used at runtime"
+  },
+  "straight_swords_supplement": "assets/items/workbench/generated/straight-swords-generation.json"
 }

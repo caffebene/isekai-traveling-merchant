@@ -1,0 +1,37 @@
+{
+  "branch": "customer-factions-v1",
+  "date": "2026-10-03",
+  "reference": "assets/customers/knight.png",
+  "entries": [
+    {
+      "id": "mila",
+      "prompt": "Use case: stylized-concept. Asset type: standalone fantasy merchant game customer character sprite. Primary request: adult stocky female human inn cook, auburn hair tied under plain ivory kerchief, warm tired eyes, rolled sleeves, brick red dress and flour-dusted ivory apron, one hand holding a small wrapped paper food parcel at waist, brisk friendly expression. Style: match the attached game character reference's clean Japanese anime cel shading, restrained linework and large deliberate grouped color shadows. Composition: exactly one person front-facing from entire head to upper thighs, shoulders and hands entirely inside canvas, centered, 8 percent transparent side margins, neutral standing pose suitable behind a merchant counter. Scene/backdrop: genuine transparent RGBA, no background, no floor, no shadow, no room, no counter. Text: none. Avoid photorealism, grain, watercolor, blur, excessive folds, chibi, nudity, readable markings, UI. Create this distinct new person; do not copy the reference identity or outfit.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-b2c8935a-c4df-4ed1-bdf1-9ca7e8fc15e3.png",
+      "target": "assets/customers/mila.png"
+    },
+    {
+      "id": "nora",
+      "prompt": "Use case: stylized-concept. Asset type: standalone fantasy merchant game customer character sprite. Primary request: adult female human night watch captain, short dark navy hair, grey eyes, tiny healed eyebrow scar, muted blue practical uniform over light leather armour, bronze badge without lettering, leather gloves, one hand resting on belt, composed alert expression, no helmet. Style: match the attached game character reference's clean Japanese anime cel shading, restrained linework and large deliberate grouped color shadows. Composition: exactly one person front-facing from entire head to upper thighs, shoulders and hands entirely inside canvas, centered, 8 percent transparent side margins, neutral standing pose suitable behind a merchant counter. Scene/backdrop: genuine transparent RGBA, no background, no floor, no shadow, no room, no counter. Text: none. Avoid photorealism, grain, watercolor, blur, excessive folds, chibi, nudity, readable markings, UI. Create this distinct new person; do not copy the reference identity or outfit.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-2a30e7d3-693c-42e1-8147-514bbcb6ae87.png",
+      "target": "assets/customers/nora.png"
+    },
+    {
+      "id": "sparrow",
+      "prompt": "Use case: stylized-concept. Asset type: standalone fantasy merchant game customer character sprite. Primary request: adult lean male human night-road courier, short messy black hair with one pale streak, amber eyes, patched charcoal jacket and muted plum scarf, small delivery satchel, hands resting at waist, slightly sleep-deprived half smile, no weapons. Style: match the attached game character reference's clean Japanese anime cel shading, restrained linework and large deliberate grouped color shadows. Composition: exactly one person front-facing from entire head to upper thighs, shoulders and hands entirely inside canvas, centered, 8 percent transparent side margins, neutral standing pose suitable behind a merchant counter. Scene/backdrop: genuine transparent RGBA, no background, no floor, no shadow, no room, no counter. Text: none. Avoid photorealism, grain, watercolor, blur, excessive folds, chibi, nudity, readable markings, UI. Create this distinct new person; do not copy the reference identity or outfit.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-a0c39e07-7ea6-4214-91a2-5e44ab02af65.png",
+      "target": "assets/customers/sparrow.png"
+    },
+    {
+      "id": "herbert",
+      "prompt": "Use case: stylized-concept. Asset type: standalone fantasy merchant game customer character sprite. Primary request: adult middle aged tall broad human mining foreman, short iron-grey hair, stubble, tired brown eyes, ochre work shirt with sleeves rolled and slate waistcoat, old brass mining lamp on belt, holding folded unlettered work gloves at waist, patient serious expression, distinct from a dwarf. Style: match the attached game character reference's clean Japanese anime cel shading, restrained linework and large deliberate grouped color shadows. Composition: exactly one person front-facing from entire head to upper thighs, shoulders and hands entirely inside canvas, centered, 8 percent transparent side margins, neutral standing pose suitable behind a merchant counter. Scene/backdrop: genuine transparent RGBA, no background, no floor, no shadow, no room, no counter. Text: none. Avoid photorealism, grain, watercolor, blur, excessive folds, chibi, nudity, readable markings, UI. Create this distinct new person; do not copy the reference identity or outfit.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-c676f591-8c3c-4c3b-8a70-9081c901bd83.png",
+      "target": "assets/customers/herbert.png"
+    },
+    {
+      "id": "eve",
+      "prompt": "Use case: stylized-concept. Asset type: standalone fantasy merchant game customer character sprite. Primary request: adult older female human community soup volunteer, silver hair in low bun, brown eyes and smile lines, sage green cardigan over plain warm ivory blouse, brown long skirt, small wicker basket held at waist, kind practical expression. Style: match the attached game character reference's clean Japanese anime cel shading, restrained linework and large deliberate grouped color shadows. Composition: exactly one person front-facing from entire head to upper thighs, shoulders and hands entirely inside canvas, centered, 8 percent transparent side margins, neutral standing pose suitable behind a merchant counter. Scene/backdrop: genuine transparent RGBA, no background, no floor, no shadow, no room, no counter. Text: none. Avoid photorealism, grain, watercolor, blur, excessive folds, chibi, nudity, readable markings, UI. Create this distinct new person; do not copy the reference identity or outfit.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-fb0a5bb4-3abf-4e1d-a977-f933269bb3df.png",
+      "target": "assets/customers/eve.png"
+    }
+  ]
+}

@@ -30,6 +30,10 @@ func run() -> void:
  var bench: Dictionary = shop.state.items.filter(func(i): return i.key == "furnace")[0]
  var id: int = bench.id
  shop._open_machine(id)
+ check(shop.machine_closes[id].get_parent() == shop.machine_window_nodes[id],"close belongs to the same drawing window")
+ check(shop.recipe_buttons[id].get_parent() == shop.machine_window_nodes[id],"recipe belongs to the same drawing window")
+ check(shop.machine_closes[id].z_index == 0 and shop.recipe_buttons[id].z_index == 0,"header actions inherit the window layer")
+ check(shop.machine_closes[id].size == Vector2(32,32) and shop.machine_closes[id].position == Vector2(472,8),"close is centered in the header with consistent right padding")
  check(shop.machine_popups[id].size == Vector2(520,340),"workbench reference proportions")
  check(shop.state.zone_size(shop.state.machine_zone(id)) == Vector2i(8,8),"8x8 input")
  for zone in shop.state.machine_zones(id):
@@ -53,9 +57,26 @@ func run() -> void:
  check(shop._item_at(shop._item_rect(ores[1]).get_center()) == ores[1].id,"input item hit testing")
  await shot("工作台-待加工")
  shop.recipe_buttons[id].emit_signal("pressed")
- check(shop.modal != null and shop.drag_id == -1,"button opens read-only drawings")
- var drawing = shop.modal.get_child(0)
+ check(shop.modal == null and is_instance_valid(shop.recipe_book) and shop.drag_id == -1,"recipe opens a standalone notebook without a global modal")
+ check(not shop._full_overlay_open(),"notebook keeps other game windows usable")
+ var drawing = shop.recipe_book
  check(drawing.page == 0,"first recipe page")
+ var before_move: Vector2 = drawing.position
+ var book_press := InputEventMouseButton.new()
+ book_press.button_index = MOUSE_BUTTON_LEFT
+ book_press.pressed = true
+ book_press.position = Vector2(80,20)
+ drawing._gui_input(book_press)
+ var book_motion := InputEventMouseMotion.new()
+ book_motion.relative = Vector2(140,45)
+ drawing._gui_input(book_motion)
+ check(drawing.position.distance_to(before_move+Vector2(140,45)) < 1,"notebook drags from its header")
+ var book_release := InputEventMouseButton.new()
+ book_release.button_index = MOUSE_BUTTON_LEFT
+ drawing._gui_input(book_release)
+ check(not drawing.dragging,"releasing the notebook ends dragging")
+ check(shop._item_at(drawing.position+Vector2(80,120)) == -1 and shop._zone_at(drawing.position+Vector2(80,120)) == "","notebook blocks only the area it occupies")
+ check(shop.machine_popups.has(id),"machine stays open while consulting notebook")
  for child in drawing.get_children():
   if child is Button and child.text == "下一张":
    child.emit_signal("pressed")
@@ -63,7 +84,11 @@ func run() -> void:
  drawing.page = 6
  drawing.queue_redraw()
  await shot("工作台-配方图纸")
- shop._close_modal()
+ var escape := InputEventKey.new()
+ escape.keycode = KEY_ESCAPE
+ escape.pressed = true
+ shop._input(escape)
+ check(shop.recipe_book == null and shop.machine_popups.has(id),"escape closes only the notebook and leaves the device open")
  shop.state.advance_day()
  var output: Array = shop.state.items.filter(func(i): return i.zone == shop.state.machine_output_zone(id))
  check(output.size() == 1,"day transition creates output")

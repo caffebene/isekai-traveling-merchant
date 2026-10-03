@@ -52,7 +52,7 @@ func _initialize() -> void:
    s.advance_day()
    var products: Array = s.items.filter(func(i): return i.zone == s.machine_output_zone(0))
    check(products.size() == 1 and products[0].key == recipe.output,"overnight output matches preview")
-   check(products[0].purity == Rules.FUELS[fuel].purity and products[0].durability == plan.max_durability,"fuel affects actual durability")
+   check(products[0].purity == Rules.FUELS[fuel].purity and products[0].durability == State.Quality.durability(products[0],plan.max_durability),"fuel affects actual durability")
    check(products[0].max_durability == products[0].durability,"fresh product at full durability")
    check(s.items.filter(func(i): return i.zone == s.machine_zone(0)).is_empty(),"consume complete recipe")
    check(s.items.filter(func(i): return i.zone == s.machine_fuel_zone(0)).size() == 1,"consume only one fuel")
@@ -64,12 +64,15 @@ func _initialize() -> void:
    var combat = Combat.new()
    combat.start(s)
    combat.next_encounter()
+   combat.enemy.hp = 1000
+   combat.enemy_hp = 1000
    combat.begin_battle()
    var before: int = combat.enemy_hp
-   combat.tick(2.0)
-   check(combat.enemy_hp == before-State.CATALOG[recipe.output].attack,"crafted weapon usable in combat")
-   check(product.durability == plan.max_durability-1,"combat consumes actual durability")
-   check(s.item_description(product).contains("/ %d" % plan.max_durability),"tooltip shows instance max durability")
+   product.affixes = product.affixes.filter(func(a): return a.key not in ["critical","leech"])
+   combat.tick(combat.weapon_interval(product))
+   check(combat.enemy_hp == before-combat.weapon_damage(product),"crafted weapon usable in combat")
+   check(product.durability == product.max_durability-2,"combat consumes actual durability")
+   check(s.item_description(product).contains("/ %d" % product.max_durability),"tooltip shows instance max durability")
  # Left/right mirror retains the material-position contract for advanced axes.
  for recipe in Rules.recipes():
   if recipe.shape != "axe":
@@ -101,7 +104,7 @@ func _initialize() -> void:
  add(s,"ancient_wood",s.machine_fuel_zone(0),Vector2i.ZERO)
  check(s.workbench_preview(0).ready and s.workbench_preview(0).fallback and s.workbench_preview(0).output == "copper_sword","fallback preserves item category")
  s.advance_day()
- check(s.items.any(func(i): return i.key == "copper_sword" and i.max_durability == 30),"fallback keeps fuel purity")
+ check(s.items.any(func(i): return i.key == "copper_sword" and i.max_durability == State.Quality.durability(i,30)),"fallback keeps fuel purity")
  # Advanced recipe requires the specified fuel, without downgrading or consuming.
  s = fixture()
  load_recipe(s,Rules.recipes()[6])

@@ -7,19 +7,35 @@ const CITIES := {
 	"windrest": {
 		"name":"风栖镇",
 		"market":"南门集市",
+		"dispatch":"林间采集者在南门卸下成捆草叶，药铺门前总能见到新鲜的山野货。运来的矿车却要翻过几道山口，铁匠常常守在城门旁等货。",
+		"life":"钟楼下的旧告示换成了手绘地图。巡夜人说，来往旅客终于不再把通向森林的小巷当作城门。",
 		"base":{"材料":0.78,"矿石":1.28,"武器":1.22,"药剂":0.94,"食物":1.05,"燃料":1.08},
 		"events":[
-			{"start":3,"duration":2,"name":"炼药师集会","forecast":"炼药师将在第 3 天集会","effects":{"herb":1.45,"berry":1.20,"potion":1.40,"power":1.35}},
-			{"start":6,"duration":2,"name":"骑士团驻扎","forecast":"骑士团将在第 6 天抵达","effects":{"sword":1.55,"iron_sword":1.55,"copper_sword":1.55,"copper_axe":1.55,"copper_pickaxe":1.42,"iron_axe":1.55,"iron_pickaxe":1.42,"tempered_sword":1.60,"tempered_axe":1.60,"bread":1.24,"steak":1.30}},
+			{"start":3,"duration":2,"name":"炼药师集会","forecast":"炼药师陆续订下客房，药铺正在清理柜台，准备接待远道而来的同行。",
+			"news":"戴着各色徽章的炼药师聚在南门附近。学徒提着篮子四处寻找新鲜草叶与浆果，几家药铺的防护和力量药剂也被来访者反复询问。",
+			"rumor":"客栈接连收到炼药师的来信。掌柜忙着腾出后院，药铺学徒已经开始寻访采集者，想为来客备些新鲜的草叶、浆果和试药材料。",
+			"effects":{"herb":1.45,"berry":1.20,"potion":1.40,"power":1.35}},
+			{"start":6,"duration":2,"name":"骑士团驻扎","forecast":"城外有人看见骑士团的旗帜，营地的补给车正在打听城里的铺子。",
+			"news":"骑士团在城外扎下帐篷。军需官挨家询问能上阵的刀剑和开营地用的工具，伙夫则在烘焙铺与烤肉摊前排起长队。",
+			"rumor":"运粮车带来骑士团将经过此地的消息。城外空地正在清理，先行的军需官向铁匠和食摊打听，能否备齐驻营所需的装备与口粮。",
+			"effects":{"sword":1.55,"iron_sword":1.55,"copper_sword":1.55,"copper_axe":1.55,"copper_pickaxe":1.42,"iron_axe":1.55,"iron_pickaxe":1.42,"tempered_sword":1.60,"tempered_axe":1.60,"bread":1.24,"steak":1.30}},
 		],
 	},
 	"ironvale": {
 		"name":"铁砧城",
 		"market":"炉桥商圈",
+		"dispatch":"炉桥旁的矿车从清晨排到午后，锻造铺与燃料商就设在矿仓附近。卖草药、鲜食和药剂的外乡商车一到，往往先被工人们围住。",
+		"life":"工人们给炉桥栏杆刷上了新漆，沿桥挂起旧矿灯。下班的人停下脚步，猜哪一盏曾跟着祖辈进过最深的矿道。",
 		"base":{"材料":1.36,"矿石":0.72,"武器":0.88,"药剂":1.30,"食物":1.24,"燃料":0.80},
 		"events":[
-			{"start":2,"duration":2,"name":"矿队归来","forecast":"矿队将在第 2 天归来","effects":{"ore":0.68,"copper_ore":0.72,"slime_mucus":0.82,"ancient_wood":0.86}},
-			{"start":5,"duration":2,"name":"矿井整修","forecast":"矿井将在第 5 天停工整修","effects":{"ore":1.55,"copper_ore":1.42,"sword":1.22,"iron_sword":1.30,"copper_sword":1.20,"copper_axe":1.20,"iron_axe":1.30,"bread":1.18,"steak":1.24}},
+			{"start":2,"duration":2,"name":"矿队归来","forecast":"满载的矿队正沿山路返城，仓库管理员已经腾出空地。",
+			"news":"远行矿队的货车挤满炉桥，矿石和途中收集的粘液、古木正在卸货。仓库几乎堆到门口，摊主忙着重新安排摆货的地方。",
+			"rumor":"山路驿站传来消息：远行矿队的车轮压得很深，随车还带着野外采集物。仓库管理员正在腾出空地，等着这批货进城。",
+			"effects":{"ore":0.68,"copper_ore":0.72,"slime_mucus":0.82,"ancient_wood":0.86}},
+			{"start":5,"duration":2,"name":"矿井整修","forecast":"矿井支架需要整修，工头正在联络外来的供货商。",
+			"news":"矿井暂时封住入口，矿车停在轨道旁。整修工人四处筹措补用的矿材与趁手刀斧，留在地面的工班仍要按时领到面包和热食。",
+			"rumor":"工头发现几处支架松动，正准备召集工班整修。外来的供货商被请去谈话，话题从补用矿材、刀斧一直说到工班的饭食。",
+			"effects":{"ore":1.55,"copper_ore":1.42,"sword":1.22,"iron_sword":1.30,"copper_sword":1.20,"copper_axe":1.20,"iron_axe":1.30,"bread":1.18,"steak":1.24}},
 		],
 	},
 }
@@ -146,31 +162,44 @@ func record_trade(customer_name: String) -> int:
 	return relationship(customer_name)
 
 func intelligence(world_day: int, customer_name := "") -> String:
-	var local_day := cycle_day(world_day)
-	var horizon := 3 if relationship(customer_name) >= 2 else 2
 	var lines: Array[String] = []
-	var active := active_event(world_day)
-	if not active.is_empty():
-		lines.append("今日：%s" % active.name)
-	for event in CITIES[city_id].events:
-		var wait: int = int(event.start) - local_day
-		if wait > 0 and wait <= horizon:
-			lines.append("%d 天后：%s" % [wait,event.name])
+	for article in news_articles(world_day,customer_name):
+		lines.append("%s：%s。%s" % [article.section,article.title,article.body])
 	if lines.is_empty():
-		lines.append("近日行情平稳")
+		lines.append("街头没有新的消息，商贩们仍在照常摆摊。")
 	return "\n".join(lines)
 
-func market_report(catalog: Dictionary, world_day: int) -> String:
-	var samples := ["herb","ore","potion","iron_sword","steak"]
-	var lines: Array[String] = ["%s · 周期第 %d 天" % [city_name(),cycle_day(world_day)],intelligence(world_day)]
-	for key in samples:
-		if not catalog.has(key):
-			continue
-		var data: Dictionary = catalog[key]
-		var current := value(key,data.category,data.value,world_day)
-		var change := roundi((float(current)/float(data.value)-1.0)*100.0)
-		lines.append("%s  %d G  %+.0f%%" % [data.name,current,change])
-	return "\n".join(lines)
+func news_articles(world_day: int, customer_name := "") -> Array[Dictionary]:
+	var local_day := cycle_day(world_day)
+	var horizon := 3 if relationship(customer_name) >= 2 else 2
+	var articles: Array[Dictionary] = []
+	for event in CITIES[city_id].events:
+		var start: int = int(event.start)
+		var active := local_day >= start and local_day < start+int(event.duration)
+		var upcoming := start > local_day and start-local_day <= horizon
+		if active or upcoming:
+			articles.append({"section":"本城新闻" if active else "街头消息","title":str(event.name),"body":str(event.news if active else event.rumor),"active":active})
+	return articles
+
+func local_dispatches() -> Array[Dictionary]:
+	var reports: Array[Dictionary] = [{"section":"市集来信","title":market_name(),"body":str(CITIES[city_id].dispatch)}]
+	var city_pressure: Dictionary = sold_pressure.get(city_id,{})
+	var goods: Array[String] = []
+	var descriptions := {"材料":"草叶与野外采集物","矿石":"矿材","武器":"刀剑工具","药剂":"药铺的瓶罐","食物":"吃食","燃料":"燃料"}
+	for category in descriptions:
+		if int(city_pressure.get(category,0)) > 0:
+			goods.append(descriptions[category])
+	if goods.is_empty():
+		reports.append({"section":"街巷拾闻","title":"城里的一角","body":str(CITIES[city_id].life)})
+	else:
+		reports.append({"section":"市集来信","title":"摊位上的旧货","body":"最近流入集市的%s还堆在货架上。有摊主忙着挑拣手里的存货，来送货的人只好再多走几家铺子。" % "、".join(goods)})
+	return reports
+
+func market_report(_catalog: Dictionary, world_day: int) -> String:
+	var lines: Array[String] = ["%s商报 · 第 %d 天" % [city_name(),world_day],intelligence(world_day)]
+	for article in local_dispatches():
+		lines.append("%s：%s" % [article.title,article.body])
+	return "\n\n".join(lines)
 
 func module_cost(module_id: String) -> int:
 	return {"roof_rack":180,"hidden_compartment":240,"field_kitchen":210}.get(module_id,9999)

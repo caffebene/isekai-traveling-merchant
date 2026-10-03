@@ -4,6 +4,7 @@ signal accepted
 signal withdrawn
 signal close_requested
 const PopupSkin = preload("res://scripts/popup_style.gd")
+const Art = preload("res://scripts/item_art.gd")
 var price: SpinBox
 var accept: Button
 var haggle: Button
@@ -16,8 +17,11 @@ var intent: Label
 var offer_label: Label
 var buy_tab: Button
 var sell_tab: Button
-var columns: HBoxContainer
 var scroll: ScrollContainer
+var list_caption: Label
+var budget: Label
+var market_total: Label
+var quote: Label
 var state_ref
 var dragging := false
 var drag_offset := Vector2.ZERO
@@ -25,31 +29,30 @@ var keep_open := false
 
 func _draw() -> void:
  PopupSkin.draw_window(self,Rect2(Vector2.ZERO,size))
+ # One continuous ledger instead of individually boxed table rows.
+ draw_style_box(PopupSkin.box(PopupSkin.BACKGROUND,PopupSkin.DIVIDER),Rect2(20,122,360,238))
+ draw_line(Vector2(21,158),Vector2(379,158),PopupSkin.DIVIDER,1)
+ draw_style_box(PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.DIVIDER),Rect2(20,368,360,48))
 
 func _ready() -> void:
- size = Vector2(400,460)
+ size = Vector2(400,536)
+ theme = PopupSkin.theme()
  mouse_filter = Control.MOUSE_FILTER_STOP
  add_theme_stylebox_override("panel",StyleBoxEmpty.new())
  var header := Panel.new()
- header.position = Vector2(1,1)
- header.size = Vector2(398,48)
+ header.size = Vector2(400,48)
  header.add_theme_stylebox_override("panel",StyleBoxEmpty.new())
  header.mouse_default_cursor_shape = Control.CURSOR_MOVE
  add_child(header)
- var accent := ColorRect.new()
- accent.position = Vector2(0,8)
- accent.size = Vector2(3,32)
- accent.color = PopupSkin.ORANGE
- accent.mouse_filter = Control.MOUSE_FILTER_IGNORE
- header.add_child(accent)
- heading = _label("交易清单",Vector2(20,12),20)
+ heading = _label("交易账单",Vector2(48,8),20)
+ heading.size = Vector2(288,32)
+ heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
  heading.add_theme_color_override("font_color",PopupSkin.HEADER_TEXT)
  heading.add_theme_font_override("font",PopupSkin.font(true))
- heading.mouse_filter = Control.MOUSE_FILTER_IGNORE
  close = Button.new()
  close.text = "×"
- close.position = Vector2(350,8)
  PopupSkin.close_button(close)
+ PopupSkin.place_close(close,400)
  close.pressed.connect(func(): close_requested.emit())
  header.add_child(close)
  header.gui_input.connect(func(e):
@@ -61,59 +64,71 @@ func _ready() -> void:
    position = (get_global_mouse_position()-drag_offset).clamp(Vector2(8,8),Vector2(1592,860)-size)
    header.accept_event()
  )
- intent = _label("",Vector2(20,62),14)
- intent.size = Vector2(360,44)
+ intent = _label("",Vector2(20,62),16)
+ intent.size = Vector2(224,52)
+ intent.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
  intent.add_theme_color_override("font_color",PopupSkin.MUTED)
- buy_tab = _button("买入",Vector2(20,112),Vector2(176,32))
- sell_tab = _button("卖出",Vector2(204,112),Vector2(176,32))
+ var budget_title := _label("顾客预算",Vector2(254,62),14)
+ budget_title.size = Vector2(126,20)
+ budget_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+ budget_title.add_theme_color_override("font_color",PopupSkin.MUTED)
+ budget = _label("",Vector2(254,84),24)
+ budget.size = Vector2(126,30)
+ budget.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+ budget.add_theme_color_override("font_color",PopupSkin.HEADER_TEXT)
+ list_caption = _label("",Vector2(28,128),16)
+ list_caption.size = Vector2(344,24)
+ list_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+ buy_tab = _button("购入",Vector2(24,126),Vector2(172,28))
+ sell_tab = _button("出售",Vector2(204,126),Vector2(172,28))
  buy_tab.pressed.connect(func(): _select_tab("buy"))
  sell_tab.pressed.connect(func(): _select_tab("sell"))
- columns = HBoxContainer.new()
- columns.position = Vector2(28,158)
- columns.add_theme_constant_override("separation",0)
- add_child(columns)
- for entry in [["商品",202],["类别",66],["行情",76]]:
-  var l := Label.new()
-  l.text = entry[0]
-  l.custom_minimum_size.x = entry[1]
-  l.add_theme_font_size_override("font_size",14)
-  l.add_theme_color_override("font_color",PopupSkin.MUTED)
-  columns.add_child(l)
  scroll = ScrollContainer.new()
- scroll.position = Vector2(20,184)
- scroll.size = Vector2(360,100)
+ scroll.position = Vector2(24,164)
+ scroll.size = Vector2(352,192)
  scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
  add_child(scroll)
  rows = VBoxContainer.new()
  rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
- rows.add_theme_constant_override("separation",4)
+ rows.add_theme_constant_override("separation",0)
  scroll.add_child(rows)
- summary = _label("",Vector2.ZERO,16)
- offer_label = _label("我的还价",Vector2.ZERO,13)
+ summary = _label("",Vector2(30,372),16)
+ summary.size = Vector2(224,22)
+ market_total = _label("",Vector2(30,395),14)
+ market_total.size = Vector2(224,18)
+ market_total.add_theme_color_override("font_color",PopupSkin.MUTED)
+ quote = _label("",Vector2(264,376),24)
+ quote.size = Vector2(106,32)
+ quote.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+ quote.add_theme_color_override("font_color",PopupSkin.HEADER_TEXT)
+ offer_label = _label("还价",Vector2(20,432),14)
  offer_label.add_theme_color_override("font_color",PopupSkin.MUTED)
  price = SpinBox.new()
  price.min_value = 1
  price.max_value = 9999
+ price.step = 1
+ price.rounded = true
  price.suffix = "G"
- price.size = Vector2(190,38)
- price.add_theme_font_size_override("font_size",18)
+ price.position = Vector2(64,424)
+ price.size = Vector2(164,36)
  var line := price.get_line_edit()
- line.alignment = HORIZONTAL_ALIGNMENT_CENTER
- line.add_theme_stylebox_override("normal",PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.FRAME,0))
- line.add_theme_stylebox_override("focus",PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.ORANGE,0))
+ line.alignment = HORIZONTAL_ALIGNMENT_RIGHT
+ line.add_theme_stylebox_override("normal",PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.FRAME))
+ line.add_theme_stylebox_override("focus",PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.ACCENT))
  line.add_theme_color_override("font_color",PopupSkin.TEXT)
  add_child(price)
- haggle = _button("提出还价",Vector2.ZERO,Vector2(158,38))
+ haggle = _button("提出还价",Vector2(240,424),Vector2(140,36))
  haggle.pressed.connect(func(): offer_submitted.emit(int(price.value)))
- accept = _button("接受报价",Vector2.ZERO,Vector2(238,44),true)
+ accept = _button("成交",Vector2(20,476),Vector2(238,40),true)
  accept.pressed.connect(func(): accepted.emit())
- cancel = _button("撤回物品",Vector2.ZERO,Vector2(110,44))
+ cancel = _button("撤回物品",Vector2(270,476),Vector2(110,40))
  cancel.pressed.connect(func(): withdrawn.emit())
 
-func _label(value: String, pos: Vector2, font_size := 15) -> Label:
+func _label(value: String, pos: Vector2, font_size := 16) -> Label:
  var l := Label.new()
  l.text = value
  l.position = pos
+ l.mouse_filter = Control.MOUSE_FILTER_IGNORE
  l.add_theme_color_override("font_color",PopupSkin.TEXT)
  l.add_theme_font_size_override("font_size",font_size)
  add_child(l)
@@ -137,6 +152,34 @@ func _select_tab(tab: String) -> void:
  state_ref.select_trade_tab(tab)
  refresh(state_ref)
 
+func _add_item_row(item: Dictionary, state) -> void:
+ var row := HBoxContainer.new()
+ row.custom_minimum_size.y = 40
+ row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+ row.add_theme_constant_override("separation",8)
+ row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ rows.add_child(row)
+ row.draw.connect(func(): row.draw_line(Vector2(4,row.size.y-1),Vector2(row.size.x-4,row.size.y-1),Color(PopupSkin.DIVIDER,0.35),1))
+ var icon := preload("res://scripts/quality_icon.gd").new()
+ icon.texture = Art.ITEM_TEXTURES[item.key]
+ icon.quality = state.Quality.tier(item) if state.CATALOG[item.key].category == "武器" else -1
+ icon.custom_minimum_size = Vector2(32,36)
+ icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ row.add_child(icon)
+ var name_label := Label.new()
+ name_label.text = str(state.CATALOG[item.key].name)
+ name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+ name_label.add_theme_font_size_override("font_size",16)
+ name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ row.add_child(name_label)
+ var amount := Label.new()
+ amount.text = "%d G" % state.item_market_value(item)
+ amount.custom_minimum_size.x = 80
+ amount.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+ amount.add_theme_font_size_override("font_size",16)
+ amount.mouse_filter = Control.MOUSE_FILTER_IGNORE
+ row.add_child(amount)
+
 func refresh(state) -> void:
  state_ref = state
  var settled_items: Array[Dictionary] = state.settled_counter_items()
@@ -145,112 +188,57 @@ func refresh(state) -> void:
   return
  var buying_items: Array[Dictionary] = state.buying_items()
  var selling_items: Array[Dictionary] = state.selling_items()
- buy_tab.visible = not buying_items.is_empty() and not selling_items.is_empty()
- sell_tab.visible = buy_tab.visible
- buy_tab.disabled = buying_items.is_empty()
- sell_tab.disabled = selling_items.is_empty()
- intent.text = "顾客资金  %d / %d G" % [state.customer_funds,state.customer_funds_limit]
+ var both := not buying_items.is_empty() and not selling_items.is_empty()
+ buy_tab.visible = both
+ sell_tab.visible = both
+ list_caption.visible = not both
+ buy_tab.text = "购入 %d 件" % buying_items.size()
+ sell_tab.text = "出售 %d 件" % selling_items.size()
+ budget.text = "%d G" % state.customer_funds
+ intent.text = ""
  if state.customer_buy_category != "":
-  intent.text += "\n收购偏好  %s" % state.customer_buy_category
+  intent.text = "收购  "+str(state.customer_buy_category)
  elif state.customer_sell_key == "*":
   var categories: Array[String] = []
   for key in state.customer_goods:
    var category: String = state.CATALOG[key].category
    if not categories.has(category):
     categories.append(category)
-  intent.text += "\n出售商品  "+"、".join(categories)
+  intent.text = "出售  "+"、".join(categories)
  elif state.customer_sell_key != "":
-  intent.text += "\n出售商品  %s" % state.CATALOG[state.customer_sell_key].name
- var both := not buying_items.is_empty() and not selling_items.is_empty()
- buy_tab.position = Vector2(20,112)
- sell_tab.position = Vector2(204 if both else 20,112)
- buy_tab.size = Vector2(176 if both else 360,32)
- sell_tab.size = Vector2(176 if both else 360,32)
+  intent.text = "出售  "+str(state.CATALOG[state.customer_sell_key].name)
  if state.active_trade_tab == "buy" and buying_items.is_empty() and not selling_items.is_empty():
   state.select_trade_tab("sell")
  elif state.active_trade_tab == "sell" and selling_items.is_empty() and not buying_items.is_empty():
   state.select_trade_tab("buy")
  _set_tab_style(buy_tab,state.active_trade_tab == "buy")
  _set_tab_style(sell_tab,state.active_trade_tab == "sell")
- var active_items: Array[Dictionary] = state.buying_items() if state.active_trade_tab == "buy" else state.selling_items()
- var list_height := clampi(maxi(1,active_items.size()) * 36,72,144)
- var awaiting_more := keep_open and active_items.is_empty() and settled_items.is_empty()
- columns.position.y = 158 if both else 112
- scroll.position.y = 184 if both else 138
- scroll.size = Vector2(360,list_height)
- var controls_y := int(scroll.position.y) + list_height + 18
- summary.position = Vector2(20,controls_y)
- offer_label.position = Vector2(20,controls_y+36)
- price.position = Vector2(20,controls_y+60)
- haggle.position = Vector2(222,controls_y+60)
- accept.position = Vector2(20,controls_y+116)
- cancel.position = Vector2(270,controls_y+116)
- size.y = controls_y + 180
+ var active_items: Array[Dictionary] = buying_items if state.active_trade_tab == "buy" else selling_items
+ var pending: bool = state.has_pending_trade()
+ list_caption.text = "%s %d 件" % ["购入" if state.active_trade_tab == "buy" else "出售",active_items.size()] if pending else "清单"
  position = position.clamp(Vector2(8,8),Vector2(1592,860)-size)
  for child in rows.get_children():
   rows.remove_child(child)
   child.queue_free()
- if awaiting_more:
-  var hint := Label.new()
-  hint.text = "暂无待交易物品"
-  hint.add_theme_font_size_override("font_size",14)
-  hint.add_theme_color_override("font_color",PopupSkin.MUTED)
-  rows.add_child(hint)
- elif active_items.is_empty() and not settled_items.is_empty():
-  var hint := Label.new()
-  hint.text = "柜台物品已支付"
-  hint.add_theme_font_size_override("font_size",14)
-  hint.add_theme_color_override("font_color",PopupSkin.MUTED)
-  rows.add_child(hint)
+ if active_items.is_empty():
+  var empty := Label.new()
+  empty.text = "暂无待交易物品" if settled_items.is_empty() else "柜台物品已支付"
+  empty.add_theme_font_size_override("font_size",14)
+  empty.add_theme_color_override("font_color",PopupSkin.MUTED)
+  empty.custom_minimum_size.y = 40
+  rows.add_child(empty)
  for item in active_items:
-  var data: Dictionary = state.CATALOG[item.key]
-  var row_panel := PanelContainer.new()
-  row_panel.custom_minimum_size.y = 32
-  var row_skin := PopupSkin.box(PopupSkin.PANEL_ALT,PopupSkin.DIVIDER,0)
-  row_skin.content_margin_left = 8
-  row_skin.content_margin_right = 8
-  row_panel.add_theme_stylebox_override("panel",row_skin)
-  rows.add_child(row_panel)
-  var row := HBoxContainer.new()
-  row.add_theme_constant_override("separation",0)
-  row_panel.add_child(row)
-  var item_name: String = ("✓ " if item.get("settled",false) else "") + str(data.name)
-  for entry in [[item_name,202],[data.category,66],[str(state.market_value(item.key))+" G",60]]:
-   var l := Label.new()
-   l.text = entry[0]
-   l.custom_minimum_size.x = entry[1]
-   l.add_theme_font_size_override("font_size",14)
-   l.add_theme_color_override("font_color",PopupSkin.TEXT)
-   l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-   if row.get_child_count() == 2:
-    l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-   row.add_child(l)
- var heading_name := "继续交易" if awaiting_more else ("交易清单" if both else ("买入清单" if not buying_items.is_empty() else "卖出清单"))
- heading.text = "%s · %d 件" % [heading_name,state.counter_items().size()]
- if not buying_items.is_empty() and not selling_items.is_empty():
-  summary.text = "购买 %d G  /  出售 %d G" % [state.buy_offer,state.sell_offer]
- elif not buying_items.is_empty():
-  summary.text = "行情 %d G   ·   对方报价 %d G" % [state.buying_value(),state.buy_offer]
- elif not selling_items.is_empty():
-  summary.text = "行情 %d G   ·   对方报价 %d G" % [state.selling_value(),state.sell_offer]
- elif awaiting_more:
-  summary.text = "顾客余款 %d G" % state.customer_funds
- else:
-  summary.text = "已支付"
- price.visible = not awaiting_more
- offer_label.visible = not awaiting_more
- haggle.visible = not awaiting_more
+  _add_item_row(item,state)
+ var balance: int = state.sell_offer-state.buy_offer
+ summary.text = "收取" if balance > 0 else "支付" if balance < 0 else "结算"
+ quote.text = "%d G" % absi(balance) if pending else "—"
+ market_total.text = "购入 %d G / 出售 %d G" % [state.buy_offer,state.sell_offer] if both else "行情合计 %d G" % (state.buying_value() if state.active_trade_tab == "buy" else state.selling_value()) if pending else ""
+ price.visible = pending
+ offer_label.visible = pending
+ haggle.visible = pending
  price.value = maxi(1,state.offer)
  haggle.disabled = state.patience <= 0
- accept.disabled = not state.has_pending_trade()
- if not buying_items.is_empty() and not selling_items.is_empty():
-  accept.text = "完成混合交易"
- elif not buying_items.is_empty():
-  accept.text = "支付 %d G" % state.buy_offer
- elif not selling_items.is_empty():
-  accept.text = "收取 %d G" % state.sell_offer
- elif awaiting_more:
-  accept.text = "等待更多货物"
- else:
-  accept.text = "已完成"
- cancel.disabled = not state.has_pending_trade()
+ accept.disabled = not pending
+ accept.text = "完成混合交易" if both else "购入 %d 件" % buying_items.size() if not buying_items.is_empty() else "出售 %d 件" % selling_items.size() if not selling_items.is_empty() else "成交"
+ cancel.disabled = not pending
+ queue_redraw()

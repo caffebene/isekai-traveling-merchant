@@ -7,7 +7,9 @@
   "base_grid": {
     "cell": 24,
     "line_weight": 1,
-    "line_alpha": 0.24
+    "line_alpha": 0.24,
+    "weapon_occupancy": "TradeState.footprint",
+    "free_weapon_cells": "available_for_other_items"
   },
   "anchors": {
     "counter": {
@@ -54,7 +56,12 @@
       "y": 104,
       "columns": 24,
       "rows": 4,
-      "cell": 24
+      "cell": 24,
+      "auto_open": "selling_customer_arrival",
+      "auto_close": "customer_departure",
+      "close_button": false,
+      "hud_button": false,
+      "escape_closes": false
     }
   },
   "windows": {
@@ -72,13 +79,16 @@
     },
     "trade": {
       "x": 1180,
-      "y": 354,
+      "y": 324,
       "width": 400,
-      "height": "content_height+180",
+      "height": 536,
       "title_bar": 48,
-      "list_height": "clamp(item_count*36,72,144)",
+      "list_height": 192,
       "draggable": true,
-      "z_index": 40
+      "z_index": 40,
+      "list_row_height": 40,
+      "mixed_only_tabs": true,
+      "footer": "net_quote_haggle_and_settlement"
     },
     "machine": {
       "width": 232,
@@ -120,6 +130,27 @@
       "y": 104,
       "width": 360,
       "height": 170
+    },
+    "newspaper": {
+      "x": 280,
+      "y": 78,
+      "width": 1040,
+      "height": 744,
+      "modal": true,
+      "z_index": 80,
+      "masthead_size": 36,
+      "left_column": 592,
+      "right_column": 328,
+      "content_height": 496,
+      "data": "CityEconomy.news_articles/local_dispatches",
+      "travel_action": "original_can_travel_and_closed_shutter",
+      "never_show": [
+        "item_price_list",
+        "event_multiplier",
+        "forecast_price",
+        "event_start_end",
+        "pressure_levels"
+      ]
     }
   },
   "window_rules": [

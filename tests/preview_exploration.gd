@@ -21,12 +21,8 @@ func run() -> void:
 	if "--battle" in OS.get_cmdline_user_args() or "--victory" in OS.get_cmdline_user_args() or preview_ready or preview_defeat:
 		for argument in OS.get_cmdline_user_args():
 			if argument.begins_with("--enemy="):
-				shop.exploration.combat.encounter = clampi(int(argument.trim_prefix("--enemy="))-1,0,4)
-		shop.exploration._primary()
-		for _step in range(100):
-			await process_frame
-			if not shop.exploration.traveling:
-				break
+				shop.exploration.combat.encounter = maxi(0,int(argument.trim_prefix("--enemy="))-1)
+		shop.exploration.combat.next_encounter()
 		if not preview_ready:
 			shop.exploration._fight()
 		if "--victory" in OS.get_cmdline_user_args():

@@ -56,14 +56,15 @@ var cancel: Button
 var next_button: Button
 var trade_panel: Panel
 var trade_panel_dismissed := false
+const ForestStory = preload("res://scripts/forest_story.gd")
+var customer_rng := RandomNumberGenerator.new()
 var customer_index := 0
+var customer_profile: Dictionary = {}
 var art_buttons: Array[TextureButton] = []
-const CUSTOMERS = [
-	{"name":"希尔薇","role":"森林采集者","portrait":"res://assets/approved-layout/customer-sylvie.png","buy_category":"材料","sell_key":"","goods":[],"funds":120,"conversation":["晚上好，我从森林边缘赶来。","我只想收购材料类物品，其他东西暂时没有意愿。","如果价格合适，就在柜台成交吧。"]},
-	{"name":"莱昂","role":"旅剑士","portrait":"res://assets/customers/knight.png","buy_category":"武器","sell_key":"sword","goods":["sword","sword"],"funds":160,"conversation":["旅商，借你的灯看一眼。","我带来两把旅人长剑，也收购你打造的武器。","看过成色之后，我们再谈报价。"]},
-	{"name":"绫叶","role":"草药师","portrait":"res://assets/customers/apothecary.png","buy_category":"药剂","sell_key":"","goods":[],"funds":180,"conversation":["你好，我刚从南坡回来。","我只想收购药剂，别的种类先不考虑。","请把你能接受的价格写在交易单上。"]},
-	{"name":"布洛克","role":"矿石商人","portrait":"res://assets/customers/miner.png","buy_category":"","sell_key":"*","goods":["ore","ore","ore","copper_ore","copper_ore","copper_ore","slime_mucus","slime_mucus","ancient_wood","ancient_wood"],"funds":100,"conversation":["让开一点，矿箱很重。","我带来了矿石和燃料，正好能用来打造装备。","看过成色之后，我们再谈报价。"]}]
+const CustomerRoster = preload("res://scripts/customer_roster.gd")
+const CUSTOMERS = CustomerRoster.PEOPLE
 var exploration: Control
+var recipe_book: Control
 var modal: Panel
 var market_board: Control
 var module_shop: Control
@@ -109,7 +110,17 @@ const SHUTTER_SIZE := Vector2(1024,362)
 const DOOR_ART_RECT := Rect2(-8,-8,225,928)
 const BED_ART_RECT := Rect2(1250,488,422,450)
 const TABLE_ART_RECT := Rect2(155,168,1362,876)
+var drag_canvas: Control
+
 func _ready() -> void:
+	customer_rng.randomize()
+	customer_index = CustomerRoster.draw(state,customer_rng)
+	drag_canvas = preload("res://scripts/inventory_window.gd").new()
+	drag_canvas.shop = self
+	drag_canvas.kind = "drag"
+	drag_canvas.z_index = 90
+	drag_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(drag_canvas)
 	font = PopupSkin.font()
 	theme = PopupSkin.theme()
 	hover_tip = HoverTip.new()
@@ -123,16 +134,16 @@ func _ready() -> void:
 	next_button = _button("下一位客人",Rect2(1430,795,150,36),_next_trade)
 	recorder_button = _button("历史对话",Rect2(1430,837,150,28),_open_recorder)
 	recorder_button.visible = false
-	customer_bag_button = _button("顾客背包",Rect2(1250,20,90,36),_open_customer_bag)
 	bag_window_node = _popup_host(bag_popup)
+	bag_window_node.kind = "bag"
 	bag_close = _popup_close(bag_window_node, _close_bag)
 	bag_window_node.hide()
 	customer_bag_window_node = _popup_host(customer_bag_rect)
-	customer_bag_close = _popup_close(customer_bag_window_node, _close_customer_bag)
+	customer_bag_window_node.kind = "customer"
 	customer_bag_window_node.hide()
 	trade_panel = Panel.new()
 	trade_panel.set_script(preload("res://scripts/trade_panel.gd"))
-	trade_panel.position = Vector2(1180,354)
+	trade_panel.position = Vector2(1180,324)
 	trade_panel.z_index = 40
 	add_child(trade_panel)
 	price = trade_panel.price
@@ -159,17 +170,18 @@ func _button(text_value: String, rect: Rect2, action: Callable, primary := false
 	add_child(b)
 	return b
 func _popup_host(rect: Rect2) -> Control:
-	var host := Control.new()
+	var host := preload("res://scripts/inventory_window.gd").new()
 	host.position = rect.position
 	host.size = rect.size
-	host.z_index = 30
+	host.shop = self
+	host.z_index = 0
 	host.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(host)
 	return host
 func _popup_close(host: Control, action: Callable) -> Button:
 	var b := Button.new()
 	b.text = "×"
-	b.position = Vector2(host.size.x - 42,8)
+	PopupSkin.place_close(b,host.size.x)
 	b.size = Vector2(30,30)
 	_style_popup_close(b)
 	b.pressed.connect(action)
@@ -178,8 +190,7 @@ func _popup_close(host: Control, action: Callable) -> Button:
 func _process(delta: float) -> void:
 	mouse = get_local_mouse_position()
 	_step_counter_physics(delta)
-	var build_summary_over := open_bag and _bag_build_summary_rect().has_point(mouse)
-	var next_hover_id := -1 if drag_id >= 0 or _full_overlay_open() or is_instance_valid(exploration) or build_summary_over else _item_at(mouse)
+	var next_hover_id := -1 if drag_id >= 0 or _full_overlay_open() or is_instance_valid(exploration) else _item_at(mouse)
 	if next_hover_id != hover_id:
 		if hover_id >= 0:
 			_hide_hover_tip("item:%d" % hover_id)
@@ -200,7 +211,8 @@ func _process(delta: float) -> void:
 			machine_over = true
 			break
 	var recorder_over := recorder_panel != null and is_instance_valid(recorder_panel) and recorder_panel.get_global_rect().has_point(mouse)
-	var over_popup := not _full_overlay_open() and not is_instance_valid(exploration) and ((open_bag and (bag_popup.has_point(mouse) or _bag_build_summary_rect().has_point(mouse))) or machine_over or recorder_over or (customer_bag_open and customer_bag_rect.has_point(mouse)))
+	var book_over := is_instance_valid(recipe_book) and recipe_book.get_rect().has_point(mouse)
+	var over_popup := not _full_overlay_open() and not is_instance_valid(exploration) and ((open_bag and bag_popup.has_point(mouse)) or (trade_panel.visible and trade_panel.get_rect().has_point(mouse)) or book_over or machine_over or recorder_over or (customer_bag_open and customer_bag_rect.has_point(mouse)))
 	for child in get_children():
 		if child is Button:
 			child.mouse_filter = Control.MOUSE_FILTER_IGNORE if over_popup else Control.MOUSE_FILTER_STOP
@@ -224,6 +236,11 @@ func _show_hover_tip(key: String, text_value: String, screen_pos: Vector2, tilte
 	if hover_tip == null:
 		return
 	hover_target = key
+	if key.begins_with("item:"):
+		var item := _find_item(int(key.get_slice(":",1)))
+		if not item.is_empty():
+			hover_tip.show_item(key,state.item_card_data(item),ITEM_TEXTURES[item.key],screen_pos)
+			return
 	hover_tip.show_tip(key,text_value,screen_pos,tilted,body_text,tip_z,side,target_rect,alignment)
 
 func _hide_hover_tip(key := "") -> void:
@@ -271,14 +288,19 @@ func _panel(rect: Rect2, bg := PopupSkin.PANEL, border := PopupSkin.FRAME) -> vo
 func _text(value: String, at: Vector2, size_value := 16, color := INK, use_serif := false) -> void:
 	draw_string(font,at,value,HORIZONTAL_ALIGNMENT_LEFT,-1,size_value,color)
 func _create_dialogue_controls() -> void:
+	var dialogue_host := Control.new()
+	dialogue_host.name = "DialogueWindow"
+	dialogue_host.z_index = 110
+	dialogue_host.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	$ArtLayers.add_child(dialogue_host)
 	dialogue_background = Panel.new()
 	dialogue_background.name = "DialogueBackground"
 	dialogue_background.position = DIALOGUE_RECT.position
 	dialogue_background.size = DIALOGUE_RECT.size
 	PopupSkin.window(dialogue_background)
 	dialogue_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	dialogue_background.z_index = 110
-	$ArtLayers.add_child(dialogue_background)
+	dialogue_background.z_index = 0
+	dialogue_host.add_child(dialogue_background)
 	dialogue_speaker_label = Label.new()
 	dialogue_speaker_label.name = "DialogueSpeaker"
 	dialogue_speaker_label.position = DIALOGUE_RECT.position + Vector2(20,12)
@@ -289,8 +311,8 @@ func _create_dialogue_controls() -> void:
 	dialogue_speaker_label.add_theme_font_override("font",PopupSkin.font(true))
 	dialogue_speaker_label.add_theme_font_size_override("font_size",20)
 	dialogue_speaker_label.add_theme_color_override("font_color",PopupSkin.HEADER_TEXT)
-	dialogue_speaker_label.z_index = 110
-	$ArtLayers.add_child(dialogue_speaker_label)
+	dialogue_speaker_label.z_index = 0
+	dialogue_host.add_child(dialogue_speaker_label)
 	dialogue_text_label = Label.new()
 	dialogue_text_label.name = "DialogueText"
 	dialogue_text_label.position = DIALOGUE_RECT.position + Vector2(20,52)
@@ -302,32 +324,32 @@ func _create_dialogue_controls() -> void:
 	dialogue_text_label.add_theme_font_override("font",font)
 	dialogue_text_label.add_theme_font_size_override("font_size",16)
 	dialogue_text_label.add_theme_color_override("font_color",PopupSkin.TEXT)
-	dialogue_text_label.z_index = 110
-	$ArtLayers.add_child(dialogue_text_label)
+	dialogue_text_label.z_index = 0
+	dialogue_host.add_child(dialogue_text_label)
 	for i in range(5):
 		var dot := Panel.new()
 		dot.name = "DialogueDot%d" % i
 		dot.size = Vector2(8,8)
 		dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		dot.z_index = 110
-		$ArtLayers.add_child(dot)
+		dot.z_index = 0
+		dialogue_host.add_child(dot)
 		dialogue_dot_nodes.append(dot)
 	dialogue_prev_button = Button.new()
 	dialogue_prev_button.name = "DialoguePrevious"
 	dialogue_prev_button.text = "◀"
 	dialogue_prev_button.focus_mode = Control.FOCUS_NONE
-	dialogue_prev_button.z_index = 110
+	dialogue_prev_button.z_index = 0
 	_style_dialogue_nav_button(dialogue_prev_button)
 	dialogue_prev_button.pressed.connect(_dialogue_previous)
-	$ArtLayers.add_child(dialogue_prev_button)
+	dialogue_host.add_child(dialogue_prev_button)
 	dialogue_next_button = Button.new()
 	dialogue_next_button.name = "DialogueNext"
 	dialogue_next_button.text = "▶"
 	dialogue_next_button.focus_mode = Control.FOCUS_NONE
-	dialogue_next_button.z_index = 110
+	dialogue_next_button.z_index = 0
 	_style_dialogue_nav_button(dialogue_next_button)
 	dialogue_next_button.pressed.connect(_dialogue_next)
-	$ArtLayers.add_child(dialogue_next_button)
+	dialogue_host.add_child(dialogue_next_button)
 	_update_dialogue_controls()
 func _style_dialogue_nav_button(button: Button) -> void:
 	button.size = Vector2(38,34)
@@ -335,8 +357,8 @@ func _style_dialogue_nav_button(button: Button) -> void:
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	button.add_theme_font_size_override("font_size",22)
 	button.add_theme_color_override("font_color",PopupSkin.TEXT)
-	button.add_theme_color_override("font_hover_color",PopupSkin.ORANGE.lightened(0.12))
-	button.add_theme_color_override("font_pressed_color",PopupSkin.ORANGE)
+	button.add_theme_color_override("font_hover_color",PopupSkin.ACCENT.lightened(0.12))
+	button.add_theme_color_override("font_pressed_color",PopupSkin.ACCENT)
 	button.add_theme_color_override("font_disabled_color",Color("667078"))
 	for mode in ["normal","hover","pressed","disabled","focus"]:
 		button.add_theme_stylebox_override(mode,StyleBoxEmpty.new())
@@ -345,7 +367,7 @@ func _update_dialogue_controls() -> void:
 		return
 	dialogue_background.visible = dialogue_active
 	dialogue_speaker_label.visible = dialogue_active
-	dialogue_speaker_label.text = CUSTOMERS[customer_index].name
+	dialogue_speaker_label.text = CUSTOMERS[customer_index].name+" · "+CustomerRoster.FACTIONS[CUSTOMERS[customer_index].faction]
 	dialogue_text_label.visible = dialogue_active
 	dialogue_text_label.text = _dialogue_display_text()
 	dialogue_prev_button.position = DIALOGUE_RECT.position + Vector2(256,128)
@@ -359,14 +381,13 @@ func _update_dialogue_controls() -> void:
 		dot.visible = dialogue_active and i < dialogue_lines.size()
 		dot.position = DIALOGUE_RECT.position + Vector2(20+i*12,145)
 		var dot_style := StyleBoxFlat.new()
-		dot_style.bg_color = PopupSkin.ORANGE if i == dialogue_line_index else Color("697277")
+		dot_style.bg_color = PopupSkin.ACCENT if i == dialogue_line_index else Color("697277")
 		dot_style.set_corner_radius_all(4)
 		dot.add_theme_stylebox_override("panel",dot_style)
 func _draw() -> void:
 	var status_rect := Rect2(20,16,275,64)
 	PopupSkin.draw_window(self,status_rect,false)
 	draw_colored_polygon(PopupSkin.header_points(Rect2(status_rect.position,Vector2(status_rect.size.x,36))),PopupSkin.HEADER)
-	draw_rect(Rect2(status_rect.position,Vector2(6,status_rect.size.y)),PopupSkin.ORANGE)
 	draw_line(status_rect.position+Vector2(16,39),status_rect.position+Vector2(status_rect.size.x-16,39),PopupSkin.DIVIDER,1.0)
 	PopupSkin.title(self,"第 %02d 天 · %s" % [state.day,state.economy.city_name()],status_rect.position+Vector2(20,26),20)
 	_text("距启程 %d 天" % state.economy.days_until_departure(state.day),status_rect.position+Vector2(20,56),14,PopupSkin.MUTED)
@@ -375,7 +396,7 @@ func _draw() -> void:
 		var progress := clampf(bell_hold_time / BELL_HOLD_DURATION,0.0,1.0)
 		var bell_center := bell_art.position + bell_art.size*0.5
 		draw_arc(bell_center,62.0,0.0,TAU,64,Color(0.05,0.08,0.09,0.72),5.0,true)
-		draw_arc(bell_center,62.0,-PI*0.5,-PI*0.5+TAU*progress,64,PopupSkin.ORANGE,6.0,true)
+		draw_arc(bell_center,62.0,-PI*0.5,-PI*0.5+TAU*progress,64,PopupSkin.ACCENT,6.0,true)
 		_text("长按呼叫",bell_center+Vector2(-31,82),13,PopupSkin.TEXT)
 	# The counter is a continuous physical surface, not an inventory grid.
 	_draw_counter_items()
@@ -383,59 +404,11 @@ func _draw() -> void:
 	for item in state.items:
 		if item.id != drag_id and ZONES.has(item.zone) and item.zone not in ["bag","customer"] and not item.zone.begins_with("machine_"):
 			_draw_item(item,_item_rect(item),false)
-	if customer_bag_open:
-		_draw_bag_shell(customer_bag_rect,"%s的背包" % CUSTOMERS[customer_index].name,"")
-		_draw_zone("customer",true)
-		for item in state.items:
-			if item.id != drag_id and item.zone == "customer":
-				_draw_item(item,_item_rect(item),false)
-	if open_bag:
-		var installed := " · ".join(state.economy.modules.map(func(id): return state.economy.module_name(id)))
-		_draw_bag_shell(bag_popup,"旅行背包 · %d×%d" % [state.bag_size.x,state.bag_size.y],installed)
-		_draw_zone("bag",true)
-		_draw_bag_layout_guides_shop()
-		for item in state.items:
-			if item.id != drag_id and item.zone == "bag":
-				var bag_item_rect := _item_rect(item)
-				_draw_item(item,bag_item_rect,false)
-				_draw_bag_effect_badge_shop(item,bag_item_rect)
-		_draw_bag_build_summary()
-	var machine_draw_order := _machine_ids_topmost()
-	machine_draw_order.reverse()
-	for machine_id in machine_draw_order:
-		var machine := _find_item(machine_id)
-		if machine.is_empty() or not machine_popups.has(machine_id):
-			continue
-		var popup: Rect2 = machine_popups[machine_id]
-		if machine.key in ["furnace","alembic"]:
-			WorkbenchView.draw_window(self,popup,machine_id)
-			continue
-		var machine_zone := state.machine_zone(machine_id)
-		_draw_bag_shell(popup,State.CATALOG[machine.key].name,"次日产出")
-		_draw_zone(machine_zone,true)
-		for item in state.items:
-			if item.id != drag_id and item.zone == machine_zone:
-				_draw_item(item,_item_rect(item),false)
-	if drag_id >= 0:
-		var item := _find_item(drag_id).duplicate()
-		if not item.is_empty():
-			item.rotated = drag_rotated
-			item.counter_angle = 0.0
-			var d: Vector2i = state.dimensions(item)
-			var zone := _zone_at(mouse)
-			if zone == "counter":
-				var ghost_rect := Rect2(mouse-drag_offset,Vector2(d)*CELL)
-				draw_rect(ghost_rect,PopupSkin.placement(true,0.18),true)
-				draw_rect(ghost_rect.grow(-1),PopupSkin.TEXT,false,2)
-			elif zone != "":
-				var at := _cell_at(mouse-drag_offset,zone)
-				var pos: Vector2 = ZONES[zone].rect.position+Vector2(at)*ZONES[zone].cell
-				var valid: bool = _valid_drop(item,zone,at)
-				draw_rect(Rect2(pos,Vector2(d)*ZONES[zone].cell),PopupSkin.placement(valid))
-			var ghost_cell: Vector2 = BAG_CELL if item.zone == "bag" else CELL
-			if zone != "" and zone != "counter":
-				ghost_cell = ZONES[zone].cell
-			_draw_item(item,Rect2(mouse-drag_offset,Vector2(d)*ghost_cell),true)
+	for host in [bag_window_node,customer_bag_window_node]:
+		host.queue_redraw()
+	for host in machine_window_nodes.values():
+		host.queue_redraw()
+	drag_canvas.queue_redraw()
 	if toast_time > 0:
 		var w := font.get_string_size(toast,HORIZONTAL_ALIGNMENT_LEFT,-1,17).x+54
 		var toast_x := clampf(120.0,8.0,1600.0-w-8.0)
@@ -450,83 +423,9 @@ func _draw_zone(zone: String, visible_grid: bool) -> void:
 	var rect: Rect2 = config.rect
 	PopupSkin.draw_grid(self,rect,state.zone_size(zone),config.cell)
 
-func _draw_bag_layout_guides_shop() -> void:
-	if not ZONES.has("bag"):
-		return
-	var rect: Rect2 = ZONES.bag.rect
-	var belt := Rect2(rect.position,Vector2(BAG_CELL.x*2.0,rect.size.y))
-	draw_rect(belt,Color(PopupSkin.CYAN,0.08),true)
-	draw_rect(belt,Color(PopupSkin.CYAN,0.45),false,2.0)
-	_text("腰包 0行动",belt.position+Vector2(4,14),9,PopupSkin.CYAN)
-	for weapon in state.items:
-		if weapon.zone != "bag" or State.CATALOG[weapon.key].category != "武器":
-			continue
-		for support in state.bag_adjacent_items(weapon):
-			if State.CATALOG[support.key].category != "矿石" and support.key != "power":
-				continue
-			var color := Color("e0ad70cc") if State.CATALOG[support.key].category == "矿石" else Color("b798e0cc")
-			draw_line(_item_rect(weapon).get_center(),_item_rect(support).get_center(),color,4.0,true)
 
-func _draw_bag_effect_badge_shop(item: Dictionary, rect: Rect2) -> void:
-	var effects: Dictionary = state.bag_effects(item)
-	var badges: Array[String] = []
-	if int(effects.damage_bonus) > 0:
-		badges.append("+%d攻" % effects.damage_bonus)
-		if float(effects.attack_interval) > 2.0:
-			badges.append("%.2f秒" % effects.attack_interval)
-	elif int(effects.adjacent_weapons) > 0 and int(effects.support_bonus) > 0:
-		badges.append("邻武+%d" % effects.support_bonus)
-	if effects.free_use:
-		badges.append("0行动")
-	if effects.protected:
-		badges.append("保留")
-	if int(effects.base_heal) > 0 and int(effects.final_heal) > int(effects.base_heal):
-		badges.append("回%d" % effects.final_heal)
-	if badges.is_empty():
-		return
-	var value := " · ".join(badges)
-	var width := font.get_string_size(value,HORIZONTAL_ALIGNMENT_LEFT,-1,9).x+10.0
-	var badge := Rect2(rect.position+Vector2(2,2),Vector2(width,17))
-	draw_style_box(PopupSkin.box(PopupSkin.BACKGROUND,PopupSkin.CYAN),badge)
-	_text(value,badge.position+Vector2(5,12),9,PopupSkin.TEXT)
 
-func _draw_bag_build_summary() -> void:
-	var bag_items: Array[Dictionary] = state.items.filter(func(i): return i.zone == "bag")
-	var weapons: Array[Dictionary] = bag_items.filter(func(i): return State.CATALOG[i.key].category == "武器")
-	var protected_ids: Array[int] = state.protected_bag_ids()
-	var protected_names: Array[String] = []
-	for item in bag_items:
-		if protected_ids.has(item.id):
-			protected_names.append(str(State.CATALOG[item.key].name))
-	var belt_names: Array[String] = []
-	for item in bag_items:
-		if state.bag_effects(item).free_use:
-			belt_names.append(str(State.CATALOG[item.key].name))
-	var summary := _bag_build_summary_rect()
-	_panel(summary,PopupSkin.PANEL,PopupSkin.FRAME)
-	_text("当前组合效果",summary.position+Vector2(18,28),17,PopupSkin.TEXT)
-	var y := 54.0
-	if weapons.is_empty():
-		_text("武器：徒手攻击 5",summary.position+Vector2(18,y),13,PopupSkin.MUTED)
-		y += 24
-	else:
-		for weapon in weapons:
-			var effects: Dictionary = state.bag_effects(weapon)
-			var base_attack: int = int(State.CATALOG[weapon.key].get("attack",8))
-			var color := PopupSkin.CYAN if int(effects.damage_bonus) > 0 else PopupSkin.MUTED
-			_text("%s：攻击 %d → %d · %.2f 秒" % [State.CATALOG[weapon.key].name,base_attack,effects.final_attack,effects.attack_interval],summary.position+Vector2(18,y),13,color)
-			y += 24
-	_text("腰包：%s" % ("、".join(belt_names)+" · 0 行动力" if not belt_names.is_empty() else "未放入消耗品"),summary.position+Vector2(18,y),13,PopupSkin.MUTED)
-	y += 24
-	if state.economy.has_module("hidden_compartment"):
-		_text("夹层保护：%s" % ("、".join(protected_names) if not protected_names.is_empty() else "等待装入物品"),summary.position+Vector2(18,y),13,PopupSkin.CYAN)
-		y += 24
-	if state.economy.has_module("roof_rack"):
-		_text("车顶货架：36 → 48 格",summary.position+Vector2(18,y),13,PopupSkin.CYAN)
 
-func _bag_build_summary_rect() -> Rect2:
-	var weapon_count: int = state.items.filter(func(i): return i.zone == "bag" and State.CATALOG[i.key].category == "武器").size()
-	return Rect2(bag_popup.end.x+12,bag_popup.position.y,350,maxf(154,(weapon_count+3)*25+62))
 func _item_rect(item: Dictionary) -> Rect2:
 	if item.zone == "counter":
 		var counter_position := _ensure_counter_position(item)
@@ -560,6 +459,10 @@ func _counter_aabb(item: Dictionary) -> Rect2:
 	return bounds
 func _item_hit_rect(item: Dictionary) -> Rect2:
 	return _counter_aabb(item) if item.zone == "counter" else _item_rect(item)
+func _item_contains_point(item: Dictionary, point: Vector2) -> bool:
+	if item.zone == "counter":
+		return _item_hit_rect(item).has_point(point)
+	return _footprint_has_point(item,_item_rect(item),point)
 func _counter_items_sorted() -> Array[Dictionary]:
 	var sorted: Array[Dictionary] = []
 	for item in state.counter_items():
@@ -625,14 +528,18 @@ func _machine_ids_topmost() -> Array[int]:
 	ids.reverse()
 	return ids
 func _item_at(p: Vector2) -> int:
+	if trade_panel.visible and trade_panel.get_rect().has_point(p):
+		return -1
+	if is_instance_valid(recipe_book) and recipe_book.get_rect().has_point(p):
+		return -1
 	if customer_bag_open and customer_bag_rect.has_point(p):
 		for item in state.items:
-			if item.zone == "customer" and _item_hit_rect(item).has_point(p):
+			if item.zone == "customer" and _item_contains_point(item,p):
 				return item.id
 		return -1
 	if open_bag and ZONES.has("bag") and ZONES["bag"].rect.has_point(p):
 		for i in range(state.items.size()-1,-1,-1):
-			if state.items[i].zone == "bag" and _item_hit_rect(state.items[i]).has_point(p):
+			if state.items[i].zone == "bag" and _item_contains_point(state.items[i],p):
 				return state.items[i].id
 		return -1
 	for machine_id in _machine_ids_topmost():
@@ -640,7 +547,7 @@ func _item_at(p: Vector2) -> int:
 		for machine_zone in state.machine_zones(machine_id):
 			if ZONES.has(machine_zone) and ZONES[machine_zone].rect.has_point(p):
 				for i in range(state.items.size()-1,-1,-1):
-					if state.items[i].zone == machine_zone and _item_hit_rect(state.items[i]).has_point(p):
+					if state.items[i].zone == machine_zone and _item_contains_point(state.items[i],p):
 						return state.items[i].id
 				return -1
 		if popup.has_point(p):
@@ -648,10 +555,14 @@ func _item_at(p: Vector2) -> int:
 	if open_bag and bag_popup.has_point(p):
 		return -1
 	for i in range(state.items.size()-1,-1,-1):
-		if (state.items[i].zone == "counter" or ZONES.has(state.items[i].zone)) and _item_hit_rect(state.items[i]).has_point(p):
+		if (state.items[i].zone == "counter" or ZONES.has(state.items[i].zone)) and _item_contains_point(state.items[i],p):
 			return state.items[i].id
 	return -1
 func _zone_at(p: Vector2) -> String:
+	if trade_panel.visible and trade_panel.get_rect().has_point(p):
+		return ""
+	if is_instance_valid(recipe_book) and recipe_book.get_rect().has_point(p):
+		return ""
 	if customer_bag_open and customer_bag_rect.has_point(p):
 		return "customer" if ZONES.customer.rect.has_point(p) else ""
 	if open_bag and ZONES.has("bag") and ZONES["bag"].rect.has_point(p):
@@ -702,6 +613,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if modal != null:
 		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 			_close_modal()
+		return
+	if is_instance_valid(recipe_book) and event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		_close_recipe_book()
 		return
 	if recorder_panel != null and event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		_close_recorder()
@@ -836,7 +750,9 @@ func _complete_bell_hold() -> void:
 	call_deferred("_next_trade")
 	queue_redraw()
 func _apply_customer_profile() -> void:
-	var profile: Dictionary = CUSTOMERS[customer_index]
+	customer_profile = CustomerRoster.arrival(state,customer_index,customer_rng)
+	var profile: Dictionary = customer_profile
+	$ArtLayers.set_customer(load(profile.portrait))
 	trade_panel.keep_open = false
 	trade_panel_dismissed = false
 	state.configure_customer(
@@ -846,10 +762,10 @@ func _apply_customer_profile() -> void:
 		int(profile.get("funds",150)),
 		str(profile.name)
 	)
-	_close_customer_bag()
-	customer_bag_button.visible = state.customer_sell_key != ""
-	if customer_bag_button.visible:
+	if state.customer_sell_key != "":
 		_open_customer_bag()
+	else:
+		_close_customer_bag()
 func _notify(value: String) -> void:
 	if value != "" and not _is_interest_reaction(value):
 		toast = value
@@ -870,10 +786,10 @@ func _is_interest_reaction(value: String) -> bool:
 func _start_customer_conversation() -> void:
 	if not _customer_present():
 		return
-	var profile: Dictionary = CUSTOMERS[customer_index]
-	var lines: Array = Array(profile.conversation).duplicate()
-	if state.economy.relationship(str(profile.name)) > 0:
-		lines[-1] = "%s\n行情：%s" % [lines[-1],state.economy.intelligence(state.day,str(profile.name)).replace("\n","；")]
+	var profile: Dictionary = customer_profile
+	var lines: Array = ForestStory.customer_lines(state,str(profile.name),Array(profile.conversation).duplicate())
+	if state.economy.relationship(str(profile.name)) >= 2:
+		lines.append_array(CustomerRoster.intelligence(state,profile))
 	_start_conversation(lines)
 func _start_conversation(lines: Array) -> void:
 	dialogue_lines.clear()
@@ -959,6 +875,8 @@ func _set_dialogue_line(index: int, reveal: bool) -> void:
 	dialogue_pause = 0.0
 	dialogue_line_recorded = false
 	dialogue = dialogue_lines[dialogue_line_index].substr(0,dialogue_char_index)
+	if reveal:
+		ForestStory.hear_line(state,str(CUSTOMERS[customer_index].name),dialogue_lines[dialogue_line_index])
 	_update_dialogue_controls()
 	queue_redraw()
 func _dialogue_previous() -> void:
@@ -989,9 +907,10 @@ func _dialogue_next() -> void:
 	if dialogue_line_index < dialogue_lines.size()-1:
 		_set_dialogue_line(dialogue_line_index+1,true)
 func _record_dialogue_line(line: String) -> void:
+	ForestStory.hear_line(state,str(CUSTOMERS[customer_index].name),line)
 	dialogue_history.append({
 		"speaker": CUSTOMERS[customer_index].name,
-		"role": CUSTOMERS[customer_index].role,
+		"role": CUSTOMERS[customer_index].role+" · "+CustomerRoster.FACTIONS[CUSTOMERS[customer_index].faction],
 		"text": line
 	})
 	if dialogue_history.size() > 80:
@@ -1029,12 +948,18 @@ func _settle() -> void:
 		return
 	var had_buying_items := not state.buying_items().is_empty()
 	var had_selling_items := not state.selling_items().is_empty()
+	var previous_stage: String = state.story_progress.stage
 	var result: String = state.settle()
 	if result.begins_with("交易完成"):
 		_clear_notification()
 		var can_continue: bool = (had_buying_items and state.gold > 0) or (had_selling_items and state.customer_funds > 0)
 		trade_panel.keep_open = can_continue
-		_start_conversation(["谢谢你的报价，这批货物我收下了。", "还有没有更多货？"])
+		if previous_stage == "none" and state.current_customer_name == "希尔薇" and state.story_progress.get("request_available",false):
+			_start_conversation(ForestStory.customer_lines(state,"希尔薇",[]))
+		elif previous_stage == "requested" and state.story_progress.stage == "delivered":
+			_start_conversation(["是这种月纹，和我母亲留下的记号一样。", "谢谢你帮我找回来。我先带回去看看，下次进林子叫上我。"])
+		else:
+			_start_conversation(CustomerRoster.thanks(state,state.current_customer_name,had_buying_items,had_selling_items))
 	else:
 		_notify(result)
 		_start_conversation([result])
@@ -1063,20 +988,23 @@ func _next_trade() -> void:
 	_clear_dialogue()
 	$ArtLayers.set_customer(null)
 	state.items = state.items.filter(func(i): return i.owner != "customer")
+	_close_customer_bag()
 	_sync()
 	await get_tree().create_timer(0.45).timeout
 	if not business_active or shutter_closed or shutter_animating:
 		next_button.disabled = false
 		return
-	customer_index = (customer_index+1)%CUSTOMERS.size()
+	customer_index = _next_customer_index()
 	var profile: Dictionary = CUSTOMERS[customer_index]
 	$ArtLayers.set_customer(load(profile.portrait))
 	_apply_customer_profile()
 	_start_customer_conversation()
 	next_button.disabled = false
 	_sync()
+func _next_customer_index() -> int:
+	return CustomerRoster.draw(state,customer_rng,customer_index)
 func _show_help() -> void:
-	_open_modal("商车经营指南","柜台 · 双击或拖放商品开始买卖\n交易 · 输入报价还价，或接受报价\n背包 · 双击打开；R 旋转，右键 / Esc 取消拖放\n设备 · 双击放入材料，休息后收取产物\n手机 · 查看历史对话\n呼叫铃 · 点击呼叫顾客；长按送走当前顾客\n卷帘门 · 关闭后可休息、探索或旅行\n行情 / 改装 · 查看物价、事件与商车模块", "开始经营",_close_modal)
+	_open_modal("商车经营指南","柜台 · 双击或拖放商品开始买卖\n交易 · 输入报价还价，或接受报价\n背包 · 双击打开；R 旋转，右键 / Esc 取消拖放\n设备 · 双击放入材料，休息后收取产物\n手机 · 查看历史对话\n呼叫铃 · 点击呼叫顾客；长按送走当前顾客\n卷帘门 · 关闭后可休息、探索或旅行\n行情 / 改装 · 阅读本城商报、安装商车模块", "开始经营",_close_modal)
 
 func _open_recorder() -> void:
 	if recorder_panel != null and is_instance_valid(recorder_panel):
@@ -1104,7 +1032,7 @@ func _open_recorder() -> void:
 	header.add_child(title)
 	recorder_close = Button.new()
 	recorder_close.text = "×"
-	recorder_close.position = Vector2(276,8)
+	PopupSkin.place_close(recorder_close,320)
 	PopupSkin.close_button(recorder_close)
 	recorder_close.pressed.connect(_close_recorder)
 	header.add_child(recorder_close)
@@ -1205,11 +1133,13 @@ func _open_modal(title_value: String, body: String, action_text: String, action:
 	if cancel_text != "":
 		b.position = Vector2(525,action_y)
 		b.size = Vector2(265,40)
-	modal.add_child(b)
+	b.position -= card.position
+	card.add_child(b)
 	if cancel_text != "":
 		var cancel_button := _button(cancel_text,Rect2(810,action_y,265,40),_close_modal)
 		remove_child(cancel_button)
-		modal.add_child(cancel_button)
+		cancel_button.position -= card.position
+		card.add_child(cancel_button)
 func _close_modal() -> void:
 	if modal != null:
 		modal.queue_free()
@@ -1404,16 +1334,13 @@ func _smoke_ui() -> void:
 		await _next_trade()
 		assert(state.counter_items().is_empty())
 		assert(state.gold == before_gold)
-		assert(customer_index == (n+1)%4)
-		assert(state.items.filter(func(i): return i.owner == "customer").size() == CUSTOMERS[customer_index].goods.size())
+		assert(CustomerRoster.eligible(state,CUSTOMERS[customer_index]))
+		assert(state.items.filter(func(i): return i.owner == "customer").size() == customer_profile.goods.size())
 		assert(customer_bag_open == (state.customer_sell_key != ""))
-		if customer_bag_open:
+		if not state.items.filter(func(i): return i.owner == "customer").is_empty():
 			var offered: Dictionary = state.items.filter(func(i): return i.owner == "customer")[0]
 			var hit: Vector2 = _item_rect(offered).get_center()
 			assert(_zone_at(hit) == "customer" and _item_at(hit) == offered.id)
-			_close_customer_bag()
-			assert(not ZONES.has("customer") and _item_at(hit) != offered.id)
-			_open_customer_bag()
 			_quick_move(offered.id)
 			assert(offered.zone == "counter")
 			_cancel_trade()
@@ -1429,7 +1356,7 @@ func _smoke_ui() -> void:
 		_quick_move(sale_items[n].id)
 	assert(trade_panel.rows.get_child_count() == state.selling_items().size())
 	assert(trade_panel.rows.get_child_count() > 8)
-	trade_panel.position = Vector2(1180,354)
+	trade_panel.position = Vector2(1180,324)
 	trade_panel.z_index = 40
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png("res://docs/testing/previews/清单与轮廓.png")
@@ -1484,7 +1411,6 @@ func _close_shutter() -> void:
 	$ArtLayers.set_customer(null)
 	state.items = state.items.filter(func(i): return i.owner != "customer")
 	_close_customer_bag()
-	customer_bag_button.visible = false
 	shutter_clip.visible = true
 	shutter_clip.size = Vector2(SHUTTER_SIZE.x,0.0)
 	var tween := create_tween()
@@ -1501,7 +1427,6 @@ func _finish_shutter_close() -> void:
 	$ArtLayers.set_customer(null)
 	state.items = state.items.filter(func(i): return i.owner != "customer")
 	_close_customer_bag()
-	customer_bag_button.visible = false
 	_sync()
 	_notify("卷帘门已关闭，车门与卧铺现在可以交互。")
 func _prepare_next_day() -> void:
@@ -1516,7 +1441,6 @@ func _prepare_next_day() -> void:
 	$ArtLayers.set_customer(null)
 	state.items = state.items.filter(func(i): return i.owner != "customer")
 	_close_customer_bag()
-	customer_bag_button.visible = false
 	_sync()
 func _open_shutter_for_business() -> void:
 	if not shutter_closed or not next_day_ready or shutter_animating:
@@ -1538,8 +1462,7 @@ func _finish_shutter_open() -> void:
 	shutter_animating = false
 	next_day_ready = false
 	business_active = true
-	customer_index = 0
-	$ArtLayers.set_customer(load(CUSTOMERS[0].portrait))
+	customer_index = _next_customer_index()
 	_apply_customer_profile()
 	_start_customer_conversation()
 	_sync()
@@ -1548,7 +1471,23 @@ func _door() -> void:
 	if not shutter_closed:
 		_notify("请先关闭卷帘门后再与车门交互。")
 		return
-	_open_modal("商车门口 · 野外探索", "月下森林\n\n可以持续探索，直到生命归零或主动返回商车。", "前往野外",_start_exploration)
+	if state.story_progress.stage == "recruited":
+		if modal != null:
+			return
+		var picker = load("res://scripts/companion_picker.gd").new()
+		picker.selected = state.selected_companion
+		picker.z_index=100
+		picker.departed.connect(func(id):
+			if id == "cancel":
+				_close_modal()
+			elif ForestStory.can_select(state,id):
+				state.selected_companion=id
+				_start_exploration()
+		)
+		modal=picker
+		add_child(picker)
+	else:
+		_open_modal("商车门口 · 野外探索", "胡闹森林", "前往野外",_start_exploration)
 func _start_exploration() -> void:
 	_close_modal()
 	_close_bag()
@@ -1580,6 +1519,21 @@ func _valid_drop(item: Dictionary, zone: String, at: Vector2i) -> bool:
 		return _customer_present()
 	return state.fits(item,zone,at,item.id)
 func _input(event: InputEvent) -> void:
+	if trade_panel.visible and (event is InputEventMouseButton or event is InputEventMouseMotion) and (trade_panel.dragging or trade_panel.get_rect().has_point(get_local_mouse_position())):
+		if event is InputEventMouseButton and not event.pressed and drag_id >= 0:
+			drag_id = -1
+			_sync()
+		return
+	if is_instance_valid(recipe_book) and not _full_overlay_open() and not is_instance_valid(exploration) and event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		_close_recipe_book()
+		get_viewport().set_input_as_handled()
+		return
+	if is_instance_valid(recipe_book) and (event is InputEventMouseButton or event is InputEventMouseMotion):
+		if recipe_book.dragging or recipe_book.get_rect().has_point(get_local_mouse_position()):
+			if event is InputEventMouseButton and not event.pressed and drag_id >= 0:
+				drag_id = -1
+				_sync()
+			return
 	if _full_overlay_open():
 		return
 	if is_instance_valid(exploration):
@@ -1588,9 +1542,6 @@ func _input(event: InputEvent) -> void:
 		return
 	if open_bag:
 		var local_mouse := get_local_mouse_position()
-		if _bag_build_summary_rect().has_point(local_mouse):
-			get_viewport().set_input_as_handled()
-			return
 		var title_rect := Rect2(bag_popup.position, Vector2(bag_popup.size.x, 48))
 		var close_rect := Rect2(bag_popup.position + bag_close.position, bag_close.size)
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -1653,6 +1604,7 @@ func _open_machine(id: int) -> void:
 	var popup := Rect2(_machine_default_position(id),Vector2(232,226))
 	machine_popups[id] = popup
 	var host := _popup_host(popup)
+	host.machine_id = id
 	var close := _popup_close(host,_close_machine.bind(id))
 	if machine.key in ["furnace","alembic"]:
 		var recipes := Button.new()
@@ -1691,7 +1643,7 @@ func _sync_bag_window() -> void:
 		"rect":Rect2(bag_popup.position + Vector2((bag_popup.size.x-grid_size.x)/2,64), Vector2(state.zone_size("bag")) * BAG_CELL),
 		"cell":BAG_CELL
 	}
-	bag_close.position = Vector2(bag_popup.size.x - 42, 8)
+	PopupSkin.place_close(bag_close,bag_popup.size.x)
 
 func _sync_machine_window(id: int) -> void:
 	if not machine_popups.has(id):
@@ -1710,7 +1662,7 @@ func _sync_machine_window(id: int) -> void:
 			ZONES[zones[n]] = {"rect":Rect2(rect.position+Vector2(xs[n],90),Vector2(state.zone_size(zones[n]))*CELL),"cell":CELL}
 		if is_alchemy:
 			ZONES[state.machine_fuel_zone(id)] = {"rect":Rect2(rect.position+Vector2(68,320),Vector2(288,48)),"cell":CELL}
-		machine_closes[id].position = Vector2(rect.size.x-44,12)
+		PopupSkin.place_close(machine_closes[id],rect.size.x)
 		return
 	var zone := state.machine_zone(id)
 	var grid_size := Vector2(state.zone_size(zone))*CELL
@@ -1725,7 +1677,7 @@ func _sync_machine_window(id: int) -> void:
 		"cell":CELL
 	}
 	var close: Button = machine_closes[id]
-	close.position = Vector2(popup.size.x - 42, 8)
+	PopupSkin.place_close(close,popup.size.x)
 
 func _close_machine(id: int = -1) -> void:
 	if id < 0:
@@ -1823,13 +1775,11 @@ func _begin_day() -> void:
 # A customer inventory is an independent window; there is no physical customer tray.
 var customer_bag_open := false
 var customer_bag_rect := Rect2(24,104,616,186)
-var customer_bag_button: Button
-var customer_bag_close: Button
 var customer_bag_window_node: Control
 var customer_bag_dragging := false
 var customer_bag_offset := Vector2.ZERO
 func _open_customer_bag() -> void:
-	if state.customer_sell_key == "":
+	if not _customer_present() or state.customer_sell_key == "":
 		return
 	customer_bag_open = true
 	_sync_customer_bag()
@@ -1846,17 +1796,12 @@ func _sync_customer_bag() -> void:
 	customer_bag_window_node.position = customer_bag_rect.position
 	customer_bag_window_node.size = customer_bag_rect.size
 	ZONES["customer"] = {"rect":Rect2(customer_bag_rect.position+Vector2(20,64),Vector2(State.SIZES.customer)*CELL),"cell":CELL}
-	customer_bag_close.position = Vector2(customer_bag_rect.size.x-42,8)
 func _customer_bag_input(event: InputEvent) -> bool:
 	if not customer_bag_open:
 		return false
 	var point := get_local_mouse_position()
-	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE and drag_id < 0:
-		_close_customer_bag()
-		get_viewport().set_input_as_handled()
-		return true
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed and Rect2(customer_bag_rect.position,Vector2(customer_bag_rect.size.x-46,48)).has_point(point):
+		if event.pressed and Rect2(customer_bag_rect.position,Vector2(customer_bag_rect.size.x,48)).has_point(point):
 			customer_bag_dragging = true
 			customer_bag_offset = point-customer_bag_rect.position
 			get_viewport().set_input_as_handled()
@@ -1874,11 +1819,6 @@ func _customer_bag_input(event: InputEvent) -> bool:
 	return false
 func _style_popup_close(button: Button) -> void:
 	PopupSkin.close_button(button)
-func _draw_bag_shell(rect: Rect2, title: String, hint: String) -> void:
-	PopupSkin.draw_window(self,rect)
-	PopupSkin.title(self,title,rect.position+Vector2(18,32))
-	if hint != "":
-		_text(hint,rect.position+Vector2(18,rect.size.y-12),14,PopupSkin.MUTED)
 
 func _open_recipe_drawings(machine_key: String = "furnace") -> void:
 	if modal != null:
@@ -1886,31 +1826,24 @@ func _open_recipe_drawings(machine_key: String = "furnace") -> void:
 	drag_id = -1
 	machine_dragging_id = -1
 	_hide_hover_tip()
-	modal = Panel.new()
-	modal.z_index = 100
-	modal.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	modal.add_theme_stylebox_override("panel",PopupSkin.box(PopupSkin.SHADE,Color.TRANSPARENT))
-	add_child(modal)
-	var drawing := WorkbenchView.new()
-	drawing.alchemy = machine_key == "alembic"
-	drawing.position = Vector2(480,184)
-	drawing.size = Vector2(640,480)
-	modal.add_child(drawing)
-	var close := _popup_close(drawing,_close_modal)
-	close.position = Vector2(598,17)
-	for direction in [-1,1]:
-		var button := Button.new()
-		button.text = "上一张" if direction < 0 else "下一张"
-		button.position = Vector2(28 if direction < 0 else 500,438)
-		button.size = Vector2(112,30)
-		PopupSkin.button(button)
-		button.pressed.connect(func():
-			drawing.page = posmod(drawing.page+direction,drawing.recipe_count())
-			drawing.queue_redraw()
-		)
-		drawing.add_child(button)
-
+	if is_instance_valid(recipe_book):
+		recipe_book.alchemy = machine_key == "alembic"
+		recipe_book.page = 0
+		recipe_book.queue_redraw()
+		return
+	recipe_book = WorkbenchView.new()
+	recipe_book.alchemy = machine_key == "alembic"
+	recipe_book.position = Vector2(24,112)
+	recipe_book.z_index = 60
+	recipe_book.close_requested.connect(_close_recipe_book)
+	add_child(recipe_book)
+func _close_recipe_book() -> void:
+	if is_instance_valid(recipe_book):
+		recipe_book.queue_free()
+	recipe_book = null
 func _show_workbench_preview() -> bool:
+	if is_instance_valid(recipe_book) and recipe_book.get_rect().has_point(mouse):
+		return false
 	if drag_id < 0 and not _full_overlay_open() and not is_instance_valid(exploration):
 		for machine_id in _machine_ids_topmost():
 			if not machine_popups[machine_id].has_point(mouse):
@@ -1930,7 +1863,7 @@ func _show_workbench_preview() -> bool:
 				if ZONES[output_zone].rect.has_point(mouse) and plan.output != "":
 					var detail: String = plan.status
 					if plan.purity > 0:
-						detail += "\n纯度 %d%% · 耐久 %d / %d" % [plan.purity,plan.max_durability,plan.max_durability]
+						detail += "\n纯度 %d%% · 基础耐久 %d" % [plan.purity,plan.max_durability]
 					if plan.fuel_id >= 0:
 						detail += "\n消耗 %d 份矿石、1 份%s" % [plan.inputs.size(),State.CATALOG[_find_item(plan.fuel_id).key].name]
 					_show_hover_tip("workbench_preview:%s:%d:%s" % [plan.output,plan.purity,plan.status],State.CATALOG[plan.output].name,mouse+Vector2(18,0),false,detail)

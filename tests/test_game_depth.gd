@@ -34,7 +34,9 @@ func _initialize() -> void:
 	check(s.economy.relationship("希尔薇") == 0,"customer relationship starts at zero")
 	s.economy.record_trade("希尔薇")
 	s.economy.record_trade("希尔薇")
-	check(s.economy.intelligence(1,"希尔薇").contains("2 天后"),"trusted customer reveals one extra forecast day")
+	check(s.economy.intelligence(3,"希尔薇").contains("骑士团驻扎") and not s.economy.intelligence(3).contains("骑士团驻扎"),"trusted customer reveals a rumor earlier than the public paper")
+	check(not s.economy.intelligence(3,"希尔薇").contains("天后") and not s.economy.intelligence(3,"希尔薇").contains("%"),"customer intelligence stays qualitative")
+	check(not s.economy.market_report(Store.CATALOG,3).contains(" G") and not s.economy.market_report(Store.CATALOG,3).contains("%"),"legacy market report cannot leak exact quotes")
 	s.day = 7
 	var old_gold: int = s.gold
 	check(s.can_travel(),"trade route opens on cycle day seven")
@@ -76,8 +78,17 @@ func _initialize() -> void:
 	var c = Combat.new()
 	c.start(s)
 	check(c.weapon_damage(sword) == 11,"adjacent ore adds weapon damage")
-	check(is_equal_approx(c.weapon_interval(sword),2.55),"heavy ore slows the adjacent weapon")
+	check(is_equal_approx(c.weapon_interval(sword),2.0),"ore does not change adjacent weapon interval")
 	check(c._adjacent(sword,ore),"grid edge adjacency is detected")
+	var fuel := move_to_bag(s,"slime_mucus",Vector2i(2,2))
+	check(is_equal_approx(c.weapon_interval(sword),1.8),"adjacent slime reduces interval by ten percent")
+	check(c.weapon_damage(sword) == 11,"fuel interval boost does not alter attack damage")
+	s.add_item("ancient_wood","stock","player")
+	var wood: Dictionary = s.items.back()
+	check(s.move_item(wood.id,"bag",Vector2i(2,4),false) == "","wood can join the same adjacent weapon")
+	check(is_equal_approx(c.weapon_interval(sword),1.44),"fuel percentage reductions multiply")
+	check(s.move_item(fuel.id,"bag",Vector2i(4,0),false) == "","fuel moves away from the weapon")
+	check(is_equal_approx(c.weapon_interval(sword),1.6),"nonadjacent fuel does not change weapon interval")
 	for n in range(7):
 		c.next_encounter()
 		if n < 6:

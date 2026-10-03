@@ -1,6 +1,6 @@
 # 客人与交互素材
 
-本轮使用内置 imagegen 生成 3 张独立透明客人立绘及 1 张铃铛，原有精灵立绘继续复用。角色姓名、对白与货物配置在 scripts/shop.gd 的 CUSTOMERS 中。
+本轮使用内置 imagegen 生成 3 张独立透明客人立绘及 1 张铃铛，原有精灵立绘继续复用。角色姓名、阵营、对白与随机货物配置在 `scripts/customer_roster.gd` 中，`shop.gd` 复用经营入口。
 
 生成提示词：
 - knight.png：Standalone transparent anime visual novel character sprite, adult friendly male human traveling swordsman, short tousled chestnut hair, blue eyes, navy blue travel cloak over cream shirt and modest leather vest, a sword sheath peeking behind shoulder, calm confident expression. Front-facing standing pose head to upper thighs, hands resting at waist. High quality clean anime cel shading matching a cozy fantasy merchant game. Entire head and shoulders inside image, consistent centered composition, no oversized weapon. Genuine transparent background, no room, no scenery, no counter, no text.
@@ -9,3 +9,5 @@
 - ../interaction/bell.png：Standalone game item sprite: small brass counter service bell with round bronze base, gold dome and small plunger button on top, front three-quarter view matching a merchant counter viewed slightly from above. Polished hand-painted anime fantasy RPG item art, subtle warm highlights, no floating shadow beyond base. Single bell centered with ample transparent margins. GENUINELY TRANSPARENT background. No text, no UI, no scenery. Square image.
 
 ../interaction/door.png 与 bed.png 按用户要求从现有背景截取，保留原像素并添加轮廓遮罩；位置见 regions.json。悬停描边在 hover_outline.gdshader 中实时生成。
+
+2026-10-03新增米菈、诺拉、阿雀、赫伯特、伊芙五张独立透明日式动画立绘。沿用 knight.png 的清晰动画分色和头至大腿构图；保持原顾客绘制、台面遮挡与位置。内置 imagegen，一人一图，原始RGBA不改色。完整提示词与来源见 [faction-generation.json](faction-generation.json)。

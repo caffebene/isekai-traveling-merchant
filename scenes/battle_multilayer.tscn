@@ -1,14 +1,14 @@
 [gd_scene format=3 uid="uid://dahne0275scg1"]
 
 [ext_resource type="Script" uid="uid://do4dinft8r0y5" path="res://scripts/battle_space_loop.gd" id="1_loop"]
-[ext_resource type="Texture2D" uid="uid://bbhtk3kqy4uyn" path="res://assets/battle/scene_layers/scene_01.png" id="2_scene_01"]
-[ext_resource type="Texture2D" uid="uid://j7v1uj1igxdr" path="res://assets/battle/scene_layers/scene_02.png" id="3_scene_02"]
-[ext_resource type="Texture2D" uid="uid://ehtrtgr8uhum" path="res://assets/battle/scene_layers/scene_03.png" id="4_scene_03"]
-[ext_resource type="Texture2D" uid="uid://btahnjvoo8vha" path="res://assets/battle/scene_layers/scene_04.png" id="5_scene_04"]
-[ext_resource type="Texture2D" uid="uid://bvt5i11ao8dxv" path="res://assets/battle/scene_layers/scene_05.png" id="6_scene_05"]
-[ext_resource type="Texture2D" uid="uid://bv2ufgpwkyg8r" path="res://assets/battle/scene_layers/scene_06.png" id="7_scene_06"]
-[ext_resource type="Texture2D" uid="uid://dnqwxxts8rpyw" path="res://assets/battle/scene_layers/scene_07.png" id="8_scene_07"]
-[ext_resource type="Texture2D" uid="uid://ytasky4fcgf6" path="res://assets/battle/scene_layers/scene_08.png" id="9_scene_08"]
+[ext_resource type="Texture2D" path="res://assets/exploration/boisterous/forest-foreground.png" id="2_scene_01"]
+[ext_resource type="Texture2D" path="res://assets/exploration/boisterous/forest-stage.png" id="3_scene_02"]
+[ext_resource type="Texture2D" path="res://assets/exploration/boisterous/forest-foreground.png" id="4_scene_03"]
+[ext_resource type="Texture2D" path="res://assets/exploration/boisterous/forest-stage.png" id="5_scene_04"]
+[ext_resource type="Texture2D" path="res://assets/exploration/boisterous/forest-foreground.png" id="6_scene_05"]
+[ext_resource type="Texture2D" path="res://assets/exploration/boisterous/forest-stage.png" id="7_scene_06"]
+[ext_resource type="Texture2D" path="res://assets/exploration/boisterous/forest-foreground.png" id="8_scene_07"]
+[ext_resource type="Texture2D" path="res://assets/exploration/boisterous/forest-stage.png" id="9_scene_08"]
 
 [sub_resource type="Environment" id="Environment_battle_space"]
 background_mode = 1

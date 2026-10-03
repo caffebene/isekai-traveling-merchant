@@ -1,0 +1,89 @@
+{
+  "tool": "built-in image_gen",
+  "style": "ordinary-fantasy-v2",
+  "style_source": "docs/game-design/整体视觉与UI规范.md",
+  "prompt_source": "docs/game-design/道具生成提示词.md",
+  "assets": [
+    {
+      "name": "copper_ore",
+      "dims": [
+        2,
+        2
+      ],
+      "subject": "A single irregular lump of red copper ore, rugged dark brown rock with broad warm red copper mineral veins and metallic copper exposed facets. Natural broken stone cluster silhouette matching other ore inventory icons, no gemstone spikes. Square 1:1 canvas.",
+      "prompt": "Use case: stylized-concept. Asset type: one production-ready transparent inventory item illustration for the game 异世界旅商. Style: clean Japanese anime 2D fantasy item painting, natural handmade materials, rich but grouped cel shading, crisp stable charcoal linework, restrained highlights, detailed enough to match an illustrated fantasy inventory yet strongly readable at 48px. Not a simple SVG or geometric pictogram, not photorealistic. Soft upper-left illumination. Centered isolated single object with 6% transparent safe margins. Genuine RGBA alpha transparency, no background, no floor or cast shadow, no text, logo, watermark, frame, border, grid, labels, hands, scenery, extra objects. Avoid pixel art, watercolor, grain, blur, neon glow, cyberpunk, modern machinery, overcomplicated ornament. A single irregular lump of red copper ore, rugged dark brown rock with broad warm red copper mineral veins and metallic copper exposed facets. Natural broken stone cluster silhouette matching other ore inventory icons, no gemstone spikes. Square 1:1 canvas."
+    },
+    {
+      "name": "copper_sword",
+      "dims": [
+        2,
+        6
+      ],
+      "subject": "A single upright red-copper longsword, pointed blade at top, pommel at bottom. Long narrow broad copper-colored blade, visible forged facets and central ridge, simple brass crossguard, dark leather wrapped grip. Practical fantasy weapon with natural warm burnished copper palette. Frontal view without perspective foreshortening, no tilt. Very tall portrait 1:3 canvas (2x6 grid footprint). Entire tip, guard and pommel visible, weapon fills height.",
+      "prompt": "Use case: stylized-concept. Asset type: one production-ready transparent inventory item illustration for the game 异世界旅商. Style: clean Japanese anime 2D fantasy item painting, natural handmade materials, rich but grouped cel shading, crisp stable charcoal linework, restrained highlights, detailed enough to match an illustrated fantasy inventory yet strongly readable at 48px. Not a simple SVG or geometric pictogram, not photorealistic. Soft upper-left illumination. Centered isolated single object with 6% transparent safe margins. Genuine RGBA alpha transparency, no background, no floor or cast shadow, no text, logo, watermark, frame, border, grid, labels, hands, scenery, extra objects. Avoid pixel art, watercolor, grain, blur, neon glow, cyberpunk, modern machinery, overcomplicated ornament. A single upright red-copper longsword, pointed blade at top, pommel at bottom. Long narrow broad copper-colored blade, visible forged facets and central ridge, simple brass crossguard, dark leather wrapped grip. Practical fantasy weapon with natural warm burnished copper palette. Frontal view without perspective foreshortening, no tilt. Very tall portrait 1:3 canvas (2x6 grid footprint). Entire tip, guard and pommel visible, weapon fills height."
+    },
+    {
+      "name": "copper_axe",
+      "dims": [
+        3,
+        5
+      ],
+      "subject": "A single red-copper one-handed axe, upright wooden handle descending vertically, broad asymmetrical copper axe blade at upper right and modest rear counterweight on left. Warm burnished copper metal, dark wooden haft, restrained leather grip and brass socket. Frontal view without perspective or diagonal tilt. Portrait 3:5 canvas, whole weapon visible and centered.",
+      "prompt": "Use case: stylized-concept. Asset type: one production-ready transparent inventory item illustration for the game 异世界旅商. Style: clean Japanese anime 2D fantasy item painting, natural handmade materials, rich but grouped cel shading, crisp stable charcoal linework, restrained highlights, detailed enough to match an illustrated fantasy inventory yet strongly readable at 48px. Not a simple SVG or geometric pictogram, not photorealistic. Soft upper-left illumination. Centered isolated single object with 6% transparent safe margins. Genuine RGBA alpha transparency, no background, no floor or cast shadow, no text, logo, watermark, frame, border, grid, labels, hands, scenery, extra objects. Avoid pixel art, watercolor, grain, blur, neon glow, cyberpunk, modern machinery, overcomplicated ornament. A single red-copper one-handed axe, upright wooden handle descending vertically, broad asymmetrical copper axe blade at upper right and modest rear counterweight on left. Warm burnished copper metal, dark wooden haft, restrained leather grip and brass socket. Frontal view without perspective or diagonal tilt. Portrait 3:5 canvas, whole weapon visible and centered."
+    },
+    {
+      "name": "copper_pickaxe",
+      "dims": [
+        4,
+        5
+      ],
+      "subject": "A single red-copper mining pickaxe, straight wooden handle vertically downward and broad curved copper metal pick head across the top, two clearly distinct tapered pointed ends extending left and right. Warm burnished copper, dark wood and minimal leather grip. Frontal view without perspective or diagonal tilt, upper head spans almost full width. Portrait 4:5 canvas, complete head and handle visible.",
+      "prompt": "Use case: stylized-concept. Asset type: one production-ready transparent inventory item illustration for the game 异世界旅商. Style: clean Japanese anime 2D fantasy item painting, natural handmade materials, rich but grouped cel shading, crisp stable charcoal linework, restrained highlights, detailed enough to match an illustrated fantasy inventory yet strongly readable at 48px. Not a simple SVG or geometric pictogram, not photorealistic. Soft upper-left illumination. Centered isolated single object with 6% transparent safe margins. Genuine RGBA alpha transparency, no background, no floor or cast shadow, no text, logo, watermark, frame, border, grid, labels, hands, scenery, extra objects. Avoid pixel art, watercolor, grain, blur, neon glow, cyberpunk, modern machinery, overcomplicated ornament. A single red-copper mining pickaxe, straight wooden handle vertically downward and broad curved copper metal pick head across the top, two clearly distinct tapered pointed ends extending left and right. Warm burnished copper, dark wood and minimal leather grip. Frontal view without perspective or diagonal tilt, upper head spans almost full width. Portrait 4:5 canvas, complete head and handle visible."
+    },
+    {
+      "name": "iron_axe",
+      "dims": [
+        3,
+        5
+      ],
+      "subject": "A single luminous iron one-handed axe, upright wooden handle descending vertically, broad asymmetrical cool silver-blue steel axe blade at upper right, modest rear counterweight left. Practical forged fantasy weapon, dark wooden haft, restrained leather grip and brass socket, grouped reflective facets, no magical glow. Frontal view, no perspective or diagonal tilt. Portrait 3:5 canvas, whole weapon centered.",
+      "prompt": "Use case: stylized-concept. Asset type: one production-ready transparent inventory item illustration for the game 异世界旅商. Style: clean Japanese anime 2D fantasy item painting, natural handmade materials, rich but grouped cel shading, crisp stable charcoal linework, restrained highlights, detailed enough to match an illustrated fantasy inventory yet strongly readable at 48px. Not a simple SVG or geometric pictogram, not photorealistic. Soft upper-left illumination. Centered isolated single object with 6% transparent safe margins. Genuine RGBA alpha transparency, no background, no floor or cast shadow, no text, logo, watermark, frame, border, grid, labels, hands, scenery, extra objects. Avoid pixel art, watercolor, grain, blur, neon glow, cyberpunk, modern machinery, overcomplicated ornament. A single luminous iron one-handed axe, upright wooden handle descending vertically, broad asymmetrical cool silver-blue steel axe blade at upper right, modest rear counterweight left. Practical forged fantasy weapon, dark wooden haft, restrained leather grip and brass socket, grouped reflective facets, no magical glow. Frontal view, no perspective or diagonal tilt. Portrait 3:5 canvas, whole weapon centered."
+    },
+    {
+      "name": "iron_pickaxe",
+      "dims": [
+        4,
+        5
+      ],
+      "subject": "A single luminous iron mining pickaxe, straight wooden handle vertically downward and broad curved cool silver-blue steel metal pick head across the top, two distinct tapered pointed ends extending left and right. Practical forged tool, dark wood and simple leather grip, soft pale blue reflected light, no magical glow. Frontal view without perspective or diagonal tilt. Portrait 4:5 canvas, whole head and handle visible.",
+      "prompt": "Use case: stylized-concept. Asset type: one production-ready transparent inventory item illustration for the game 异世界旅商. Style: clean Japanese anime 2D fantasy item painting, natural handmade materials, rich but grouped cel shading, crisp stable charcoal linework, restrained highlights, detailed enough to match an illustrated fantasy inventory yet strongly readable at 48px. Not a simple SVG or geometric pictogram, not photorealistic. Soft upper-left illumination. Centered isolated single object with 6% transparent safe margins. Genuine RGBA alpha transparency, no background, no floor or cast shadow, no text, logo, watermark, frame, border, grid, labels, hands, scenery, extra objects. Avoid pixel art, watercolor, grain, blur, neon glow, cyberpunk, modern machinery, overcomplicated ornament. A single luminous iron mining pickaxe, straight wooden handle vertically downward and broad curved cool silver-blue steel metal pick head across the top, two distinct tapered pointed ends extending left and right. Practical forged tool, dark wood and simple leather grip, soft pale blue reflected light, no magical glow. Frontal view without perspective or diagonal tilt. Portrait 4:5 canvas, whole head and handle visible."
+    },
+    {
+      "name": "tempered_sword",
+      "dims": [
+        2,
+        6
+      ],
+      "subject": "A single upright tempered longsword, pointed blade at top and pommel at bottom. Long narrow cool dark-steel blade with a brighter sharpened silver edge and subtle bronze-gold central fuller or forge seam. Brass crossguard, dark leather wrapped grip, small subdued amber accent on pommel. Clearly tempered higher-grade practical weapon, no runes, flames or aura. Frontal view no perspective or tilt. Very tall portrait 1:3 canvas (2x6 grid footprint), entire weapon visible.",
+      "prompt": "Use case: stylized-concept. Asset type: one production-ready transparent inventory item illustration for the game 异世界旅商. Style: clean Japanese anime 2D fantasy item painting, natural handmade materials, rich but grouped cel shading, crisp stable charcoal linework, restrained highlights, detailed enough to match an illustrated fantasy inventory yet strongly readable at 48px. Not a simple SVG or geometric pictogram, not photorealistic. Soft upper-left illumination. Centered isolated single object with 6% transparent safe margins. Genuine RGBA alpha transparency, no background, no floor or cast shadow, no text, logo, watermark, frame, border, grid, labels, hands, scenery, extra objects. Avoid pixel art, watercolor, grain, blur, neon glow, cyberpunk, modern machinery, overcomplicated ornament. A single upright tempered longsword, pointed blade at top and pommel at bottom. Long narrow cool dark-steel blade with a brighter sharpened silver edge and subtle bronze-gold central fuller or forge seam. Brass crossguard, dark leather wrapped grip, small subdued amber accent on pommel. Clearly tempered higher-grade practical weapon, no runes, flames or aura. Frontal view no perspective or tilt. Very tall portrait 1:3 canvas (2x6 grid footprint), entire weapon visible."
+    },
+    {
+      "name": "tempered_axe",
+      "dims": [
+        3,
+        5
+      ],
+      "subject": "A single tempered one-handed axe, upright dark wooden handle descending vertically, strong broad asymmetrical dark-steel axe blade at upper right with bright sharpened silver edge and subtle warm bronze-gold seam. Modest rear counterweight, minimal brass socket and leather grip, small subdued amber accent. High-grade practical forged fantasy weapon, no flames, runes, aura. Frontal view no perspective or diagonal tilt. Portrait 3:5 canvas, whole weapon centered.",
+      "prompt": "Use case: stylized-concept. Asset type: one production-ready transparent inventory item illustration for the game 异世界旅商. Style: clean Japanese anime 2D fantasy item painting, natural handmade materials, rich but grouped cel shading, crisp stable charcoal linework, restrained highlights, detailed enough to match an illustrated fantasy inventory yet strongly readable at 48px. Not a simple SVG or geometric pictogram, not photorealistic. Soft upper-left illumination. Centered isolated single object with 6% transparent safe margins. Genuine RGBA alpha transparency, no background, no floor or cast shadow, no text, logo, watermark, frame, border, grid, labels, hands, scenery, extra objects. Avoid pixel art, watercolor, grain, blur, neon glow, cyberpunk, modern machinery, overcomplicated ornament. A single tempered one-handed axe, upright dark wooden handle descending vertically, strong broad asymmetrical dark-steel axe blade at upper right with bright sharpened silver edge and subtle warm bronze-gold seam. Modest rear counterweight, minimal brass socket and leather grip, small subdued amber accent. High-grade practical forged fantasy weapon, no flames, runes, aura. Frontal view no perspective or diagonal tilt. Portrait 3:5 canvas, whole weapon centered."
+    },
+    {
+      "name": "wastewater",
+      "dims": [
+        1,
+        3
+      ],
+      "subject": "One tall narrow clear glass potion vial sealed with a simple cork stopper, filled with dull murky gray-olive wastewater, a little settled dark sediment at bottom and only a few bubbles. No label, not glowing, visibly inert failed potion rather than a colorful active magic potion. Clean fantasy illustrated glass with grouped reflections and readable thick silhouette. Bottle upright, frontal orthographic view. Very tall portrait 1:3 canvas matching a 1x3 inventory footprint, whole vial visible.",
+      "prompt": "Use case: stylized-concept. Asset type: one production-ready transparent inventory item illustration for the game 异世界旅商. Style: clean Japanese anime 2D fantasy item painting, natural handmade materials, rich but grouped cel shading, crisp stable charcoal linework, restrained highlights, detailed enough to match an illustrated fantasy inventory yet strongly readable at 48px. Not a simple SVG or geometric pictogram, not photorealistic. Soft upper-left illumination. Centered isolated single object with 6% transparent safe margins. Genuine RGBA alpha transparency, no background, no floor or cast shadow, no text, logo, watermark, frame, border, grid, labels, hands, scenery, extra objects. Avoid pixel art, watercolor, grain, blur, neon glow, cyberpunk, modern machinery, overcomplicated ornament. One tall narrow clear glass potion vial sealed with a simple cork stopper, filled with dull murky gray-olive wastewater, a little settled dark sediment at bottom and only a few bubbles. No label, not glowing, visibly inert failed potion rather than a colorful active magic potion. Clean fantasy illustrated glass with grouped reflections and readable thick silhouette. Bottle upright, frontal orthographic view. Very tall portrait 1:3 canvas matching a 1x3 inventory footprint, whole vial visible."
+    }
+  ]
+}

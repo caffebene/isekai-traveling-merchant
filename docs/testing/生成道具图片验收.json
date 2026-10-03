@@ -1,0 +1,105 @@
+{
+  "assets": [
+    {
+      "alpha_bounds": "[P: (31, 17), S: (130, 541)]",
+      "height": 576,
+      "key": "sword",
+      "path": "res://assets/items/workbench/generated/sword.png",
+      "rgba": true,
+      "transparent_corners": true,
+      "width": 192
+    },
+    {
+      "alpha_bounds": "[P: (22, 17), S: (147, 541)]",
+      "height": 576,
+      "key": "iron_sword",
+      "path": "res://assets/items/workbench/generated/iron_sword.png",
+      "rgba": true,
+      "transparent_corners": true,
+      "width": 192
+    },
+    {
+      "alpha_bounds": "[P: (28, 17), S: (135, 541)]",
+      "height": 576,
+      "key": "copper_sword",
+      "path": "res://assets/items/workbench/generated/copper_sword.png",
+      "rgba": true,
+      "transparent_corners": true,
+      "width": 192
+    },
+    {
+      "alpha_bounds": "[P: (6, 10), S: (180, 172)]",
+      "height": 192,
+      "key": "copper_ore",
+      "path": "res://assets/items/workbench/generated/copper_ore.png",
+      "rgba": true,
+      "transparent_corners": true,
+      "width": 192
+    },
+    {
+      "alpha_bounds": "[P: (27, 14), S: (234, 451)]",
+      "height": 480,
+      "key": "copper_axe",
+      "path": "res://assets/items/workbench/generated/copper_axe.png",
+      "rgba": true,
+      "transparent_corners": true,
+      "width": 288
+    },
+    {
+      "alpha_bounds": "[P: (11, 17), S: (361, 446)]",
+      "height": 480,
+      "key": "copper_pickaxe",
+      "path": "res://assets/items/workbench/generated/copper_pickaxe.png",
+      "rgba": true,
+      "transparent_corners": true,
+      "width": 384
+    },
+    {
+      "alpha_bounds": "[P: (35, 14), S: (218, 451)]",
+      "height": 480,
+      "key": "iron_axe",
+      "path": "res://assets/items/workbench/generated/iron_axe.png",
+      "rgba": true,
+      "transparent_corners": true,
+      "width": 288
+    },
+    {
+      "alpha_bounds": "[P: (11, 16), S: (361, 447)]",
+      "height": 480,
+      "key": "iron_pickaxe",
+      "path": "res://assets/items/workbench/generated/iron_pickaxe.png",
+      "rgba": true,
+      "transparent_corners": true,
+      "width": 384
+    },
+    {
+      "alpha_bounds": "[P: (33, 17), S: (125, 541)]",
+      "height": 576,
+      "key": "tempered_sword",
+      "path": "res://assets/items/workbench/generated/tempered_sword.png",
+      "rgba": true,
+      "transparent_corners": true,
+      "width": 192
+    },
+    {
+      "alpha_bounds": "[P: (24, 14), S: (240, 451)]",
+      "height": 480,
+      "key": "tempered_axe",
+      "path": "res://assets/items/workbench/generated/tempered_axe.png",
+      "rgba": true,
+      "transparent_corners": true,
+      "width": 288
+    },
+    {
+      "alpha_bounds": "[P: (22, 8), S: (51, 271)]",
+      "height": 288,
+      "key": "wastewater",
+      "path": "res://assets/items/workbench/generated/wastewater.png",
+      "rgba": true,
+      "transparent_corners": true,
+      "width": 96
+    }
+  ],
+  "date": "2026-10-02",
+  "runtime_png_count": 25
+}

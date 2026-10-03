@@ -7,12 +7,12 @@ const PopupSkin = preload("res://scripts/popup_style.gd")
 const INK = PopupSkin.TEXT
 const MUTED = PopupSkin.MUTED
 const GOLD = PopupSkin.TEXT
-const ACTIVE = PopupSkin.CYAN
+const ACTIVE = PopupSkin.SUCCESS
 const LOCKED = PopupSkin.DISABLED
 const MODULES := [
-	{"id":"roof_rack","name":"车顶货架","tag":"空间","effect":"旅行背包","before":"6 × 6 · 36 格","after":"8 × 6 · 48 格","proof":"安装后背包立即增加两列"},
+	{"id":"roof_rack","name":"车顶货架","tag":"空间","effect":"旅行背包","before":"标准容量","after":"容量 +33%","proof":""},
 	{"id":"hidden_compartment","name":"隐藏夹层","tag":"保险","effect":"探索战败","before":"背包物品全部遗失","after":"保留价值最高的 2 件","proof":"受保护物品显示锁形标记"},
-	{"id":"field_kitchen","name":"行军灶","tag":"续航","effect":"食物恢复","before":"面包 12 · 烤肉 20","after":"面包 20 · 烤肉 28","proof":"物品悬停显示最终恢复值"},
+	{"id":"field_kitchen","name":"行军灶","tag":"续航","effect":"食物恢复","before":"生肉 8 · 面包 12 · 烤肉 20","after":"生肉 16 · 面包 20 · 烤肉 28","proof":"物品悬停显示最终恢复值"},
 ]
 
 var state
@@ -40,9 +40,10 @@ func _ready() -> void:
 	PopupSkin.window(window)
 	add_child(window)
 	_label(window,"商车改装台",Vector2(24,8),24,PopupSkin.HEADER_TEXT)
-	_label(window,"模块插槽 2",Vector2(32,62),15,MUTED)
 	gold_label = _label(window,"",Vector2(890,14),16,PopupSkin.HEADER_TEXT)
 	var close := _button(window,"×",Vector2(1164,8),Vector2(34,34),false)
+	PopupSkin.close_button(close)
+	PopupSkin.place_close(close,window.size.x)
 	close.pressed.connect(func(): close_requested.emit())
 	cards.position = Vector2(30,108)
 	cards.size = Vector2(1160,312)

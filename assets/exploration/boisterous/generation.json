@@ -1,0 +1,238 @@
+{
+  "branch": "boisterous-forest-v4-requests-companions",
+  "date": "2026-10-02",
+  "generator": "built-in imagegen",
+  "global_style": "docs/game-design/整体视觉与UI规范.md",
+  "style": "Clean Japanese anime 2D game production assets, crisp selective outlines, large graphic color blocks, grouped cel shadows, restrained highlights; no UI, text, logos, photo texture, grain or bloom.",
+  "assets": [
+    {
+      "name": "forest-distance",
+      "transparent": false,
+      "prompt": "Wide 16:9 game backdrop ONLY: distant moonlit forest vista with enormous whimsical bent trees receding toward a luminous pale moon and calm blue mist, central path vanishing point at x60% y55%, spacious quiet center and right encounter area, lower half dim teal forest floor. No foreground trees, no characters. Edge to edge opaque landscape.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-7e8251a4-ff65-4054-ad96-1334a0211397.png",
+      "target": "assets/exploration/boisterous/forest-distance.png",
+      "active": true,
+      "role": "complete static background"
+    },
+    {
+      "name": "forest-foreground",
+      "transparent": true,
+      "prompt": "Wide 16:9 transparent foreground framing overlay ONLY: chunky midnight navy tree trunks hugging far left and far right edges, sparse drooping blue-green branches at upper corners, large whimsical leaf silhouettes near bottom corners, CENTER 75% ENTIRELY EMPTY transparent including lower central path. Full composition fits canvas, zero background or ground plane.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-31b02581-6c34-4a81-bdb2-317844df54ae.png",
+      "target": "assets/exploration/boisterous/forest-foreground.png",
+      "active": false
+    },
+    {
+      "name": "forest-road",
+      "transparent": true,
+      "prompt": "Wide 16:9 transparent game environment layer ONLY: a broad flat blue-green forest road in lower 35% of canvas widening toward bottom edge, a few roots tracing perspective toward x60% y55%, upper 60% empty transparent. Quiet right-side encounter platform and central path. No characters, no trees, no sky.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-22de1e63-def9-42e8-bc54-af38f78bfd39.png",
+      "target": "assets/exploration/boisterous/forest-road.png",
+      "active": false
+    },
+    {
+      "name": "forest-stage",
+      "transparent": true,
+      "prompt": "Wide 16:9 transparent middle environment layer ONLY: two clusters of rounded teal bushes, whimsical curving slender trees and giant blue mushrooms placed at far left and right sides, a small flat mossy mound at right-bottom 70% x 80% y for encounters. Center is empty transparent, no foreground trunks, no sky, no ground filling the canvas.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-ac8dc5c4-1cb9-4836-9f6c-0dbe1fb7ab0c.png",
+      "target": "assets/exploration/boisterous/forest-stage.png",
+      "active": false
+    },
+    {
+      "name": "chest",
+      "transparent": true,
+      "prompt": "One comical anthropomorphic wooden treasure chest with brass fittings and two long skinny wooden legs, facing left in three-quarter side view, lid ajar like a shy smiling toothy mouth, eager wide eyes on front, expressive playful running stance. No loot outside.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-7da70bec-aa40-45e7-8fe2-22d103e65e76.png",
+      "target": "assets/exploration/boisterous/chest.png",
+      "active": true
+    },
+    {
+      "name": "court",
+      "transparent": true,
+      "prompt": "One unified compact mushroom court character cluster: a large red-capped grumpy mushroom judge seated centrally on a root throne holding a tiny wooden gavel, surrounded by five small expressive mushrooms forming a semicircle. Entire cluster isolated, single production sprite.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-4cfa8514-d983-40cc-9ea6-5548bc8290d1.png",
+      "target": "assets/exploration/boisterous/court.png",
+      "active": true
+    },
+    {
+      "name": "frog",
+      "transparent": true,
+      "prompt": "One smug green frog sage with a white little beard, gold monocle and tiny cape, seated cross-legged on a broad floating blue-green lotus leaf, leaf occupies bottom of isolated sprite, arms folded, cheeky half-closed eyes, facing left.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-592b07bf-d1d1-41e6-9617-77ced9dc4774.png",
+      "target": "assets/exploration/boisterous/frog.png",
+      "active": true
+    },
+    {
+      "name": "well",
+      "transparent": true,
+      "prompt": "One squat blue-grey stone wishing well creature, three-quarter view facing left, chunky round stones and rope pulley, a huge sarcastic mouth built into its front stones and rolling eyes above mouth, silly theatrical expression. No ground or background.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-df6a9c98-d598-498d-b533-24aa4e4f8052.png",
+      "target": "assets/exploration/boisterous/well.png",
+      "active": true
+    },
+    {
+      "name": "merchant-poses",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-97badbd0-3d8b-4bff-ab16-d22eaac67263.png",
+      "target": "assets/exploration/boisterous/merchant-poses.png",
+      "active": false
+    },
+    {
+      "name": "slime",
+      "transparent": true,
+      "prompt": "One emerald gelatinous tundra slime creature, squat translucent jelly mound with lime leaves forming a little crown, expressive amber eyes and grumpy mouth, slightly cocked eyebrow, ready to bounce. Separate readable leafy tuft emerging on top, sparse large highlights, warm emerald with cool teal shadows.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-fef9a99e-cc74-4419-95c3-cd9dd2ca5833.png",
+      "target": "assets/exploration/boisterous/slime.png",
+      "active": true
+    },
+    {
+      "name": "wolf",
+      "transparent": true,
+      "prompt": "One full-body thorn forest wolf crouched ready to pounce, navy-grey fur with teal grouped highlights, red-brown thorn vine wrapped around shoulders, large expressive amber eyes, long readable tail, paws spread, comically serious eyebrows but dangerous silhouette.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-2346c308-2f5e-4be2-8a48-92b1c387046d.png",
+      "target": "assets/exploration/boisterous/wolf.png",
+      "active": true
+    },
+    {
+      "name": "treant",
+      "transparent": true,
+      "prompt": "A single huge moon-eclipse ancient tree king character for a Japanese anime fantasy 2D game. Complete towering living tree monster with two root legs, two massive crooked branch arms, enormous broad dark teal leaf crown, expressive amber eyes and comical angry bark face, holding one spare branch as a repair tool. Clearly readable silhouette, grouped brown bark planes, crisp selective linework, cel shading, large simple color masses. Facing left toward player. Entire subject within canvas with safe transparent margins. Genuine transparent RGBA background, no floor or cast shadow, no UI, no text, no logo, no bloom, no photo texture.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-d5e449c3-ec6f-42a3-a4c5-dcda432440ac.png",
+      "target": "assets/exploration/boisterous/treant.png",
+      "active": true
+    },
+    {
+      "name": "merchant-idle",
+      "transparent": true,
+      "prompt": "Extract ONLY the top-left idle pose holding a sword down from the merchant pose sheet, preserving identity and costume, remove all five other characters, center with true RGBA transparency.",
+      "reference": "assets/exploration/boisterous/merchant-poses.png",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-0cac7b81-f2f8-493d-8fdb-83011d1b66b3.png",
+      "target": "assets/exploration/boisterous/merchant-idle.png",
+      "active": true
+    },
+    {
+      "name": "merchant-walk",
+      "transparent": true,
+      "prompt": "Extract ONLY the top-middle walking pose leaning forward from the merchant pose sheet, preserving identity and costume, remove all five other characters, center with true RGBA transparency.",
+      "reference": "assets/exploration/boisterous/merchant-poses.png",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-67db8ad2-7a85-42e4-b8fb-c5fe5ba2872b.png",
+      "target": "assets/exploration/boisterous/merchant-walk.png",
+      "active": true
+    },
+    {
+      "name": "merchant-attack",
+      "transparent": true,
+      "prompt": "Extract ONLY the top-right attacking pose sword extended from the merchant pose sheet, preserving identity and costume, remove all five other characters, center with true RGBA transparency.",
+      "reference": "assets/exploration/boisterous/merchant-poses.png",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-df25b4a9-a78c-4597-9b80-80164f12c3c0.png",
+      "target": "assets/exploration/boisterous/merchant-attack.png",
+      "active": true
+    },
+    {
+      "name": "merchant-hit",
+      "transparent": true,
+      "prompt": "Extract ONLY the bottom-left recoiling injured pose from the merchant pose sheet, preserving identity and costume, remove all five other characters, center with true RGBA transparency.",
+      "reference": "assets/exploration/boisterous/merchant-poses.png",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-4b86a2ed-65d3-4fb9-9903-5382d6864eb1.png",
+      "target": "assets/exploration/boisterous/merchant-hit.png",
+      "active": true
+    },
+    {
+      "name": "merchant-use",
+      "transparent": true,
+      "prompt": "Extract ONLY the bottom-middle drinking green potion pose from the merchant pose sheet, preserving identity and costume, remove all five other characters, center with true RGBA transparency.",
+      "reference": "assets/exploration/boisterous/merchant-poses.png",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-eb9a593c-685c-4e29-8844-b656cac0f640.png",
+      "target": "assets/exploration/boisterous/merchant-use.png",
+      "active": true
+    },
+    {
+      "name": "merchant-surprise",
+      "transparent": true,
+      "prompt": "Extract ONLY the bottom-right startled pose looking over shoulder from the merchant pose sheet, preserving identity and costume, remove all five other characters, center with true RGBA transparency.",
+      "reference": "assets/exploration/boisterous/merchant-poses.png",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-a65cb2f4-d4c1-4942-97a4-ce0d0b1f3644.png",
+      "target": "assets/exploration/boisterous/merchant-surprise.png",
+      "active": true
+    },
+    {
+      "name": "mushrooms",
+      "transparent": true,
+      "active": true,
+      "prompt": "One compact cluster of wild mushrooms and moonlight medicinal herbs for a Japanese anime fantasy game encounter sprite. Seven expressive red, orange and muted teal mushroom caps growing closely from a tiny root tangle, two pale green herb stalks among them. Wild forest growth, subtle tiny eyes on only two small mushrooms; no clothes, judge, throne, tools or humanoid bodies. Crisp clean selective linework, large graphic color blocks, grouped cel shadows, restrained highlights, blue-green moonlit palette. Single isolated production asset, whole cluster centered with transparent safety margin. Genuine transparent RGBA, no scenery, no ground plane or shadow, no text, no UI, no pixel art, no photographic texture, no grain, no bloom.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-05de29ad-7074-4e89-9881-8ef6657536e0.png",
+      "target": "assets/exploration/boisterous/mushrooms.png"
+    },
+    {
+      "name": "mining",
+      "transparent": true,
+      "prompt": "Single isolated transparent RGBA 2D fantasy game encounter sprite, clean Japanese anime illustration matching a moonlit blue-green whimsical forest. Crisp readable outlines, grouped cel-shading, restrained detail, warm highlights and coherent cool shadow, charming absurd character identity. Entire subject inside canvas, no UI, no words, no lettering, no numerals, no background landscape, no floor plane, no cast shadow, no vignette, no bloom, no grain, no photorealistic texture. Production cutout for a right-side encounter stage, front three-quarter view. A low lumpy ore vein boulder with large copper-orange and muted blue iron mineral seams, sleepy disgruntled eyes formed from pebble cracks, loose rocks at its foot, two small moss clumps. Clearly a solid mineable rock with physical ore veins, no neon crystal fantasy, no pickaxe attached, no mining machinery.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-c8f7c83c-5e2e-4e52-8b0a-29e6409d2f31.png",
+      "target": "assets/exploration/boisterous/mining.png",
+      "active": true
+    },
+    {
+      "name": "camp",
+      "transparent": true,
+      "prompt": "Single isolated transparent RGBA 2D fantasy game encounter sprite, clean Japanese anime illustration matching a moonlit blue-green whimsical forest. Crisp readable outlines, grouped cel-shading, restrained detail, warm highlights and coherent cool shadow, charming absurd character identity. Entire subject inside canvas, no UI, no words, no lettering, no numerals, no background landscape, no floor plane, no cast shadow, no vignette, no bloom, no grain, no photorealistic texture. Production cutout for a right-side encounter stage, front three-quarter view. A compact tiny campfire with a sleepy friendly face in warm flame shapes, a little ember spirit slumped atop three visible cut logs, a miniature kettle resting at the side. Flame orange and gold with soft grouped highlights, no enormous explosion or bloom, no people, no ground circle, no labels.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-dd3fad2c-54d7-44a3-8531-35f513a9ec42.png",
+      "target": "assets/exploration/boisterous/camp.png",
+      "active": true
+    },
+    {
+      "name": "snail",
+      "transparent": true,
+      "prompt": "Single isolated transparent RGBA 2D fantasy game encounter sprite, clean Japanese anime illustration matching a moonlit blue-green whimsical forest. Crisp readable outlines, grouped cel-shading, restrained detail, warm highlights and coherent cool shadow, charming absurd character identity. Entire subject inside canvas, no UI, no words, no lettering, no numerals, no background landscape, no floor plane, no cast shadow, no vignette, no bloom, no grain, no photorealistic texture. Production cutout for a right-side encounter stage, front three-quarter view. A comically self-important large snail with gentle expressive stalk eyes and a brown spiral shell carrying a small improvised twig toll barrier tied by ropes. Barrier has no writing or sign text. Snail rests low with full soft green body visible, a small leather coin pouch attached to shell, fantasy woodland resident, wholesome absurd humor.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-315969c6-2697-44cc-86ab-4a91063bca16.png",
+      "target": "assets/exploration/boisterous/snail.png",
+      "active": true
+    },
+    {
+      "name": "logging",
+      "transparent": true,
+      "prompt": "Single isolated transparent RGBA 2D fantasy game encounter sprite, clean Japanese anime illustration matching a moonlit blue-green whimsical forest. Crisp readable outlines, grouped cel-shading, restrained detail, warm highlights and coherent cool shadow, charming absurd character identity. Entire subject inside canvas, no UI, no words, no lettering, no numerals, no background landscape, no floor plane, no cast shadow, no vignette, no bloom, no grain, no photorealistic texture. Production cutout for a right-side encounter stage, front three-quarter view. A short old hollow dead tree with a few leafy twigs, a funny sleepy face formed naturally from bark knots, two drooping branch arms and several clearly loose dry branches ready to harvest. A tiny bird nest with a peeking round bird on one upper branch. Broad compact silhouette rather than extremely tall, roots entirely visible. Natural wood identity, no weapons, no axe stuck in it, no clothing.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-fe859efe-fd95-46f2-8629-2402c362c58f.png",
+      "target": "assets/exploration/boisterous/logging.png",
+      "active": true
+    },
+    {
+      "name": "hunter",
+      "transparent": true,
+      "prompt": "Clean Japanese anime 2D fantasy game production sprite, crisp linework, large graphic color blocks and grouped cel shadows, restrained highlights, genuine transparent RGBA background, isolated entire silhouette including feet, no ground plane, shadows, text, UI, watermark, photorealism, grain, bloom or scenery. A young adult wounded forest hunter, ash brown short hair, green hooded cloak and leather ranger clothing, quiver and short bow, sitting clutching a bandaged forearm with red stain, weary but alert expression, three quarter view facing left, compact readable full figure.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-36b9d07f-25bf-4695-93e4-20a03d069fcc.png",
+      "target": "assets/exploration/boisterous/hunter.png",
+      "active": true
+    },
+    {
+      "name": "hollow_stag",
+      "transparent": true,
+      "prompt": "Clean Japanese anime 2D fantasy game production sprite, crisp linework, large graphic color blocks and grouped cel shadows, restrained highlights, genuine transparent RGBA background, isolated entire silhouette including feet, no ground plane, shadows, text, UI, watermark, photorealism, grain, bloom or scenery. A terrifying majestic hollow forest stag king, enormous crooked antlers, slate blue bark armor on deer-like body, chest has visibly empty split hollow cavity framed in silver pale branches, pale moon crescent forehead marking, green leaf accents, dynamic braced four-legged stance facing left, powerful threatening silhouette, few bold details, all antlers entirely within frame.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-4e629a2e-210a-4423-b86a-fbc8a09ffa3c.png",
+      "target": "assets/exploration/boisterous/hollow_stag.png",
+      "active": true
+    },
+    {
+      "name": "hunter-customer",
+      "transparent": true,
+      "prompt": "Edit this forest hunter into his recovered customer portrait. Preserve exactly his identity, ash brown short hair, green eyes, green hooded cloak, ranger leather outfit, quiver and bow and clean Japanese anime style. He is now standing upright, calm grateful slight smile, holding his bow by his side, healed clean forearm with neat white bandage, no blood anywhere, no face scratches or wounds. Entire full figure including boots in frame. Isolated genuine transparent RGBA background, no ground plane, no scenery, no text or UI, crisp linework, grouped cel shadows and restrained highlights.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-98996268-4738-46b4-a6d2-da07e7a375f4.png",
+      "target": "assets/exploration/boisterous/hunter-customer.png",
+      "active": true
+    },
+    {
+      "name": "sylvie-ally",
+      "transparent": true,
+      "prompt": "Create an exploration ally sprite of EXACTLY this adult elf woman Sylvie, preserving her facial identity, long silver white hair, violet eyes, pointed ears, green hooded cloak, cream blouse, brown corset belt and shoulder bag. Three quarter view facing right toward an enemy, entire full body including leather boots, standing alert holding a simple wooden bow with arrow nocked, calm determined protective expression, no weapon obscuring face. Clean Japanese anime 2D game production art, crisp outlines and large cel shaded graphic planes, few restrained highlights. Isolated genuine transparent RGBA background, no ground plane, shadows, text, UI, scenery, glow, grain or photorealism.",
+      "source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-208f9de5-bc51-4047-a49f-9387b0f9c814.png",
+      "target": "assets/exploration/boisterous/sylvie-ally.png",
+      "active": true
+    }
+  ],
+  "merchant_sheet": {
+    "prompt": "Create a transparent 3 columns by 2 rows production animation pose sheet for the EXACT same anime merchant from the supplied reference, preserving brown tousled hair, dark green cloak, cream sleeves, brown backpack with rolled teal blanket and brass lantern. Six equal cells with generous transparent gutters, each shows same half-body three-quarter back view facing RIGHT, backpack visible and side face visible, same scale and baseline within each cell, no text or borders. Top row LEFT idle relaxed holding a short sword low, MIDDLE walking leaning forward with backpack and lantern swinging, RIGHT attacking extending sword diagonally toward the right. Bottom row LEFT recoiling from hit with hunched shoulders, MIDDLE drinking small green potion with free hand, RIGHT surprised looking over shoulder wide-eyed. All six complete half-body sprites contained within own cell, no overlap or cropped limbs. Crisp clean Japanese anime cel shading, large grouped shadows, sparse folds, warm moonlight, readable silhouette. Genuine transparent RGBA, no scenery, no floor shadows, no bloom.",
+    "cleanup_prompt": "Remove ALL backdrop from this six-pose merchant animation sheet. Preserve the exact six drawings, positions, colors and scale. Output TRUE transparent alpha for every pixel outside the six character silhouettes, including all smoky grey/brown background and all spaces between poses. NO opaque background, no glow, no shadows around the silhouettes, no checkerboard pattern. Keep 3 columns by 2 rows exactly. Each complete character has transparent margin separating it from neighbors. Do not add or alter any characters.",
+    "cleanup_source": "/Users/macmini/.codex/generated_images/01a0fc0b-8649-7451-a759-b6f0d3cfb252/exec-6ffb6570-196c-4db3-89c1-7bbfe3570cb7.png",
+    "usage": "Generation reference only; independent six sprites are used at runtime."
+  },
+  "runtime_background": "forest-distance.png (single static opaque plate; no viewport, road overlay or forward change)",
+  "runtime_travel": "0.475s walk + 0.175s arrival; runtime blur on background texture only, no new generated plate"
+}

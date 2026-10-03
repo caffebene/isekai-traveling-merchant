@@ -11,9 +11,9 @@ const Economy = preload("res://scripts/city_economy.gd")
 const MACHINES = ["pot", "alembic", "furnace"]
 const CATALOG = {
  "wastewater": {"name":"废水","category":"杂物","value":1,"size":Vector2i(1,3),"color":"8c886d","desc":"未匹配配方的材料炼制成的废水。\n没有药效，无法在战斗中使用。"},
- "copper_ore": {"name":"赤铜矿","category":"矿石","value":16,"size":Vector2i(2,2),"color":"bd815b","desc":"用于工作台配方，每件占2×2格。"},
- "slime_mucus": {"name":"史莱姆粘液","category":"燃料","value":10,"size":Vector2i(2,2),"color":"9fca75","desc":"史莱姆死亡后留下的粘液。\n锻造纯度 60% · 炼药产出 1瓶。"},
- "ancient_wood": {"name":"古藤木","category":"燃料","value":28,"size":Vector2i(2,2),"color":"a77850","desc":"古木精身上脱落的硬木。\n锻造纯度 100% · 炼药产出 2瓶。"},
+ "copper_ore": {"tags":["材料","矿石"], "name":"赤铜矿","category":"矿石","value":16,"size":Vector2i(2,2),"color":"bd815b","desc":"用于工作台锻造。"},
+ "slime_mucus": {"tags":["材料","燃料"], "name":"史莱姆粘液","category":"燃料","value":10,"size":Vector2i(2,2),"color":"9fca75","desc":"史莱姆死亡后留下的粘液。\n锻造纯度 60% · 炼药产出 1瓶。"},
+ "ancient_wood": {"tags":["材料","燃料"], "name":"古藤木","category":"燃料","value":28,"size":Vector2i(2,2),"color":"a77850","desc":"古木精身上脱落的硬木。\n锻造纯度 100% · 炼药产出 2瓶。"},
  "copper_sword": {"name":"赤铜剑","category":"武器","value":76,"size":Vector2i(2,6),"color":"c89067","attack":7,"base_durability":20,"desc":"攻击 7 · 耐久 20 / 20\n按图纸制作，燃料纯度决定最大耐久。"},
  "copper_axe": {"name":"赤铜斧","category":"武器","value":92,"size":Vector2i(3,5),"color":"c89067","attack":7,"base_durability":20,"desc":"攻击 7 · 耐久 20 / 20\n按图纸制作，燃料纯度决定最大耐久。"},
  "copper_pickaxe": {"name":"赤铜镐","category":"武器","value":108,"size":Vector2i(4,5),"color":"c89067","attack":7,"base_durability":20,"desc":"攻击 7 · 耐久 20 / 20\n按图纸制作，燃料纯度决定最大耐久。"},
@@ -21,21 +21,38 @@ const CATALOG = {
  "iron_pickaxe": {"name":"辉铁镐","category":"武器","value":188,"size":Vector2i(4,5),"color":"a2d7dc","attack":10,"base_durability":20,"desc":"攻击 10 · 耐久 20 / 20\n按图纸制作，燃料纯度决定最大耐久。"},
  "tempered_sword": {"name":"淬火剑","category":"武器","value":184,"size":Vector2i(2,6),"color":"e3ad77","attack":13,"base_durability":24,"desc":"攻击 13 · 耐久 24 / 24\n按图纸制作，燃料纯度决定最大耐久。"},
  "tempered_axe": {"name":"淬火斧","category":"武器","value":216,"size":Vector2i(3,5),"color":"e3ad77","attack":13,"base_durability":24,"desc":"攻击 13 · 耐久 24 / 24\n按图纸制作，燃料纯度决定最大耐久。"},
- "small_bag": {"name":"小背包", "category":"容器", "value":0, "size":Vector2i(3,4), "color":"a77c56", "desc":"旅商的初始背包，占用 3 × 4 格。\n点击打开：内部有 6 × 6 格。"},
+ "small_bag": {"name":"小背包", "category":"容器", "value":0, "size":Vector2i(3,4), "color":"a77c56", "desc":"旅商的随身背包。"},
  "pot": {"name":"烹饪锅", "category":"设备", "value":120, "size":Vector2i(3,3), "color":"b79a73", "desc":"点击展开内部空间。\n放入鲜兽肉，次日制成烤肉。"},
  "alembic": {"name":"炼药器", "category":"设备", "value":180, "size":Vector2i(3,4), "color":"89bdb0", "desc":"按配方放入材料和燃料，隔天炼制药水。\n只看材料种类与数量，不要求摆放位置。"},
  "furnace": {"name":"工作台", "category":"设备", "value":240, "size":Vector2i(4,4), "color":"bd8964", "desc":"打开工作台，按配方摆放矿石与燃料。\n隔天生成装备；燃料决定纯度与耐久。"},
  "iron_sword": {"name":"辉铁剑", "attack":10, "base_durability":20, "category":"武器", "value":140, "size":Vector2i(2,6), "color":"a2d7dc", "desc":"攻击 10 · 耐久 20 / 20\n辉铁打造的剑，可在工作台制作。"},
- "herb": {"name": "月光草", "category": "材料", "value": 18, "size": Vector2i(2,3), "color": "98bfad", "desc": "在月色中生长的草药。\n可投入炼药器，按配方炼制药剂。"},
- "berry": {"name": "绯红果", "category": "材料", "value": 12, "size": Vector2i(1,1), "color": "d98683", "desc": "风栖镇郊外采摘的甜果。\n可烹饪，也可直接出售。"},
- "meat": {"name": "鲜兽肉", "category": "材料", "value": 24, "size": Vector2i(3,2), "color": "ce927e", "desc": "适合烹饪的鲜肉。\n投入烹饪锅可制成烤肉。"},
- "bread": {"name": "蜜糖面包", "category": "食物", "value": 26, "size": Vector2i(3,2), "color": "dfb779", "desc": "松软的旅行口粮。\n战斗中消耗：恢复 12 点生命。"},
- "steak": {"name": "香草烤肉", "category": "食物", "value": 40, "size": Vector2i(3,2), "color": "c8946c", "desc": "烤得恰到好处的肉排。\n战斗中消耗：恢复 20 点生命。"},
- "ore": {"name": "辉铁矿", "category": "矿石", "value": 32, "size": Vector2i(2,2), "color": "a6bfd2", "desc": "带着蓝色晶纹的铁矿。\n放入工作台，按图纸打造辉铁装备。"},
+ "herb": {"tags":["材料","药材"], "name": "月光草", "category": "材料", "value": 18, "size": Vector2i(2,3), "color": "98bfad", "desc": "在月色中生长的草药。\n可投入炼药器，按配方炼制药剂。"},
+ "moonheart": {"tags":["材料"], "name":"月蚀树心", "category":"材料", "value":80, "size":Vector2i(2,2), "color":"a6bfd2", "desc":"古树深处封存的月纹树心。\n希尔薇正在寻找它。"},
+ "berry": {"tags":["材料","药材"], "name": "绯红果", "category": "材料", "value": 12, "size": Vector2i(1,1), "color": "d98683", "desc": "风栖镇郊外采摘的甜果。\n可烹饪，也可直接出售。"},
+ "meat": {"tags":["材料","食物"], "heal":8, "name": "鲜兽肉", "category": "材料", "value": 24, "size": Vector2i(3,2), "color": "ce927e", "desc": "可直接食用恢复生命，也可烹饪为烤肉。"},
+ "bread": {"heal":12, "name": "蜜糖面包", "category": "食物", "value": 26, "size": Vector2i(3,2), "color": "dfb779", "desc": "松软的旅行口粮。\n战斗中消耗：恢复 12 点生命。"},
+ "steak": {"heal":20, "name": "香草烤肉", "category": "食物", "value": 40, "size": Vector2i(3,2), "color": "c8946c", "desc": "烤得恰到好处的肉排。\n战斗中消耗：恢复 20 点生命。"},
+ "ore": {"tags":["材料","矿石"], "name": "辉铁矿", "category": "矿石", "value": 32, "size": Vector2i(2,2), "color": "a6bfd2", "desc": "带着蓝色晶纹的铁矿。\n放入工作台，按图纸打造辉铁装备。"},
  "sword": {"name": "旅人长剑", "category": "武器", "value": 96, "size": Vector2i(2,6), "color": "c1d3d7", "desc": "攻击 8  ·  耐久 20 / 20\n每次攻击消耗 1 点耐久。"},
  "potion": {"name": "防护药剂", "category": "药剂", "value": 45, "size": Vector2i(1,3), "color": "81bdc0", "desc": "封存着森林的守护之力。\n战斗中消耗：获得 15 点护盾。"},
  "power": {"name": "力量药剂", "category": "药剂", "value": 56, "size": Vector2i(1,3), "color": "b698cc", "desc": "散发着微弱的紫色光芒。\n本场战斗攻击力 +20%。"}
 }
+# Rows describe occupied cells inside the unchanged artwork bounds.
+const FOOTPRINTS = {
+ "copper_pickaxe":["1111","0110","0110","0110","0110"],
+ "iron_pickaxe":["1111","0110","0110","0110","0110"],
+ "copper_axe":["111","111","011","010","010"],
+ "iron_axe":["111","111","011","010","010"],
+ "tempered_axe":["111","111","011","010","010"],
+}
+const Quality = preload("res://scripts/weapon_quality.gd")
+var quality_rng := RandomNumberGenerator.new()
+var forest_memory: Dictionary = {}
+var story_progress := {"stage":"none","hunter_saved":false}
+var selected_companion := ""
+var customer_memory: Dictionary = {}
+const CustomerRoster = preload("res://scripts/customer_roster.gd")
+const ForestStory = preload("res://scripts/forest_story.gd")
 var items: Array[Dictionary] = []
 var bag_size: Vector2i = SIZES.bag
 var gold := 387
@@ -60,6 +77,7 @@ var economy = Economy.new()
 var current_customer_name := ""
 
 func _init() -> void:
+ quality_rng.randomize()
  for key in ["sword","herb","herb","bread","ore","potion","potion","power","berry","berry","meat","steak","ore","bread"]:
   add_item(key, "stock", "player")
  for key in ["potion","bread","power"]:
@@ -75,17 +93,36 @@ func dimensions(item: Dictionary) -> Vector2i:
  var d: Vector2i = CATALOG[item.key].size
  return Vector2i(d.y,d.x) if item.rotated else d
 
+static func footprint(item: Dictionary) -> Array[Vector2i]:
+ var bounds: Vector2i = CATALOG[item.key].size
+ var cells: Array[Vector2i] = []
+ var mask: Array = FOOTPRINTS.get(item.key,[])
+ for y in range(bounds.y):
+  for x in range(bounds.x):
+   if mask.is_empty() or mask[y][x] == "1":
+    cells.append(Vector2i(bounds.y-1-y,x) if item.rotated else Vector2i(x,y))
+ return cells
+
+static func occupied_cells(item: Dictionary, at: Vector2i) -> Array[Vector2i]:
+ var cells := footprint(item)
+ for index in range(cells.size()):
+  cells[index] += at
+ return cells
+
 func fits(item: Dictionary, zone: String, at: Vector2i, ignore_id: int = -1) -> bool:
  var d := dimensions(item)
  var bounds: Vector2i = zone_size(zone)
  if at.x < 0 or at.y < 0 or at.x+d.x > bounds.x or at.y+d.y > bounds.y:
   return false
- var rect := Rect2i(at,d)
+ var occupied := {}
+ for cell in occupied_cells(item,at):
+  occupied[cell] = true
  for other in items:
   if other.id == ignore_id or other.zone != zone:
    continue
-  if rect.intersects(Rect2i(other.cell, dimensions(other))):
-   return false
+  for cell in occupied_cells(other,other.cell):
+   if occupied.has(cell):
+    return false
  return true
 
 func free_cell(item: Dictionary, zone: String) -> Vector2i:
@@ -95,7 +132,7 @@ func free_cell(item: Dictionary, zone: String) -> Vector2i:
     return Vector2i(x,y)
  return Vector2i(-1,-1)
 
-func add_item(key: String, zone: String, owner: String) -> bool:
+func add_item(key: String, zone: String, owner: String, source := "", quality := -1) -> bool:
  var item := {
   "id":serial,
   "key":key,
@@ -115,9 +152,6 @@ func add_item(key: String, zone: String, owner: String) -> bool:
   "counter_angular_velocity":0.0,
   "counter_sleeping":false,
  }
- if CATALOG[key].category == "武器":
-  item.max_durability = CATALOG[key].get("base_durability",20)
-  item.durability = item.max_durability
  var at := free_cell(item,zone)
  if at.x < 0 and item_size_is_rectangular(key):
   # Customer and loot areas are only four cells tall; auto-pack long items sideways.
@@ -125,6 +159,11 @@ func add_item(key: String, zone: String, owner: String) -> bool:
   at = free_cell(item,zone)
  if at.x < 0:
   return false
+ if CATALOG[key].category == "武器":
+  item.quality = clampi(quality,0,4) if quality >= 0 else Quality.roll_quality(source if source != "" else zone,quality_rng)
+  item.affixes = Quality.roll_affixes(item.quality,quality_rng)
+  item.max_durability = Quality.durability(item,CATALOG[key].get("base_durability",20))
+  item.durability = item.max_durability
  item.cell = at
  serial += 1
  items.append(item)
@@ -162,7 +201,7 @@ func customer_will_sell(item: Dictionary) -> bool:
  return (customer_sell_key == "*" and customer_goods.has(item.key)) or (customer_sell_key != "" and item.key == customer_sell_key)
 
 func customer_reaction(item: Dictionary) -> String:
- var value: int = market_value(item.key)
+ var value: int = item_market_value(item)
  var multiplier := market_multiplier(item.key)
  if multiplier >= 1.35:
   return "顾客眼睛一亮：眼下正缺这个。"
@@ -175,19 +214,19 @@ func customer_reaction(item: Dictionary) -> String:
 func total_value() -> int:
  var value := 0
  for item in buying_items()+selling_items():
-  value += market_value(item.key)
+  value += item_market_value(item)
  return value
 
 func buying_value() -> int:
  var value := 0
  for item in buying_items():
-  value += market_value(item.key)
+  value += item_market_value(item)
  return value
 
 func selling_value() -> int:
  var value := 0
  for item in selling_items():
-  value += market_value(item.key)
+  value += item_market_value(item)
  return value
 
 func market_multiplier(key: String) -> float:
@@ -198,17 +237,46 @@ func market_value(key: String) -> int:
  var data: Dictionary = CATALOG[key]
  return economy.value(key,data.category,data.value,day)
 
+func item_market_value(item: Dictionary) -> int:
+ var data: Dictionary = CATALOG[item.key]
+ var multiplier: float = Quality.PRICES[Quality.tier(item)] if data.category == "武器" else 1.0
+ return maxi(1,roundi(float(data.value)*multiplier*market_multiplier(item.key)))
+
 func market_report() -> String:
  return economy.market_report(CATALOG,day)
 
 func bag_adjacent(a: Dictionary, b: Dictionary) -> bool:
  if a.get("zone","") != "bag" or b.get("zone","") != "bag":
   return false
- var ar := Rect2i(a.cell,dimensions(a))
- var br := Rect2i(b.cell,dimensions(b))
- var horizontal := (ar.end.x == br.position.x or br.end.x == ar.position.x) and maxi(ar.position.y,br.position.y) < mini(ar.end.y,br.end.y)
- var vertical := (ar.end.y == br.position.y or br.end.y == ar.position.y) and maxi(ar.position.x,br.position.x) < mini(ar.end.x,br.end.x)
- return horizontal or vertical
+ var occupied := {}
+ for cell in occupied_cells(a,a.cell):
+  occupied[cell] = true
+ for cell in occupied_cells(b,b.cell):
+  for direction in [Vector2i.LEFT,Vector2i.RIGHT,Vector2i.UP,Vector2i.DOWN]:
+   if occupied.has(cell+direction):
+    return true
+ return false
+
+const FUEL_INTERVAL_REDUCTION = {"slime_mucus":10,"ancient_wood":20}
+
+static func bag_interval_reduction(item: Dictionary) -> int:
+ return int(FUEL_INTERVAL_REDUCTION.get(item.key,0))
+
+static func bag_support_bonus(item: Dictionary) -> int:
+ return 3 if CATALOG[item.key].category == "矿石" else 2 if item.key == "power" else 0
+
+func bag_bonus_cells(item: Dictionary, at: Vector2i) -> Array[Vector2i]:
+ var result: Array[Vector2i] = []
+ if bag_support_bonus(item) == 0 and bag_interval_reduction(item) == 0:
+  return result
+ var occupied := occupied_cells(item,at)
+ var bounds := zone_size("bag")
+ for cell in occupied:
+  for direction in [Vector2i.LEFT,Vector2i.RIGHT,Vector2i.UP,Vector2i.DOWN]:
+   var neighbor: Vector2i = cell+direction
+   if neighbor.x >= 0 and neighbor.y >= 0 and neighbor.x < bounds.x and neighbor.y < bounds.y and not occupied.has(neighbor) and not result.has(neighbor):
+    result.append(neighbor)
+ return result
 
 func bag_adjacent_items(item: Dictionary) -> Array[Dictionary]:
  return items.filter(func(other): return other.zone == "bag" and other.id != item.id and bag_adjacent(item,other))
@@ -218,7 +286,7 @@ func protected_bag_ids() -> Array[int]:
  if not economy.has_module("hidden_compartment"):
   return result
  var candidates: Array[Dictionary] = items.filter(func(i): return i.zone == "bag")
- candidates.sort_custom(func(a,b): return market_value(a.key) > market_value(b.key))
+ candidates.sort_custom(func(a,b): return item_market_value(a) > item_market_value(b))
  for index in range(mini(2,candidates.size())):
   result.append(candidates[index].id)
  return result
@@ -230,14 +298,20 @@ func bag_effects(item: Dictionary) -> Dictionary:
  var adjacent_weapons := neighbors.filter(func(i): return CATALOG[i.key].category == "武器").size()
  var base_attack: int = int(CATALOG[item.key].get("attack",8 if CATALOG[item.key].category == "武器" else 0))
  var damage_bonus: int = ore_count*3 + power_count*2 if CATALOG[item.key].category == "武器" else 0
- var base_heal := 12 if item.key == "bread" else 20 if item.key == "steak" else 0
+ var base_heal: int = int(CATALOG[item.key].get("heal",0))
+ var interval_multiplier := 1.0
+ if CATALOG[item.key].category == "武器":
+  for neighbor in neighbors:
+   interval_multiplier *= 1.0-bag_interval_reduction(neighbor)/100.0
  return {
   "damage_bonus":damage_bonus,
-  "final_attack":base_attack+damage_bonus,
-  "attack_interval":2.55 if ore_count > 0 and CATALOG[item.key].category == "武器" else 2.0,
-  "free_use":item.zone == "bag" and item.cell.x < 2 and item.key in ["bread","steak","potion","power"],
+  "final_attack":roundi(base_attack*(1.0+Quality.bonus(item,"sharp")/100.0))+damage_bonus,
+  "attack_interval":2.0*interval_multiplier/(1.0+Quality.bonus(item,"swift")/100.0),
+  "critical_chance":Quality.bonus(item,"critical")/100.0,
+  "leech_ratio":Quality.bonus(item,"leech")/100.0,
+  "free_use":item.zone == "bag" and item.cell.x < 2 and (base_heal > 0 or item.key in ["potion","power"]),
   "adjacent_weapons":adjacent_weapons,
-  "support_bonus":3 if CATALOG[item.key].category == "矿石" else 2 if item.key == "power" else 0,
+  "support_bonus":bag_support_bonus(item),
   "protected":protected_bag_ids().has(item.id),
   "final_heal":base_heal+(8 if base_heal > 0 and economy.has_module("field_kitchen") else 0),
   "base_heal":base_heal,
@@ -249,7 +323,7 @@ func bag_effect_text(item: Dictionary) -> String:
  var effects := bag_effects(item)
  var lines: Array[String] = []
  if CATALOG[item.key].category == "武器":
-  var base_attack: int = int(CATALOG[item.key].get("attack",8))
+  var base_attack: int = roundi(int(CATALOG[item.key].get("attack",8))*(1.0+Quality.bonus(item,"sharp")/100.0))
   lines.append("当前布局：攻击 %d → %d · 间隔 %.2f 秒" % [base_attack,effects.final_attack,effects.attack_interval])
  elif int(effects.adjacent_weapons) > 0 and int(effects.support_bonus) > 0:
   lines.append("已连接 %d 把武器：每把攻击 +%d" % [effects.adjacent_weapons,effects.support_bonus])
@@ -437,13 +511,16 @@ func settle() -> String:
  if customer_funds + buy_offer < sell_offer:
   return "顾客的资金不足，最多还能支付 %d G。" % (customer_funds + buy_offer)
  var customer_placements: Array[Dictionary] = []
- var reserved: Array[Rect2i] = []
+ var reserved: Array[Vector2i] = []
  for item in selling_batch:
   var placement := _customer_sale_placement(item,reserved)
   if placement.is_empty():
    return "顾客格子空间不足，暂时无法接收这些商品。"
   customer_placements.append(placement)
-  reserved.append(placement.rect)
+  reserved.append_array(placement.cells)
+ ForestStory.sold(self,current_customer_name,selling_batch)
+ CustomerRoster.completed(self,current_customer_name,selling_batch,buying_batch)
+ _record_purchase_prices(buying_batch)
  for i in range(selling_batch.size()):
   var item: Dictionary = selling_batch[i]
   item.zone = "customer"
@@ -470,7 +547,7 @@ func settle() -> String:
  active_trade_tab = "buy"
  return "交易完成，期待下次与你相遇。"
 
-func _customer_sale_placement(item: Dictionary, reserved: Array[Rect2i]) -> Dictionary:
+func _customer_sale_placement(item: Dictionary, reserved: Array[Vector2i]) -> Dictionary:
  # Plan all packing before mutating goods or money. Long crafted equipment
  # needs rotation to fit the customer's four-row inventory.
  var probe := item.duplicate()
@@ -482,9 +559,10 @@ func _customer_sale_placement(item: Dictionary, reserved: Array[Rect2i]) -> Dict
     if not fits(probe,"customer",cell,probe.id):
      continue
     var rect := Rect2i(cell,dimensions(probe))
-    if reserved.any(func(other): return rect.intersects(other)):
+    var cells := occupied_cells(probe,cell)
+    if cells.any(func(occupied): return reserved.has(occupied)):
      continue
-    return {"rect":rect,"rotated":rotation}
+    return {"rect":rect,"rotated":rotation,"cells":cells}
  return {}
 
 func restock_customer(goods: Array = [], force_goods := false) -> void:
@@ -545,17 +623,76 @@ func item_description(item: Dictionary) -> String:
  var data: Dictionary = CATALOG[item.key]
  if data.category != "武器":
   return data.desc
- var detail := "攻击 %d · 耐久 %d / %d" % [data.get("attack",8),item.get("durability",20),item.get("max_durability",data.get("base_durability",20))]
+ var detail := "攻击 %d · 耐久 %d / %d" % [bag_effects(item).final_attack,item.get("durability",20),item.get("max_durability",data.get("base_durability",20))]
  if item.has("purity"):
   detail += " · 纯度 %d%%" % item.purity
  return detail+"\n"+str(data.desc).get_slice("\n",1)
 
+func _record_purchase_prices(batch: Array[Dictionary]) -> void:
+ # Allocate the negotiated batch cost by current item value, to whole gold.
+ # The largest remainders receive leftover gold; ties follow item identity.
+ if batch.is_empty():
+  return
+ var total_weight := 0
+ for item in batch:
+  total_weight += maxi(1,item_market_value(item))
+ var allocations: Array[Dictionary] = []
+ var allocated := 0
+ for item in batch:
+  var numerator: int = buy_offer*maxi(1,item_market_value(item))
+  var gold_share := floori(float(numerator)/total_weight)
+  allocations.append({"item":item,"gold_share":gold_share,"remainder":numerator % total_weight})
+  allocated += gold_share
+ allocations.sort_custom(func(a,b): return a.remainder > b.remainder if a.remainder != b.remainder else a.item.id < b.item.id)
+ for n in range(buy_offer-allocated):
+  allocations[n].gold_share += 1
+ for entry in allocations:
+  entry.item.purchase_price = int(entry.gold_share)
+
+func item_card_data(item: Dictionary) -> Dictionary:
+ var data: Dictionary = CATALOG[item.key]
+ var effects := bag_effects(item)
+ var display_category: String = "背包" if item.key == "small_bag" else str(data.category)
+ var stats: Array[Dictionary] = []
+ if data.category == "武器":
+  stats.append({"label":"品质","value":Quality.NAMES[Quality.tier(item)]+"色"})
+  stats.append({"label":"攻击","value":str(effects.final_attack)})
+  stats.append({"label":"耐久","value":"%d / %d" % [item.get("durability",20),item.get("max_durability",data.get("base_durability",20))]})
+  stats.append({"label":"攻击间隔","value":"%.2f 秒" % effects.attack_interval})
+  if item.has("purity"):
+   stats.append({"label":"锻造纯度","value":"%d%%" % item.purity})
+  for affix in item.get("affixes",[]):
+   stats.append({"label":Quality.AFFIXES[affix.key].name,"value":Quality.affix_text(affix)})
+ elif int(effects.base_heal) > 0:
+  stats.append({"label":"生命恢复","value":str(effects.final_heal)})
+ elif item.key == "potion":
+  stats.append({"label":"护盾","value":"15"})
+ elif item.key == "power":
+  stats.append({"label":"攻击增幅","value":"20%"})
+ elif item.key in ["slime_mucus","ancient_wood"]:
+  stats.append({"label":"锻造纯度","value":"60%" if item.key == "slime_mucus" else "100%"})
+  stats.append({"label":"炼药产出","value":"1 瓶" if item.key == "slime_mucus" else "2 瓶"})
+ if bag_support_bonus(item) > 0:
+  stats.append({"label":"相邻武器攻击","value":"+%d" % bag_support_bonus(item)})
+ if bag_interval_reduction(item) > 0:
+  stats.append({"label":"相邻武器攻击间隔","value":"-%d%%" % bag_interval_reduction(item)})
+ if item.get("zone","") == "bag":
+  if effects.free_use:
+   stats.append({"label":"行动力消耗","value":"0 · 腰包"})
+  if effects.protected:
+   stats.append({"label":"夹层保护","value":"战败保留"})
+ var description: String = data.desc
+ if data.category == "武器":
+  description = description.get_slice("\n",1)
+ return {"quality":Quality.tier(item) if data.category == "武器" else -1,"name":data.name,"category":display_category,"quantity":maxi(1,int(item.get("quantity",1))),
+  "market_price":item_market_value(item),"purchase_price":item.get("purchase_price",null),
+  "description":description,"tags":Array(data.get("tags",[display_category])).duplicate(),"stats":stats}
+
 func item_hover_details(item: Dictionary, action_hint := "") -> String:
  var data: Dictionary = CATALOG[item.key]
- var dimensions_value: Vector2i = dimensions(item)
  var details := [
   ("未拥有" if item.owner == "customer" else "已拥有")+"  /  "+str(data.category),
-  "本地行情 %d G（基础估值 %d G） · 占用 %d × %d" % [market_value(item.key),data.value,dimensions_value.x,dimensions_value.y],
+  "本地行情 %d G（基础估值 %d G）" % [item_market_value(item),data.value],
   item_description(item),
  ]
  if action_hint == "":
@@ -632,14 +769,14 @@ func advance_day() -> void:
    # Stage the complete batch before consuming any ingredients or fuel.
    var produced_ids: Array[int] = []
    for n in range(plan.get("quantity",1)):
-    if not add_item(plan.output,machine_output_zone(device.id),"player"):
+    if not add_item(plan.output,machine_output_zone(device.id),"player",plan.get("fuel_key","") if device.key == "furnace" else ""):
      break
     var product: Dictionary = items.back()
     produced_ids.append(product.id)
     if device.key == "furnace":
      product.purity = plan.purity
-     product.max_durability = plan.max_durability
-     product.durability = plan.max_durability
+     product.max_durability = Quality.durability(product,plan.max_durability)
+     product.durability = product.max_durability
    if produced_ids.size() != plan.get("quantity",1):
     items = items.filter(func(i): return not produced_ids.has(i.id))
     continue

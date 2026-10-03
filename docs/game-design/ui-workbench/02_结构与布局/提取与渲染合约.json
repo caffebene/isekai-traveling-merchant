@@ -164,5 +164,22 @@
     "door_and_bed_require": "shutter_closed",
     "open_shutter_click_message": "请先关闭卷帘门后再交互"
   },
-  "style_authority": "docs/game-design/整体视觉与UI规范.md"
+  "style_authority": "docs/game-design/整体视觉与UI规范.md",
+  "style_version": "merchant-ledger-v2",
+  "recipe_notebook": {
+    "renderer": "scripts/workbench_view.gd",
+    "style_entry": "scripts/popup_style.gd:draw_notebook",
+    "rect": [
+      24,
+      112,
+      520,
+      620
+    ],
+    "z_index": 60,
+    "modal": false,
+    "draggable": "title_bar",
+    "contents": "actual item icons, quantities, recipe silhouettes and arrows",
+    "dismiss": "close or Escape",
+    "reference": "docs/game-design/references/配方册参考.png"
+  }
 }

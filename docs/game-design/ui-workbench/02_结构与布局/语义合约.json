@@ -11,7 +11,9 @@
       "type": "draggable_window",
       "size": "24x4",
       "owner": "customer",
-      "source": "customer_inventory"
+      "source": "customer_inventory",
+      "visibility": "customer_present_and_selling",
+      "manual_close": false
     },
     {
       "id": "counter",
@@ -29,7 +31,7 @@
     {
       "id": "trade_panel",
       "type": "draggable_window",
-      "content": "customer_intent_and_purchase_sale_tabs"
+      "content": "ledger_intent_budget_scrollable_items_net_quote_haggle_and_settlement"
     },
     {
       "id": "bag_window",

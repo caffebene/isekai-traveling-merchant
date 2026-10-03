@@ -41,11 +41,13 @@ func _initialize() -> void:
 	c.use_item(potion.id)
 	check(c.phase == "ready" and c.hp == 40 and c.shield == 15 and not s.items.has(potion),"preparation allows manual potion use without spending energy")
 	c.shield = 0
+	c.enemy.hp = 60
+	c.enemy_hp = 60
 	c.begin_battle()
 	check(c.phase == "battle","fight action starts battle")
 	c.tick(2)
 	var sword_after_attack: Dictionary = s.items.filter(func(i): return i.id == sword.id)[0]
-	check(c.enemy_hp == 14 and sword_after_attack.get("durability",20) == 19,"weapon auto attacks and loses durability")
+	check(c.enemy_hp == 44 and sword_after_attack.get("durability",20) == 18,"weapon auto attacks and loses durability")
 	var second_potion: Dictionary = move_to_bag(s,"potion")
 	c.hp = 30
 	c.tick(3)
@@ -102,10 +104,25 @@ func _initialize() -> void:
 	c.next_encounter()
 	c.begin_battle()
 	c.tick(2)
-	check(c.enemy_hp == 17,"empty bag auto fallback")
+	check(c.enemy_hp == 12,"empty bag attacks immediately then after cooldown")
 	var bread: Dictionary = move_to_bag(s,"bread")
 	c.hp = 30
 	c.use_item(bread.id)
 	check(not s.items.has(bread) and c.hp == 42,"food is only consumed by an explicit use action")
+	var meat: Dictionary = move_to_bag(s,"meat")
+	c.hp = c.MAX_HP
+	c.use_item(meat.id)
+	check(s.items.has(meat),"full health does not consume raw meat")
+	c.hp = 30
+	c.energy = 3
+	c.use_item(meat.id)
+	check(c.hp == 38 and not s.items.has(meat),"raw meat heals eight and is consumed")
+	s.add_item("meat","bag","player")
+	var more_meat: Dictionary = s.items.back()
+	s.economy.modules.append("field_kitchen")
+	c.hp = 30
+	c.energy = 3
+	c.use_item(more_meat.id)
+	check(c.hp == 46 and not s.items.has(more_meat) and c.energy == 3,"raw meat shares kitchen bonus and free belt use")
 	print("PASS: %d exploration checks" % checks)
 	quit()

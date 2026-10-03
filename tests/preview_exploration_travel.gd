@@ -8,16 +8,15 @@ func run() -> void:
 	page.state = load("res://scripts/trade_state.gd").new()
 	root.add_child(page)
 	page.set_process(false)
-	page._primary()
-	page._process(page.TRAVEL_DURATION)
-	page._process(0.2)
+	page.combat.next_encounter()
 	page._fight()
 	page.combat.attack(999)
 	page.combat.clear_loot()
-	var directory := "/tmp/merchant-travel-preview"
+	var directory := ProjectSettings.globalize_path("res://docs/testing/previews/forest-travel-frames")
 	DirAccess.make_dir_recursive_absolute(directory)
 	for n in range(60):
 		if n == 12:
+			page.combat.event_streak = 2
 			page._primary()
 		page._process(1.0/24.0)
 		await process_frame
